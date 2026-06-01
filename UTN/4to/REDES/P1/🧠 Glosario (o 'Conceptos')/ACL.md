@@ -1,0 +1,1 @@
+los enrutadores manejan la seguridad y el control de tráfico a través de **[[ACL]]**. Las **[[ACL]]** son reglas de configuración dictadas en el **[[Router]]** que definen explícitamente qué redes pueden comunicarse con otras (por ejemplo, bloqueando el acceso de los estudiantes a la red de los servidores).

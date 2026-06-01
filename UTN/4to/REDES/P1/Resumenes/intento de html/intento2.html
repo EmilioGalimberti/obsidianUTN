@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Examen: Arquitectura de Redes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .option-card { transition: all 0.2s ease; }
+        .option-card:hover { transform: translateY(-2px); }
+        .selected { border-color: #3b82f6; background-color: #eff6ff; }
+        .correct-ans { border-color: #10b981; background-color: #ecfdf5; }
+        .incorrect-ans { border-color: #ef4444; background-color: #fef2f2; }
+        /* Scrollbar styling para mejor lectura */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fa-solid fa-network-wired mr-2"></i> Simulador: Redes UTN</h1>
+            <div id="score-display" class="font-semibold hidden text-lg bg-blue-700 px-3 py-1 rounded-lg shadow-inner">Puntaje: 0</div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div id="game-container" class="w-full max-w-4xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+            
+            <!-- Start Screen -->
+            <div id="start-screen" class="text-center py-10">
+                <div class="text-6xl text-blue-600 mb-6"><i class="fa-solid fa-server"></i></div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">¡Mega-Simulador de Redes!</h2>
+                <p class="text-gray-600 mb-8 max-w-xl mx-auto">Esta versión incluye <strong>todas las preguntas</strong> extraídas de la Unidad 1, 2 y 3. Pon a prueba tus conocimientos sobre TCP/IP, Capa de Acceso, Dispositivos, IPv4 y VLSM.</p>
+                <button onclick="startGame()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105 text-lg">
+                    <i class="fa-solid fa-play mr-2"></i> Comenzar Examen Completo
+                </button>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quiz-screen" class="hidden">
+                <!-- Progress -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-sm text-gray-500 mb-2 font-semibold">
+                        <span id="question-counter">Pregunta 1 de X</span>
+                        <span id="phase-indicator" class="text-blue-600">Fase Normal</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Image Warning -->
+                <div id="image-warning" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded-r">
+                    <div class="flex">
+                        <div class="flex-shrink-0"><i class="fa-solid fa-triangle-exclamation text-yellow-500"></i></div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700 font-bold">¡Atención! Pregunta con imagen topológica.</p>
+                            <p class="text-sm text-yellow-600">Asegúrate de tener la imagen <code id="image-filename" class="bg-yellow-200 px-1 rounded text-xs font-mono"></code> en tu carpeta.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Container -->
+                <div id="image-container" class="hidden mb-6 flex justify-center bg-gray-50 p-2 rounded-lg border border-gray-100">
+                    <img id="question-image" src="" alt="Topología" class="max-h-72 object-contain rounded shadow-sm">
+                </div>
+
+                <!-- Question -->
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-snug"></h2>
+                <p id="question-hint" class="text-sm text-gray-500 mb-6 italic border-b pb-2"></p>
+
+                <!-- Options -->
+                <div id="options-container" class="grid grid-cols-1 gap-3 mb-8">
+                    <!-- Options injected here -->
+                </div>
+
+                <!-- Feedback Section -->
+                <div id="feedback-section" class="hidden mb-6 p-5 rounded-lg border shadow-sm transition-all">
+                    <div class="flex items-start">
+                        <div id="feedback-icon" class="text-2xl mr-3 mt-1"></div>
+                        <div>
+                            <h3 id="feedback-title" class="text-lg font-bold mb-2"></h3>
+                            <p id="feedback-theory" class="text-gray-700 text-sm leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex justify-end border-t pt-4">
+                    <button id="action-btn" onclick="handleAction()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed text-lg w-full md:w-auto" disabled>
+                        Verificar Respuesta
+                    </button>
+                </div>
+            </div>
+
+            <!-- End Screen -->
+            <div id="end-screen" class="hidden text-center py-10">
+                <div class="text-7xl mb-6" id="end-icon">🎉</div>
+                <h2 id="end-title" class="text-3xl font-bold text-gray-800 mb-2">¡Fase completada!</h2>
+                <p id="end-score" class="text-xl text-gray-600 mb-8 font-semibold"></p>
+                
+                <div id="retry-section" class="hidden mb-8 p-6 bg-red-50 rounded-xl border border-red-200 shadow-inner">
+                    <h3 class="text-red-800 font-bold text-xl mb-3"><i class="fa-solid fa-dumbbell mr-2"></i>Repaso Obligatorio</h3>
+                    <p class="text-red-700 mb-6">Tuviste errores en algunas preguntas. El juego no terminará hasta que logres afianzar la teoría fallada.</p>
+                    <button onclick="startRetryPhase()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition text-lg w-full md:w-auto">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Repasar Incorrectas
+                    </button>
+                </div>
+
+                <div id="restart-section" class="hidden">
+                    <button onclick="initGame()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-full shadow-lg transition text-lg">
+                        <i class="fa-solid fa-power-off mr-2"></i> Jugar de nuevo
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- BASE DE DATOS COMPLETA DE PREGUNTAS ---
+        const allQuestions = [
+            // --- UNIDAD 1: CLASIFICACIÓN Y REDES ---
+            { q: "Cuando utilizamos las redes de computadoras, encontramos distintos tipos de usos o aplicaciones para las mismas. (Elija dos):", options: ["Usuarios moviles", "Aplicaciones industriales", "Usuarios Fjos", "Aplicaciones de negocios"], correct: ["Usuarios Fjos", "Aplicaciones de negocios"], theory: "Según la bibliografía, los tipos de usos principales se dividen en usuarios fijos y aplicaciones de negocios." },
+            { q: "Cual de las siguientes clasificaciones de redes es decreciente con respecto al area de cobertura", options: ["PAN-LAN-MAN-WAN", "LAN-MAN-WAN-PAN", "WAN-MAN-LAN-PAN", "MAN-WAN-LAN-PAN", "WAN-SAN-MAN-LAN"], correct: ["WAN-MAN-LAN-PAN"], theory: "WAN (Continentes/Países) > MAN (Metropolitana) > LAN (Local) > PAN (Personal)." },
+            { q: "La sigla WAN significa:", options: ["Wall Area Network", "Wide Area Network", "Wise Area Network", "Wonderful Area Network"], correct: ["Wide Area Network"], theory: "Wide Area Network: Abarca una extensa área geográfica, como un país o continente." },
+            { q: "La red del campus de la Facultad Regional Córdoba es una red:", options: ["MAN", "LAN", "PAN", "WAN"], correct: ["LAN"], theory: "LAN (Local Area Network): Enlaza computadoras dentro de un edificio o campus." },
+            { q: "Indicar cual es una característica de las redes LAN:", options: ["Velocidad negociada", "Área extendida", "Pertenencia a una sola organizacion", "Campo de acción amplio", "Usa solo medios físicos de cobre", "Pertenece a varias organizaciones"], correct: ["Pertenencia a una sola organizacion"], theory: "Las LAN operan en un área restringida y son administradas privadamente por una sola organización." },
+            { q: "La red del campus de la UTN Facultad Regional Córdoba es una red MAN:", options: ["Verdadero", "Falso"], correct: ["Falso"], theory: "Falso. Es una LAN (Local Area Network), no una MAN, porque se restringe al área de un campus universitario." },
+            { q: "Indicar cómo se clasifican las redes de acuerdo a una dispersión geográfica reducida a un edificio:", options: ["P2P", "ninguna", "provinciles", "WAN", "LAN", "MAN", "Nacionales", "Cliente / servidor"], correct: ["LAN"], theory: "Dispersión reducida a un edificio o campus es la definición exacta de LAN." },
+            { q: "¿Dónde encontraríamos las redes por cableado eléctrico?", options: ["Ninguna de las opciones", "PAN", "WAN", "LAN", "MAN"], correct: ["LAN"], theory: "El cableado eléctrico interior de un edificio se utiliza para establecer conexiones locales (LAN)." },
+            { q: "La red de televisión por cable (CATV) es un tipo de red:", options: ["LAN", "PAN", "WAN", "MAN", "WLAN"], correct: ["MAN"], theory: "MAN (Metropolitan Area Network): Cubre toda una ciudad, como las redes de televisión por cable disponibles." },
+            { q: "La tecnología 802.16 (WiMAX) se puede clasificar como una red:", options: ["WLAN", "PAN", "MAN", "WPAN", "LAN", "WMAN"], correct: ["WMAN"], theory: "IEEE 802.16 (WiMAX) está diseñada para conectividad inalámbrica de alta velocidad en áreas metropolitanas (WMAN)." },
+            { q: "Según la tecnología de transmisión, una red se puede clasificar en:", options: ["Simplex", "LAN", "Duplex", "WAN", "Red de difusión", "Red punto a punto"], correct: ["Red de difusión", "Red punto a punto"], theory: "La tecnología de transmisión clasifica las redes en: Punto a punto (enlace directo) y de Difusión (medio compartido por varios)." },
+            { q: "Una red en la cual todos los dispositivos comparten el mismo canal de comunicación es una:", options: ["Wan", "Red punto a punto", "MAN", "Red de difusion", "Simplex"], correct: ["Red de difusion"], theory: "En una red de difusión (Broadcast), los datos son enviados usando un mismo medio que todos escuchan." },
+            { q: "Según la direccionalidad de los datos, una red se puede clasificar en:", options: ["Duplex o full Duplex", "Punto a punto", "Simplex", "Semi Dúplex o Half Duplex", "Broadcast", "Difusión"], correct: ["Duplex o full Duplex", "Simplex", "Semi Dúplex o Half Duplex"], theory: "Direccionalidad: Simplex (1 sentido), Half-Duplex (ambos pero 1 a la vez), Full-Duplex (ambos simultáneos)." },
+            { q: "Considerando la movilidad de los dispositivos, una red se puede clasificar en:", options: ["Red fija (o cableada)", "Red dispersa", "LAN", "Red móvil (o inalámbrica)", "WAN", "Punto a punto"], correct: ["Red fija (o cableada)", "Red móvil (o inalámbrica)"], theory: "Movilidad: Dispositivos fijos usando medios guiados (cables) o móviles usando medios no guiados (aire/inalámbrica)." },
+            { q: "Bluetooth es un tipo de red:", options: ["Fija o alambrada", "PAN", "MAN", "LAN", "Movil o inalambrica"], correct: ["PAN", "Movil o inalambrica"], theory: "Bluetooth (IEEE 802.15) es una WPAN: Red de Área Personal Inalámbrica (Móvil)." },
+            { q: "Una empresa posee 30 puestos de trabajo en la sucursal de Mendoza, todos conectados con Access point. Se dice que esa red es:", options: ["De banda angosta, dúplex, WLAN", "De banda ancha, semiduplex, WAN", "De banda ancha, semiduplex, WLAN", "Banda ancha, dúplex, PAN", "De banda ancha, dúplex, LAN"], correct: ["De banda ancha, semiduplex, WLAN"], theory: "WLAN (Access Points/Inalámbrica), Semidúplex (medio compartido por aire, no transmite/recibe a la vez), Banda ancha (alta velocidad local)." },
+            { q: "El WiFi es/utiliza: (Seleccione todas las correctas)", options: ["De difusión", "El ancho de banda total se divide en partes iguales", "Ofrece un ancho de banda fijo", "WAN", "Inalámbrica", "Utiliza el protocolo CSMA/CA", "Full Duplex", "Simplex"], correct: ["De difusión", "Inalámbrica", "Utiliza el protocolo CSMA/CA"], theory: "WiFi opera en un medio inalámbrico de difusión (aire). Usa CSMA/CA para evitar colisiones. El ancho de banda no es fijo, decae con más usuarios." },
+            { q: "Si tuviera que implementar una red de computadoras temporaria de manera rápida y económica, lo haría con tecnología:", options: ["3G", "W-Fi", "Ethernet", "Telefónica", "Frame Relay"], correct: ["W-Fi"], theory: "Wi-Fi (WLAN) permite crear redes temporales rápidamente sin el alto costo ni tiempo del tendido de cableado estructurado." },
+            { q: "Identifique las distintas tecnologías de LAN. A) Red empresarial cableada. B) Red campus universitaria inalámbrica:", options: ["Ethernet, WiFi", "WiMax, WiFi", "WiFi, Ethernet", "Ethernet, Bluetooth"], correct: ["Ethernet, WiFi"], theory: "A) Cableada = Ethernet (802.3). B) Inalámbrica = WiFi (802.11)." },
+            { q: "Los enlaces en una WAN generalmente son:", options: ["Instalación local", "Contratatos propios", "Propios", "Arrendados", "Backbone"], correct: ["Arrendados"], theory: "Como instalar cableado a nivel país/continente es inviable, las empresas arriendan (alquilan) enlaces a proveedores de servicios." },
+            
+            // --- UNIDAD 1: TCP/IP ---
+            { q: "La sigla TCP significa:", options: ["Transport control protocol", "Terminal control protocol", "Transfer control protocol", "Transmission control protocol"], correct: ["Transmission control protocol"], theory: "Protocolo de Control de Transmisión (Transmission Control Protocol)." },
+            { q: "¿Qué tipo de servicio provee TCP? (Cuidado)", options: ["Entrega segura de tramas con errores", "Entrega insegura de datos con errores", "Ninguna de las anteriores", "Entrega insegura con detección de errores extremo a extremo", "Encaminamiento seguro de datos"], correct: ["Ninguna de las anteriores"], theory: "TCP provee entrega SEGURA y fiable, pero opera con SEGMENTOS, no tramas ni paquetes. Y el encaminamiento lo hace IP, no TCP." },
+            { q: "Dos dispositivos están intercambiando datos entre si. ¿Cuál protocolo garantiza que la información llegue completa, ordenada e íntegra?", options: ["IP", "TCP", "ICMP", "UDP", "DND"], correct: ["TCP"], theory: "TCP es orientado a la conexión, confiable, asegura integridad, orden y reenvía los datos perdidos." },
+            { q: "La arquitectura TCP/IP surgió en:", options: ["Europa", "EEUU", "Asia", "Argentina", "Japón", "Alemania"], correct: ["EEUU"], theory: "Surgió en EEUU, impulsado por el Departamento de Defensa (DARPA)." },
+            { q: "Capa que recibe paquetes, los encapsula y los entrega a dispositivos conectados a la misma red:", options: ["SESION", "APLICAICON", "HOST A RED", "TRANSPORTE", "INTERRED"], correct: ["HOST A RED"], theory: "La Capa Host a Red recibe el paquete IP, lo encapsula en una trama y lo entrega en el medio físico local." },
+            { q: "La capa que permite introducir paquetes a la red, los cuales pueden viajar de manera independiente entre sí es:", options: ["HOST A RED", "TRANSPORTE", "PRESENTACION", "APLICACION", "INTERRED"], correct: ["INTERRED"], theory: "La capa de Interred encamina los paquetes de manera independiente, permitiendo que cada uno tome rutas distintas." },
+            { q: "En la arquitectura TCP/IP la función de la capa de interred es:", options: ["Encaminar paquetes por MAC", "Implementar direccionamiento físico", "Encaminar paquetes a partir de la dirección IP de destino y tablas de encaminamiento", "Brindar servicio fiable", "Dividir datos según MTU para transporte"], correct: ["Encaminar paquetes a partir de la dirección IP de destino y tablas de encaminamiento"], theory: "Su función central es el ruteo lógico basado en IP." },
+            { q: "¡EN TEORÍA NO VA AL PARCIAL! Un paquete se divide en 3 fragmentos. Afirmación correcta IPv4:", options: ["Todos los fragmentos tendrán el mismo número de identificación y el mismo protocolo", "Todos los fragmentos tendrán diferentes números de identificación", "Misma IP origen/destino pero diferente identificacion", "Mismo desplazamiento y diferente identificacion"], correct: ["Todos los fragmentos tendrán el mismo número de identificación y el mismo protocolo"], theory: "Mantiene el mismo ID original para que el destino sepa que pertenecen al mismo paquete y pueda reensamblarlo." },
+            { q: "Si un router no tiene información correspondiente a la red de destino lo envía a:", options: ["Al puerto", "Ninguna es correcta", "Todos los puertos", "La red", "A sus vecínos"], correct: ["Ninguna es correcta"], theory: "Si no tiene ruta, DESCARTA el paquete y envía un ICMP 'Destination Unreachable'." },
+            { q: "Capa que brinda un servicio de comunicación de datos extremo a extremo entre aplicaciones:", options: ["Interred", "Host a red", "Aplicación", "Transporte"], correct: ["Transporte"], theory: "Transporte asume una conexión lógica 'extremo a extremo', operando independientemente de la red subyacente." },
+            { q: "Indique el orden correcto de las capas o niveles de la arquitectura TCP/IP (Descendente):", options: ["Aplicacion-Host a red-Transporte-Interred", "Aplicacion-Transporte-Interred-Host a red", "Transporte-Aplicacion-Interred-Host a red", "Aplicacion-Interred-Transporte-Host a red"], correct: ["Aplicacion-Transporte-Interred-Host a red"], theory: "Orden de encapsulamiento: Aplicación -> Transporte -> Interred -> Host a Red." },
+            { q: "La arquitectura TCP/IP tiene más capas o niveles que el modelo OSI:", options: ["Verdadero", "Falso"], correct: ["Falso"], theory: "Falso. OSI tiene 7 capas, TCP/IP simplifica la estructura a solo 4 capas." },
+            { q: "Capa que permite la comunicación de datos entre máquinas, sobre una red de conmutación de paquetes, transportando independientemente:", options: ["Aplicación", "Transporte", "Interred", "Enlace", "Presentación", "Host a Red", "Sesión"], correct: ["Interred"], theory: "Interred inyecta paquetes y los transporta de manera independiente salto a salto." },
+            { q: "Cuáles afirmaciones son correctas en relación a TCP/IP y OSI:", options: ["La capa de aplicación de TCP/IP cumple funciones de aplicación, sesión y presentación OSI", "La capa Host a Red TCP/IP cumple funciones de física y enlace OSI", "La capa Host a Red TCP/IP cumple enlace y red OSI", "Transporte OSI cumple mismas que Interred", "Interred TCP/IP cumple fisica, enlace y red"], correct: ["La capa de aplicación de TCP/IP cumple las funciones de las capas de aplicación, sesión y presentación del modelo OSI", "La capa de Host a Red de TCP/IP cumple las funciones de la capa física y de enlace del modelo OSI"], theory: "TCP/IP fusionó las 3 superiores en 'Aplicación', y las 2 inferiores en 'Host a Red'." },
+            { q: "Cuáles protocolos pertenecen a la capa de Interred del modelo TCP/IP:", options: ["ftp", "IPv4", "UDP", "TCP", "ICMP", "DNS"], correct: ["IPv4", "ICMP"], theory: "IPv4 rutea, e ICMP maneja mensajes de control en Capa 3." },
+            { q: "Protocolo que garantiza que la información llegue lo más rápido posible aunque desordenado:", options: ["UDP", "ICMP", "DNS", "FTP", "TCP", "HTTP", "ARP"], correct: ["UDP"], theory: "UDP no es orientado a conexión ni fiable, no verifica errores ni orden, lo que lo hace muy rápido." },
+            { q: "Cuáles protocolos pertenecen a la capa de transporte TCP/IP:", options: ["IP", "RARP", "ICMP", "VoIP", "DHCP", "UDP", "TCP"], correct: ["UDP", "TCP"], theory: "TCP (fiable) y UDP (no fiable) son los protocolos de Transporte." },
+            { q: "¿En qué capa trabaja SNMP?", options: ["Presentación.", "Red.", "Ninguna de las opciones.", "Transporte.", "Aplicación"], correct: ["Aplicación"], theory: "SNMP (Gestión de red) es de alto nivel, Capa de Aplicación." },
+            { q: "¿Cuál es uso principal de DNS?", options: ["Asociar los nombres de host con direcciones IP.", "Asociar los nombres de host con direcciones MAC.", "Ninguna de las opciones.", "Asociar las direcciones IP con direcciones MAC"], correct: ["Asociar los nombres de host con direcciones IP."], theory: "Domain Name System traduce nombres (google.com) a IPs rutables." },
+            { q: "Protocolos que pertenecen a la capa de Aplicacion TCP/IP:", options: ["IP", "WIFI", "TCP", "HTTP", "DHCP", "UPD", "DNS"], correct: ["HTTP"], theory: "HTTP (Web) reside en Aplicación. (Nota: DHCP y DNS también lo son, pero en la variante de esta pregunta específica la clave fue HTTP según el apunte)." },
+            { q: "¿Para qué capa, la arquitectura TCP/IP, define protocolos (de alto nivel)?", options: ["Sockets", "Sesión", "Enlace de datos", "Aplicación", "Física"], correct: ["Aplicación"], theory: "TCP/IP eliminó Sesión y Presentación; todo el alto nivel (HTTP, FTP, SMTP) recae en Aplicación." },
+            { q: "Una trama Ethernet contiene en su carga útil (datos):", options: ["Cabecera enlace, cabecera transporte y datos app", "Cabecera de la capa de red, cabecera de la capa de transporte y datos de la capa de aplicación", "Cabecera transporte y red", "Datos de aplicación", "Cabecera enlace, red y datos app"], correct: ["Cabecera de la capa de red, cabecera de la capa de transporte y datos de la capa de aplicación"], theory: "La Trama encapsula el Paquete IP COMPLETO (Cabecera de red + segmento + datos)." },
+            { q: "Router posee interfaz Fast Ethernet y Serial. Recibe paquete de 1000 bytes y encamina a serial MTU 1500. Se deberá:", options: ["Descartar siempre el paquete.", "Descartar sólo si bit MF activo.", "Dividir paquete en dos fragmentos", "Dividir paquete en 3 fragmentos.", "Encapsular dicho paquete en una trama."], correct: ["Encapsular dicho paquete en una trama."], theory: "Como 1000 < 1500 (MTU), no requiere fragmentación. El router solo debe crear una nueva trama Serial (re-encapsular) para inyectarlo en el enlace de salida." },
+            { q: "Si tamaño de trama Ethernet (CABLE) es 1458 bytes, determinar la carga útil (datos) del paquete IPv4:", options: ["1428 bytes", "1410 bytes", "1440 bytes (datos de ethernet)", "1400 bytes", "1420 bytes"], correct: ["1420 bytes"], theory: "Trama total (1458) - Cabecera/Cola Ethernet (18 bytes) = 1440 bytes (Paquete IP). 1440 - Cabecera IPv4 mínima (20 bytes) = 1420 bytes de datos útiles IP." },
+            { q: "Secuencia correcta de PDU en equipo origen (Encapsulamiento):", options: ["Segmentos, tramas, datos, paquetes,bits", "Datos, segmentos, paquetes, tramas, bits", "Datos, paquetes, segmentos, tramas, bits", "Bits, tramas, paquetes, segmentos, datos"], correct: ["Datos, segmentos, paquetes, tramas, bits"], theory: "Desciende: Aplicación(Datos)->Transporte(Segmento)->Red(Paquete)->Enlace(Trama)->Físico(Bits)." },
+            { q: "¿Cómo se lleva a cabo la comunicación virtual entre las capas del mismo nivel?", options: ["Vertical", "Horizontal", "Ninguna de las anteriores", "De origen a destino"], correct: ["Horizontal"], theory: "El flujo físico es vertical, pero la relación lógica entre protocolos de la misma capa (ej. Capa 4 a Capa 4) es horizontal." },
+            
+            // --- UNIDAD 1: INTERNET Y ESTÁNDARES ---
+            { q: "Internet es (Seleccione correctas):", options: ["Una red MAN", "Una red tolerante a fallas tanto de sus enlaces como de sus nodos", "Una red conmutada por paquetes", "Una red privada de intercambio de información academica", "Una red de redes", "Una red WAN", "Una red LAN"], correct: ["Una red tolerante a fallas tanto de sus enlaces como de sus nodos", "Una red conmutada por paquetes", "Una red de redes"], theory: "Usa conmutación de paquetes (IPv4) para ser tolerante a caídas físicas de nodos, entrelazando redes a nivel global." },
+            { q: "Cuáles afirmaciones son correctas con respecto a la arquitectura de internet:", options: ["Las redes tier 3 ofrecen conectividad a operadores tier 2", "Las redes tier 3 brindan servicios de conexión a internet a los usuarios residenciales y a empresas", "Las redes tier 2 se conectan a tier 1 a través de peering", "Las redes tier 1 son las redes de los grandes operadores, quieres invirtieron en tendidos de fibra óptica en al menos dos continentes", "Los IXP se conectan a través de peering"], correct: ["Las redes tier 3 brindan servicios de conexión a internet a los usuarios residenciales y a empresas", "Las redes tier 1 son las redes de los grandes operadores, quieres invirtieron en tendidos de fibra óptica en al menos dos continentes"], theory: "Tier 1 es el backbone global. Tier 3 (ej. Claro) provee a los usuarios finales." },
+            { q: "La arquitectura actual de Internet es:", options: ["Plana", "Centralizada", "Organizada en 3 niveles", "Organizada en 5 niveles", "Jerarquica"], correct: ["Organizada en 3 niveles", "Jerarquica"], theory: "Está organizada jerárquicamente en 3 Tiers (Niveles)." },
+            { q: "Cuáles de las siguientes características hacen referencia a las redes de Nivel 1 (Tier1):", options: ["Pertenecen a los grandes operadores de Internet", "Pueden acceder a cualquier punto de Internet", "Forman el backbone de Internet", "Brindan conectividad a los operadores de nivel 3", "Permiten acceder al usuario hogareño a Internet"], correct: ["Pertenecen a los grandes operadores de Internet", "Forman el backbone de Internet"], theory: "Tier 1 forma el esqueleto (backbone) mundial intercontinental." },
+            { q: "Cuál de los siguientes son operadores de nivel 3 (Tier 3) de Internet:", options: ["Telefónica Internacional", "Fibertel", "Verizon", "Silica Network", "Arnet"], correct: ["Fibertel", "Arnet"], theory: "Fibertel y Arnet (ISPs locales) entregan servicio al consumidor final." },
+            { q: "Características que hacen referencia a redes de nivel 3 (Tier 3):", options: ["Tienen tendidos de fibra óptica por lo menos en dos continentes", "Forman el backbone de Internet", "Pueden acceder a cualquier punto de Internet", "Brindan acceso a Internet a usuarios hogareños y empresas"], correct: ["Brindan acceso a Internet a usuarios hogareños y empresas"], theory: "Tier 3 provee acceso de última milla a hogares/empresas." },
+            { q: "Qué tipos de conexiones se utilizan actualmente entre los operadores de Internet:", options: ["Conexiones centrales", "Conexiones dispersas", "Conexiones difusas", "Conexiones de transito", "Conexiones de peering"], correct: ["Conexiones de transito", "Conexiones de peering"], theory: "Peering (mismo nivel, gratis) y Tránsito (menor a mayor, pago)." },
+            { q: "Conexiones entre operadores de diferente jerarquía, donde el mayor le vende al menor se denominan:", options: ["IXP", "Conexiones de tránsito", "Conexiones de backbone", "Conexiones de peering", "ISP", "Conexiones punto a punto"], correct: ["Conexiones de tránsito"], theory: "El tránsito implica pagar a un Tier superior para acceder a sus rutas globales." },
+            { q: "Conexiones de transito se caracterizan por (seleccione 3):", options: ["El operador de menor jerarquía debe pagar una conexion al operador de mayor jerarquía", "Puede ser publicas o privadas", "El proveedor le da acceso al cliente a todas sus rutas", "Permiten conectar operadores de diferente jerarquía", "Permiten el intercambio de trafico sin costo", "El proveedor le da acceso al cliente solo a algunas de sus rutas"], correct: ["El operador de menor jerarquía debe pagar una conexion al operador de mayor jerarquía", "El proveedor le da acceso al cliente a todas sus rutas", "Permiten conectar operadores de diferente jerarquía"], theory: "El Tránsito se paga, cruza jerarquías y te da salida a TODO internet." },
+            { q: "En la arquitectura de Internet, las conexiones de peering:", options: ["Pueden ser publicas o privadas", "Cada operador publica sólo sus rutas (direcciones IP)", "Constituyen el blackbone de Internet", "Permiten conectar operadores de diferentes jerarquía", "Permiten el intercambio de trafico sin costo entre operadores"], correct: ["Pueden ser publicas o privadas", "Cada operador publica sólo sus rutas (direcciones IP)", "Permiten el intercambio de trafico sin costo entre operadores"], theory: "Peering es un acuerdo gratis entre pares; solo se comparten rutas mutuas." },
+            { q: "La estandarización o normalización presenta la siguiente ventaja:", options: ["Aumento del costo", "Usuario debe elegir sola empresa", "Exigir conectar dispositivos del mismo fabricante", "El usuario posee mayor libertad y flexibilidad a la hora de seleccionar donde adquirir sus productos"], correct: ["El usuario posee mayor libertad y flexibilidad a la hora de seleccionar donde adquirir sus productos"], theory: "Garantiza interoperabilidad, evitando el monopolio tecnológico." },
+            { q: "LA ITU o UIT (Union Internacional de telecomunicaciones) está organizada en tres sectores:", options: ["ITU-R", "ITU-A", "ITU-X", "ITU-T", "ITU-D"], correct: ["ITU-R", "ITU-T", "ITU-D"], theory: "Radiocomunicaciones (R), Estandarización (T) y Desarrollo (D)." },
+            { q: "Organización voluntaria que emite estándares internacionales en CUALQUIER ámbito (industrial, tecnología):", options: ["ITU", "ISO", "IEEE", "IAB", "DoD", "TCP/IP"], correct: ["ISO"], theory: "La ISO aplica normativas mundiales en incontables industrias, no solo TICs." },
+            { q: "Los estándares desarrollados para redes LAN son definidos y administrados por:", options: ["IBM", "OSI", "ITU", "Ethernet", "IEEE", "IETF", "IXP"], correct: ["IEEE"], theory: "El IEEE (Instituto de Ingenieros Eléctricos y Electrónicos) crea la familia 802 (LAN/WLAN)." },
+            { q: "Cual de las siguientes caracteristicas corresponde a IEEE:", options: ["Se dedica a la creación de normas de cualquier producto", "Organización de profesionales más grande del mundo", "Define estándares relacionados con las LANs", "Regula el uso de radiofrecuencias mundial", "Permite que usuario se conecte a Internet"], correct: ["Organización de profesionales más grande del mundo", "Define estándares relacionados con las LANs"], theory: "Es una gigantesca asociación de ingenieros que estandariza las LAN/WLAN." },
+            { q: "¿Quién fue el creador de ARPANET?", options: ["TCP/IP", "IEEE", "DARPA", "ISO", "ITU"], correct: ["DARPA"], theory: "Agencia de Proyectos de Investigación Avanzados de Defensa de EEUU." },
+            { q: "IETF significa:", options: ["Internet Exchange Team Force", "Internet Engineering Task Force", "Internet Exclusive Terms Foce", "Interior Engineering Task Fault"], correct: ["Internet Engineering Task Force"], theory: "Fuerza de trabajo de ingeniería de internet." },
+            { q: "Organismos internacionales que desarrolla trabajos de investigación a CORTO PLAZO de internet:", options: ["ITU", "RFC", "ISO", "IEEE", "IETF", "IRTF"], correct: ["IETF"], theory: "IETF resuelve problemas urgentes y a corto plazo (RFCs). IRTF investiga a largo plazo." },
+            { q: "Las RFC son un conjunto de documentos que sirven de referencia, implementación de estandarización emitidas por IETF.", options: ["Verdadero", "Falso"], correct: ["Verdadero"], theory: "Requests for Comments (RFC) documentan todos los estándares y protocolos." },
+            { q: "Los request for comments (RFC) son:", options: ["Bases de datos que asocian dominios", "Documentos técnicos establecidos por el IEEE", "Documentos técnicos que describen el funcionamiento de los protocolos de internet (IEFT)", "Estandares que definen la arquitectura de SO"], correct: ["Documentos técnicos que describen el funcionamiento de los protocolos de internet (IEFT)"], theory: "Describen el funcionamiento de TCP, IP, HTTP, etc." },
+            { q: "Si tuviera que elegir red con garantía de entrega sin demora, en orden y con un ancho de banda constante, elegiría:", options: ["Red conmutada por etiquetas", "Red por Difusión", "Red conmutada por circuitos", "Red conmutada por paquetes", "Red conmutada por mensajes"], correct: ["Red conmutada por circuitos"], theory: "Reservar un circuito exclusivo anula congestión y demoras." },
+            { q: "Indicar cuáles son algunos de los aspectos a tener en cuenta al analizar la red:", options: ["Enlaces", "Acceso lógico", "Confiabilidad", "Capas", "Topologías", "Distancia", "Seguridad", "Tipos de host"], correct: ["Topologías", "Distancia"], theory: "Estructuralmente, se analiza su Topología Física (Bus/Estrella) y Distancia/Cobertura (LAN/WAN)." },
+            { q: "Si una estación de trabajo se encuentra a 180 mts del armario principal de la red. Seleccione:", options: ["Podré empalmar dos cables UTP", "Podré colocar un switch en un punto intermedio para repetir la señal", "Deberé ubicar a la estación en otra VLAN", "Reemplazaré UTP por coaxil"], correct: ["Podré colocar un switch en un punto intermedio para repetir la señal"], theory: "El límite físico del cable UTP Ethernet es de 100m. Un switch intermedio regenera la señal eléctrica." },
+
+            // --- UNIDAD 2: MODELO OSI, CAPA DE ENLACE Y DISPOSITIVOS ---
+            { q: "¿Qué capa del modelo OSI se encarga de enrutar los paquetes?", options: ["Capa de aplicación", "Capa de enlace de datos", "Capa de red", "Capa de transporte"], correct: ["Capa de red"], theory: "El enrutamiento basado en IP es función exclusiva de la Capa de Red (Capa 3)." },
+            { q: "1. Las tecnologías Ethernet, Fastethernet y Gigaethernet ejecutan funciones de las siguientes capas", options: ["Capa física y subcapas MAC y LLC de enlace", "Capa física, enlace y red", "Capa física y subcapa LLC", "Capa física y subcapa MAC de la capa de enlace", "Capa física y capa de enlace"], correct: ["Capa física y subcapa MAC de la capa de enlace"], theory: "Están limitadas al hardware físico y al Control de Acceso al Medio (MAC)." },
+            { q: "2. ¿En qué capa trabaja la placa de red? Seleccion una:", options: ["En la subcapa LLC y física", "En la física, de enlace y red", "En la física y de red", "En la física y subcapa MAC", "Ninguna de las opciones"], correct: ["En la física y subcapa MAC"], theory: "La NIC (tarjeta de red) contiene el hardware (Capa 1) y su dirección física grabada (Capa 2 - subcapa MAC)." },
+            { q: "3. ¿Cuál es un elemento básico de un protocolo de capa de enlace", options: ["Establecimiento de enlace", "Paquete", "Control de acceso al medio", "Recuperación de errores", "Señalización", "Segmento", "Control de tráfico", "Fibra óptica"], correct: ["Control de acceso al medio"], theory: "Debe dictar las reglas (CSMA/CD o CSMA/CA) para saber cuándo un dispositivo puede usar el medio compartido." },
+            { q: "4. ¿En qué capa del modelo OSI se define la topología de la red?", options: ["Física", "Red", "Enlace", "Transporte", "Aplicación"], correct: ["Física"], theory: "El cableado físico (estrella, bus, malla) se define en la Capa 1." },
+            { q: "5. El modelo OSI fue desarrollado por:", options: ["IEE", "ITU", "ISO", "RFC", "IET"], correct: ["ISO"], theory: "International Organization for Standardization (ISO) desarrolló OSI en 1984." },
+            { q: "Completar los métodos de acceso al medio de la actualidad: A) inalambrico B) cableado", options: ["A) CSMA/CA ; B) CSMA/CD", "A) Token Ring ; B) CSMA/CD", "A) CSMA/CA ; B) Token Ring"], correct: ["A) CSMA/CA ; B) CSMA/CD"], theory: "Wi-Fi (Aire) = Avoidance (CA). Ethernet (Cable) = Detection (CD)." },
+            { q: "6. ¿Cuáles son métodos de acceso al medio más difundidos en LAN?", options: ["CDMA/CD", "X25", "HDLC", "PPP", "LAPD", "CSMA/CD"], correct: ["CSMA/CD"], theory: "Carrier Sense Multiple Access with Collision Detection es el rey de las redes LAN Ethernet clásicas." },
+            { q: "¿Cuál es el principal objetivo del protocolo CSMA/CA en redes inalámbricas?", options: ["Detectar colisiones.", "Prevenir colisiones.", "Evitar interferencias externas.", "Enviar datos sin necesidad de verificación."], correct: ["Prevenir colisiones."], theory: "Como las radios no pueden 'escuchar' colisiones mientras transmiten, su foco es EVITAR (Avoidance) que sucedan." },
+            { q: "7. En el método de acceso CSMA/CA, el mensaje RTS lo envía:", options: ["Hub", "Dispositivo origen (también DATA)", "Switch", "Dispositivo destino (CTS-ACK-NAK)"], correct: ["Dispositivo origen (también DATA)"], theory: "El emisor anuncia su intención con Request To Send (RTS)." },
+            { q: "8. En el método de acceso al medio utilizado por las redes inalámbricas, los dispositivos cuando tienen que transmitir una trama:", options: ["Esperan token", "Escuchan el medio y si está libre, esperan un tiempo aleatorio y envían una trama RTS indicando dirección MAC origen y dirección MAC destino", "Escuchan medio y envían datos", "Garantizan tramas colisionadas con ACK"], correct: ["Escuchan el medio y si está libre, esperan un tiempo aleatorio y envían una trama RTS indicando dirección MAC origen y dirección MAC destino"], theory: "Paso crucial de CSMA/CA para reservar el medio aéreo antes de enviar." },
+            { q: "9. En el método de acceso CSMA/CA el mensaje RTS contiene:", options: ["Direcciones MAC del dispositivo origen y destino", "Direcciones IP del dispositivo origen y destino", "Número de puerto", "Relación IP-MAC"], correct: ["Direcciones MAC del dispositivo origen y destino"], theory: "Opera en Capa 2, usa direcciones físicas (MAC) para identificar a los equipos." },
+            { q: "10. ¿Qué trama usa una estación de trabajo, cuando quiere transmitir a otro puesto de trabajo utilizando CSMA/CA?", options: ["Ninguna", "RxBUSY", "ACK", "RTS", "CTS"], correct: ["RTS"], theory: "Solicitud de envío (Request To Send)." },
+            { q: "11. En cuáles de los siguientes dispositivos se ejecuta el método de acceso al medio CSMA/CA (seleccione dos):", options: ["Placas de red Ethernet", "Cable UTP", "Placas de red inalámbricas", "Switches", "Hubs", "Access Point"], correct: ["Placas de red inalámbricas", "Access Point"], theory: "Tanto la tarjeta de red de la PC (Wi-Fi) como la antena del AP ejecutan 802.11 CSMA/CA." },
+            { q: "El método de acceso al medio Token Ring garantiza que no haya colisiones en la red.", options: ["Verdadero", "Falso"], correct: ["Verdadero"], theory: "Es un método determinístico basado en turnos. Sin el Token, nadie puede hablar." },
+            { q: "12. Tamaño máx. de trama Ethernet MTU:", options: ["512 bytes", "2048 bytes", "1000 bytes", "1518 bytes"], correct: ["1518 bytes"], theory: "1500 datos + 18 cabeceras = 1518 bytes máximos en el cable." },
+            { q: "13. El campo de la trama Ethernet que permite verificar la integridad de la trama es:", options: ["Secuencia de verificación de trama (CRC o FCS)", "Tipo", "Ninguno porque Ethernet no es fiable", "Preámbulo", "CTS"], correct: ["Secuencia de verificación de trama (CRC o FCS)"], theory: "El Frame Check Sequence en la cola de la trama verifica bits corruptos." },
+            { q: "14. Una computadora tiene que enviar un archivo de 5 Kbytes a través de la tecnologia GigaEthernet. Si desea maximizar MTU enviará:", options: ["5 tramas", "2 tramas", "3 tramas", "7 tramas", "4 tramas", "6 trama"], correct: ["4 tramas"], theory: "5Kbytes = 5120 bytes. 5120 / 1500 (MTU) = 3 completas + 1 remanente." },
+            { q: "15. Una pc tiene que enviar un archivo de 5 Kbytes a través de la tecnología Fast Ethernet. maximizando MTU:", options: ["4 tramas", "5 tramas", "2 tramas", "1 trama", "3 tramas"], correct: ["4 tramas"], theory: "Al igual que Giga, Fast Ethernet usa la misma MTU de 1500 bytes." },
+            { q: "16. La siguiente dirección 01:00:5E:00:04:C9 aparece en el campo destino de una trama", options: ["Es una dirección jerárquica.", "Procesada solo por una PC.", "Todas las PCs de la LAN procesarán.", "No puede aparecer.", "La trama será procesada solo por un grupo de PCs de la LAN."], correct: ["La trama será procesada solo por un grupo de PCs de la LAN."], theory: "El prefijo MAC '01:00:5E' es el identificador oficial de tráfico MULTICAST (Grupo)." },
+            { q: "17. Una dirección MAC es", options: ["Física, jerárquica", "Lógica, jerárquica", "Física, plana, es independiente de la ubicación dentro de la organización", "Lógica, plana"], correct: ["Física, plana, es independiente de la ubicación dentro de la organización"], theory: "Grabada en hardware, es plana porque no revela en qué red o país estás." },
+            { q: "18. Una dirección MAC Ethernet está compuesta por: (2 opciones)", options: ["6 bytes", "8 bytes", "32 bits", "48 bits", "12 bytes"], correct: ["6 bytes", "48 bits"], theory: "48 bits en sistema hexadecimal (6 bloques de 1 byte)." },
+            { q: "19. ¿En qué capa del modelo OSI se definen las direcciones Físicas o de Hardware?", options: ["Física", "Transporte", "Ninguna es correcta", "Aplicación", "Red"], correct: ["Ninguna es correcta"], theory: "Las direcciones físicas se definen en la Capa 2 (Enlace de datos), la cual no está listada." },
+            { q: "OUI en dirección MAC identifica:", options: ["Usuario", "Puerto", "Fabricante", "Protocolo"], correct: ["Fabricante"], theory: "Organizationally Unique Identifier (24 bits) identifica a la empresa (Intel, Cisco, etc)." },
+            { q: "20. Si se quiere que una trama sea procesada por todos los dispositivos de una determinada LAN, la dirección de destino será:", options: ["127.0.0.0.1", "255.255.255.255", "01:00:5E:98:76:54", "FF:FF:FF:FF:FF:FF"], correct: ["FF:FF:FF:FF:FF:FF"], theory: "Broadcast MAC de Capa 2 (todos los bits en 1)." },
+            { q: "21. ¿Cuál es la máxima tasa de bits a la que funcionará una LAN tipo Ethernet si el switch tiene 24 puertos 1Gb/s, cableado Cat 6 y placas Fast Ethernet?", options: ["1 Gb/s", "100 Mb/s", "2,4 Gb/s", "22,4 Gb/s", "24 Gb/s"], correct: ["100 Mb/s"], theory: "El enlace negocia la velocidad adaptándose al equipo más lento (la placa Fast Ethernet = 100Mbps)." },
+            { q: "22. Administrador actualiza placa de usuario de FastEthernet a GigaEthernet. esto implica que (seleccione dos):", options: ["Se debe actualizar la dirección IPv4", "La velocidad de la placa será de 1000Mbps", "Reinstalar SO", "La PC tendrá otra dirección MAC", "Velocidad 100Mbps", "100 veces más rapida"], correct: ["La velocidad de la placa será de 1000Mbps", "La PC tendrá otra dirección MAC"], theory: "Giga = 1000Mbps. Como cambiaste el hardware, ineludiblemente cambia la MAC de fábrica." },
+            { q: "23. Se deben conectar dos edificios en un campus universitario a 200 metros. ¿Qué tecnología se podría implementar?", options: ["1000BASE-CX", "1000BASE-T", "1000BASE-TX", "1000BASE-T4", "1000BASE-SX"], correct: ["1000BASE-TX", "1000BASE-SX"], theory: "Para distancias medias/largas en Giga, se usan variantes X (Fibra SX o UTP especial TX)." },
+            { q: "24. Determine a partir de la topología (7 equipos en varios hubs/switches), cuáles de las afirmaciones son correctas (seleccione dos):", options: ["Existen 6 dominios de colisión", "Existen 4 dominios de colisión", "Existen 5 dominios de colisión", "Existe 1 dominio de broadcast", "Existen 3 dominios de broadcast", "Existen 7 dominios de colisión", "Existen 2 dominios de broadcast"], correct: ["Existen 7 dominios de colisión", "Existen 2 dominios de broadcast"], theory: "El router divide 2 dominios broadcast. Los switches dividen 1 dominio colisión por puerto ocupado (7).", image: "{CE97C7A5-1278-401E-9F0C-331851C13E73}.png" },
+            { q: "25. Qué dispositivo divide dominios de colisión?", options: ["Hub", "Switch", "Router", "Repetidor"], correct: ["Switch"], theory: "El switch crea microsegmentos libres de colisiones." },
+            { q: "26. Un switch de 24 bocas (puertos) está conectado a un hub, a un router y a computadoras el resto. ¿Cuantos dominios de colisión existen?", options: ["2", "3", "22", "1", "24", "Dependen si conectan PC o hubs", "23"], correct: ["24"], theory: "1 dominio por CADA puerto activo del Switch, sin importar lo que conectes (24)." },
+            { q: "27. Si en una LAN se tienen 3 Switch (24 bocas) encadenados como figura, ¿Cuántos dominios colision?", options: ["24", "48", "72", "78", "82"], correct: ["82"], theory: "3 switches x 24 bocas = 72, más puertos interconexión = 78 (ó 82 según parcial histórico UTN).", image: "{4E39FA54-ADC9-4BB3-B39E-0A43F6EC118A}.png" },
+            { q: "28. ¿Qué permiten los dispositivos de capa 3 en la red?", options: ["Segmentación de LAN", "Reducción de la congestión", "Ninguna es correcta", "Planificar red", "Segmentación de tramas", "Segmentación de paquetes"], correct: ["Ninguna es correcta"], theory: "Enrutan paquetes y dividen broadcast. No segmentan tramas ni paquetes." },
+            { q: "29. Un switch de 24 bocas conectado a hub, router y pc. ¿Cuantos dominios de broadcast existen?", options: ["23", "24", "22", "Depende", "1", "2"], correct: ["1"], theory: "Un switch no bloquea broadcast. Todo de ese lado del router es 1 solo dominio." },
+            { q: "30. Indique cuántos dominios de broadcast existen en la figura (3 VLANs).", options: ["1", "3", "Ninguno"], correct: ["3"], theory: "VLAN = Dominio Broadcast Lógico. Hay 3 VLANs, ergo 3 dominios.", image: "{E206E5CD-D1EC-4632-8C92-CFB90A55BCB3}.png" },
+            { q: "31. A partir de la siguiente topología (solo switches) determine cuantos dominios de broadcast existen:", options: ["14", "4", "1", "5", "3"], correct: ["1"], theory: "Sin routers ni vlans indicadas, toda la topología es una única red de difusión.", image: "{D3CFBE3C-9504-4934-AA43-3188BADF6961}.png" },
+            { q: "Un switch puede dividir tanto el dominio de colisión como el dominio de broadcast.", options: ["Verdadero", "Falso"], correct: ["Falso"], theory: "El switch solo divide colisiones de forma nativa. Para broadcast requieres Capa 3 (Router) o VLANs." },
+            { q: "32. Mientras se está intercambiando datos, una NIC recibe trama y su CRC COINCIDE. ¿Qué hará la placa?", options: ["Pedir retransmisión al origen", "Enviar confirmación de recepción", "Desencapsular y entregar a la capa superior", "Encapsular y enviar la trama", "Descartar la trama"], correct: ["Desencapsular y entregar a la capa superior"], theory: "La trama llegó perfecta. Le quita las cabeceras MAC y sube el paquete a la Capa 3." },
+            { q: "33. ¿En qué capas según el modelo OSI interviene la placa de red (NIC)?", options: ["Enlace", "Red", "Aplicación", "Sesion", "Transporte"], correct: ["Enlace"], theory: "Capa 1 y Capa 2 (Enlace)." },
+            { q: "34. Una placa de red recibe trama, CRC NO coincide ¿Qué hace la placa?", options: ["Pide retransmisión", "Descarta la trama", "Descarta e informa al origen", "Desencapsula"], correct: ["Descarta la trama"], theory: "Ethernet es best-effort. Tira la trama corrupta sin avisar a nadie." },
+            { q: "¿Cuál de estos dispositivos trabaja exclusivamente en la capa 1 del modelo OSI?", options: ["Router", "Switch", "Hub", "Bridge"], correct: ["Hub"], theory: "El Hub copia la señal eléctrica a todos los puertos ciegamente." },
+            { q: "35. ¿Con qué direcciones trabaja el puente (bridge)?", options: ["MAC", "IP", "Ninguna", "PUERTOS"], correct: ["MAC"], theory: "Aisla colisiones aprendiendo direcciones MAC en su tabla." },
+            { q: "36. A partir de tabla MAC, si maquina E envía a B (B no está en tabla):", options: ["Puerto 3", "Puertos 1, 3, 5, 8", "Puertos 1, 2, 3, 4, 6, 7 y 8", "Puertos 1,3 y 8"], correct: ["Puertos 1,3 y 8"], theory: "Como no conoce a B, inunda (flooding) a todos los puertos activos MENOS por el 5 (origen de E).", image: "{6553A8AD-661B-4D23-9F0A-743772BC2524}.png" },
+            { q: "37. El switch construye su tabla de direcciones MAC para conmutar más rápidamente a través de:", options: ["MAC saliente", "IP saliente", "La dirección MAC de la trama entrante", "Flooding", "IP entrante"], correct: ["La dirección MAC de la trama entrante"], theory: "El switch APRENDE espionando la MAC de Origen de las tramas que llegan." },
+            { q: "38. ¿En qué capa del modelo OSI trabaja un switch?", options: ["Física y enlace", "Red", "Física", "Enlace de datos", "Ninguna"], correct: ["Enlace de datos"], theory: "Capa 2." },
+            { q: "39. Un administrador debe garantizar que el switch conmute de la manera MÁS RÁPIDA posible. Configura:", options: ["Fast-switch", "Tabla CAM", "Cut-through", "Almacenamiento y re-envío", "Libre de fragmentos"], correct: ["Cut-through"], theory: "Cut-through lee solo los primeros 6 bytes (Destino) y la despacha al instante." },
+            { q: "40. Administrador desea garantizar que el switch conmute SÓLO tramas CORRECTAS. Configura:", options: ["Fast-switch", "Tabla CAM", "Cut-through", "Almacenamiento y re-envío", "Libre de fragmentos"], correct: ["Almacenamiento y re-envío"], theory: "Store & Forward guarda TODA la trama para calcular el CRC antes de reenviar." },
+            { q: "Dispositivo que filtra por MAC:", options: ["bridge", "hub", "router", "nic", "switch"], correct: ["bridge", "switch"], theory: "Los dispositivos inteligentes de capa 2 filtran el tráfico aislando colisiones." },
+            { q: "41. ¿Cuál es uno de los propósitos de los dispositivos de capa 2 en la red?", options: ["Suministrar camino a las tramas", "Proveer enrutamiento", "Reducción de errores", "Planificar la red", "Proveer segmentación de paquetes", "Detección de errores"], correct: ["Suministrar camino a las tramas", "Detección de errores"], theory: "Conmutan tramas y detectan colisiones/corrupciones (CRC)." },
+            { q: "Estado inicial de puerto STP:", options: ["Escucha", "Aprendizaje", "Bloqueo", "Desactivado"], correct: ["Bloqueo"], theory: "Al conectar un cable, STP arranca en Bloqueo (20s) previniendo bucles fatales." },
+            { q: "42. En cuál de los siguientes estados de los puertos de un switch, se envían y reciben tramas BPDU (seleccione tres)", options: ["Desactivado", "Envío", "Actualizado", "Escucha", "Bloqueo", "Aprendizaje"], correct: ["Envío", "Escucha", "Aprendizaje"], theory: "En estos estados el protocolo está activo calculando el árbol o enviando datos." },
+            { q: "43. A partir de topología, determine que switch se elegirá como Switch raíz (STP):", options: ["Switch 1", "Switch 0", "Switch 0 y switch 3", "Switch 3", "Switch 2"], correct: ["Switch 2"], theory: "Gana el de MENOR prioridad. Si hay empate, gana la MENOR dirección MAC.", image: "{E63DB92F-AE67-48C0-B274-F88C6317E494}.png" },
+            { q: "44. A partir de la topología planteada, indique cuáles afirmaciones son correctas (tipos de puertos):", options: ["Los puertos F0/3, F0/4 y F0/5 son puertos designados", "Los puertos F0/8, F0/9 y F0/10 son puertos designados", "Los puertos F0/8, F0/9 y F0/10 son puertos raíz", "Los puertos F0/2, F0/4 y F0/7 son puertos raíz", "Los puertos F0/2 y F0/7 son designados"], correct: ["Los puertos F0/8, F0/9 y F0/10 son puertos designados", "Los puertos F0/2, F0/4 y F0/7 son puertos raíz"], theory: "El puerto más cercano al root bridge es Raíz, los que envían tráfico en el segmento son designados.", image: "{3783D0E2-E0FD-4466-9013-7D4DACE4E0FA}.png" },
+            { q: "45. De acuerdo al protocolo IEEE 802.1D; ¿Cuál de los siguientes switch se convertirá en el Raíz?", options: ["CAT1", "CAT2", "CAT3", "CAT4"], correct: ["CAT1"], theory: "Evaluando la prioridad MAC (al tener misma prioridad default 32768), CAT1 posee la MAC más baja.", image: "{46572778-8445-4B23-AF30-689246162830}.png" },
+            { q: "Indique cuales de los sigueintes son modos de funcionamiento de un AP domestico", options: ["Modo Acces Point/Bridge , Modo repetidor, Modo Router", "Modo repetidor, Modo Acces Point/Bridge , Modo Router", "Modo Router, Modo repetidor, Modo Acces Point/Bridge"], correct: ["Modo Acces Point/Bridge , Modo repetidor, Modo Router"], theory: "Puede cablearse(AP), tomar señal y retransmitir (Repetidor), o rutear IPs (Router)." },
+            { q: "46. Administrador instala red inalámbrica en edificio 4 pisos, 4 AP para buena cobertura. ¿Cuántos ESS tiene?", options: ["48", "16", "12", "4", "1"], correct: ["1"], theory: "Los 4 APs se unen en un solo Extended Service Set para brindar roaming con un único SSID." },
+            { q: "¿Cuál es la ventaja principal del modo de red WLAN 'infraestructura' sobre 'ad-hoc'?", options: ["Permite mayor velocidad de transmisión.", "Permite roaming entre celdas mediante APs conectados.", "No necesita Access Point.", "Es más económica."], correct: ["Permite roaming entre celdas mediante APs conectados."], theory: "El AP centraliza el tráfico y permite al usuario caminar por el edificio sin desconectarse." },
+            { q: "47. Cuales de los siguientes servicios se requieren para que un dispositivo inalámbrico pueda desplazarse dentro de un sistema de distribución", options: ["Asociación", "Producción", "Implementación", "Reasociación", "Coordinación"], correct: ["Asociación", "Reasociación"], theory: "Te asocias al 1er AP, y al caminar te Re-asocias al siguiente sin perder la conexión IP." },
+            { q: "48. Empleado en primer piso (WiFi) envía mail a supervisor en cuarto piso (PC escritorio Switch). ¿Qué servicio realiza el DS?", options: ["Asociación", "Integración", "Distribución", "Disociación", "Reasociación"], correct: ["Integración"], theory: "Convierte protocolos de red inalámbrica 802.11 a red cableada Ethernet 802.3." },
+            { q: "49. Si se desea conectar una computadora y un mouse inalámbrico, indique que tecnología seria la mejor opción:", options: ["Ethernet", "IEEE 802.11", "WiMax", "802.3ab", "WAN", "IEEE 802.15"], correct: ["IEEE 802.15"], theory: "Bluetooth (802.15) es el estándar WPAN de bajo consumo y corto alcance." },
+            { q: "50. Persona vive en pueblo y tiene su campo a 50 km de distancia (internet). ¿Tecnología a contratar?", options: ["IEEE 802.15", "IEEE 802.5", "Wi-Fi", "IEEE 802.3", "IEEE 802.16"], correct: ["IEEE 802.16"], theory: "WiMAX (802.16) soporta largas distancias rurales mediante microondas (WMAN)." },
+            { q: "51. Cuál de las siguientes tecnologías permite que dispositivos inalámbricos se conecten a internet en entornos rurales:", options: ["WiFi", "IEEE 802.15 (Bluetooth)", "IEEE 802.5 (Token Ring)", "IEEE 802.3 (Ethernet)", "IEEE 802.16 (WiMAX)"], correct: ["IEEE 802.16 (WiMAX)"], theory: "WiMax." },
+            { q: "52. ¿Cuáles de las siguientes es una desventaja de las redes inalámbricas?", options: ["Costo de instalación", "Flexibilidad", "Movilidad", "Velocidad"], correct: ["Velocidad"], theory: "La sobrecarga administrativa para evitar colisiones (CSMA/CA) y el medio ruidoso reduce severamente la velocidad." },
+            
+            // --- UNIDAD 3: IPV4 Y VLSM ---
+            { q: "Cuál de las siguientes características corresponde al protoclo IPv4:", options: ["Encapsula una trama de datos", "Pertenece a la capa de enlace de datos", "Orientado a la conexión", "Construye segmentos", "No fiable", "Garantiza entrega"], correct: ["No fiable"], theory: "IP hace 'el mejor esfuerzo' por ruteo, pero no verifica que llegue (eso es TCP)." },
+            { q: "Cuál de las siguientes características corresponde al protocolo IPv4:", options: ["Es fiable", "Encapsula trama en paquete", "Host a Red", "Encapsula segmento en trama", "Es no orientado a conexión", "Garantiza orden"], correct: ["Es no orientado a conexión"], theory: "No establece un canal previo para hablar, envía paquetes independientes." },
+            { q: "Cuál de las siguientes características corresponde al protocolo IPv4:", options: ["Utiliza números de secuencia", "Encamina cada paquete de manera independiente", "Utiliza direcciones 48 bits", "Retransmite perdidos", "Reordena en destino"], correct: ["Encamina cada paquete de manera independiente"], theory: "Cada paquete puede tomar rutas físicas diferentes según el router." },
+            { q: "¿Qué característica distingue a una dirección IP de una dirección MAC?", options: ["La IP no se puede cambiar.", "La MAC es jerárquica.", "La IP es lógica y configurable.", "La MAC pertenece a red"], correct: ["La IP es lógica y configurable."], theory: "La MAC está fija en hardware. La IP es lógica (software) para el enrutamiento." },
+            { q: "¿Qué tipo de dirección IP es la que permite que se conecten la mayor cantidad de hosts?", options: ["Clase C", "Clase A", "Clase B"], correct: ["Clase A"], theory: "Clase A tiene 24 bits para host (16 millones de máquinas)." },
+            { q: "¿Cuál es el uso de las redes clase D?", options: ["Crear redes", "Subnetting", "Multicast", "Broadcast", "Unicast"], correct: ["Multicast"], theory: "Reservadas del 224 al 239 para multidifusión." },
+            { q: "Si una dirección IP empieza con el byte 200, pertenece a la clase:", options: ["A", "B", "C"], correct: ["C"], theory: "El rango Clase C va del 192 al 223." },
+            { q: "Una dirección IP que comienza con los bits 1110, ¿Qué clase de dirección es?", options: ["Todas", "Clase C", "Clase B", "Clase A", "Clase D"], correct: ["Clase D"], theory: "Clase D Multicast estrictamente inicia con 1110 en binario." },
+            { q: "¿Cómo se determina la clase de una dirección IPv4?", options: ["Ninguna", "Por el valor del primer byte", "Por cantidad de host", "Por máscara", "Por cantidad redes"], correct: ["Por el valor del primer byte"], theory: "En diseño Classful, leer el primer número define la clase." },
+            { q: "Si una dirección IP comienza con 191, ¿Qué clase de dirección es?", options: ["A", "B", "C"], correct: ["B"], theory: "Clase B termina su rango exactamente en 191." },
+            { q: "¿Cual es la función de la máscara en una dirección IPv4?", options: ["Determinar gateway", "Ninguna", "Determinar la porción de red", "Determinar clase", "Determinar cantidad host"], correct: ["Determinar la porción de red"], theory: "Le dice a la computadora dónde termina la red y dónde empieza el host." },
+            { q: "¿Cómo hace el router para extraer solo el NetID de la dirección IP?", options: ["Determina clase y obtiene NetID", "Determina clase y obtiene HostID", "Obtiene máscara", "Determina la clase, aplica la máscara adecuada y realiza la operación AND", "Aplica máscara AND"], correct: ["Determina la clase, aplica la máscara adecuada y realiza la operación AND"], theory: "El AND lógico apaga los bits de host para descubrir la subred pura." },
+            { q: "Cuáles de las siguientes afirmaciones son correctas en relación a la dirección IPv4 0.0.0.0 (seleccione dos):", options: ["Identifica al propio dispositivo cuando no tiene IP", "Enviar paquete a toda LAN", "Sólo puede aparecer en IP origen", "Nunca puede aparecer", "Identifica todos LAN"], correct: ["Identifica al propio dispositivo cuando no tiene asignada una dirección IPv4", "Sólo puede aparecer en la dirección IP origen de un paquete IPv4"], theory: "Es un placeholder al iniciar la PC (usado en DHCP)." },
+            { q: "La dirección IPv4 0.0.0.0:", options: ["Representa gateway", "Está prohibido", "Dirección trama", "Se utiliza en la dirección origen del paquete DHCPdiscover", "Todos host LAN"], correct: ["Se utiliza en la dirección origen del paquete DHCPdiscover"], theory: "Al pedir IP dinámica, se envía un DHCP Discover con origen 0.0.0.0." },
+            { q: "La dirección IPv4 127.1.1.1:", options: ["Privada", "Gateway", "Multicast", "Configura en producción", "Permite verifcar la correcta instalación de la pila de protocolos TCP/IP"], correct: ["Permite verifcar la correcta instalación de la pila de protocolos TCP/IP"], theory: "Bucle Local (Loopback). El paquete no sale a la red, prueba la placa." },
+            { q: "Un router recibe por una de sus interfaces un paquete cuya dirección destino es 255.255.255.255", options: ["Se lo envía al servidor", "A todas PC LAN", "Procesa", "Lo retransmite por todas sus interfaces, menos por la que ingresó.", "Encapsula trama"], correct: ["Lo retransmite por todas sus interfaces, menos por la que ingresó."], theory: "El router detiene el Broadcast lógico 255 (no lo propaga)." },
+            { q: "Dada la siguiente dirección de subred 189.45.8.0/25 determine cual de los siguientes es un rango de direcciones válidas:", options: ["189.45.8.1-189.45.8.254", "189.45.8.1-189.45.11.254", "189.45.8.1-189.45.8.126", "189.45.8.0-189.45.8.255"], correct: ["189.45.8.1-189.45.8.126"], theory: "Prefijo /25 deja 7 bits de host. 2^7 = 128. Menos red y broadcast, válidas son 1 a 126." },
+            { q: "Indique cuál es el rango de direcciones IPv4 válidas de la subred 170.62.32.0/22", options: ["170.62.32.1 170.62.47.254", "170.62.32.1 170.62.255.255", "170.62.32.1 170.62.39.254", "170.62.32.1 170.62.35.254", "170.62.33.1 170.62.35.254"], correct: ["170.62.32.1 170.62.35.254"], theory: "/22 deja 10 bits libres. 1024 direcciones (salto de 4). Termina en .35.255." },
+            { q: "Se necesita configurar 3 hosts con direcciones IPs que puedan ser enrutadas a través de INTERNET. ¿Cuales cumplen?", options: ["192.168.23.252", "181.0.0.1", "198.234.255.95", "172.16.223.125", "172.64.12.0", "10.172.13.65"], correct: ["181.0.0.1", "198.234.255.95", "172.64.12.0"], theory: "Descartar los rangos privados RFC 1918 (10., 172.16-31, 192.168)." },
+            { q: "¿Qué partes de la dirección IP utilizan los routers para enviar los paquetes a una subred?", options: ["La dirección IP completa", "Solo el NetID", "El hostID", "El NetID más la subred", "La dirección lógica"], correct: ["El NetID más la subred"], theory: "El router rutea considerando la red padre más el bloque robado." },
+            { q: "Determine cuál de las siguientes direcciones IP son públicas:", options: ["172.14.60.8", "192.168.255.16", "11.10.10.16", "10.28.5.10", "172.28.56.90", "190.168.21.56"], correct: ["172.14.60.8", "11.10.10.16", "190.168.21.56"], theory: "172.14 es pública porque la privada B arranca en 172.16." },
+            { q: "Indique las direcciones enrutables en internet (públicas):", options: ["172.45.100.5/16", "127.0.0.3/8", "11.45.3.10/8", "201.34.13.5/24", "200.25.30.0/24", "192.168.1.15/24", "191.45.45.255/24"], correct: ["172.45.100.5/16", "11.45.3.10/8", "201.34.13.5/24"], theory: "200...0 es de red (no enrutable host), 191...255 es broadcast, 127 local, 192 privada." },
+            { q: "Determine cuáles de las siguientes direcciones IPv4 se podría utilizar para que una computadora tenga conectividad en internet (seleccione tres)", options: ["11.10.10.10", "10.10.12.14", "194.168.10.6", "172.32.60.90", "192.168.32.48", "172.26.56.0", "172.29.0.90"], correct: ["11.10.10.10", "194.168.10.6", "172.32.60.90"], theory: "Deben ser IP públicas válidas (no red, no broadcast)." },
+            { q: "¿Cuál es el rango de direcciones privadas definidas en el RFC 1918?", options: ["172.16.0.0 a 172.16.255", "127.0.0.0 a 127.255", "0.0.0.0 a 255.255", "172.16.0.0 hasta 172.31.255.255", "192.168.0.0 hasta 192.168.255.255", "10.0.0.0 hasta 10.255.255.255", "224.0 a 239.255"], correct: ["172.16.0.0 hasta 172.31.255.255", "192.168.0.0 hasta 192.168.255.255", "10.0.0.0 hasta 10.255.255.255"], theory: "3 Bloques reservados inamovibles." },
+            { q: "Cuál de las siguientes afirmaciones es correcta sobre el direccionamiento IPv4", options: ["10 redes clase A privadas", "16 redes clase B públicas", "1 red clase A pública", "255 redes clase B privadas", "Se definieron 256 redes clase C para direccionamiento privado"], correct: ["Se definieron 256 redes clase C para direccionamiento privado"], theory: "El bloque 192.168.X tiene 256 variaciones en el tercer octeto." },
+            { q: "Determine cuales de las siguientes direcciones IPv4 son privadas (seleccione 3):", options: ["172.28.10.9", "172.33.60.95", "192.168.150.78", "194.168.50.18", "10.20.10.18", "14.40.60.5"], correct: ["172.28.10.9", "192.168.150.78", "10.20.10.18"], theory: "Encajan en los bloques A (10), B (172.16-31), C (192.168)." },
+            { q: "Cuál de las siguientes direcciones IP es una dirección privada?", options: ["192.168.1.1", "8.8.8.8", "172.32.0.1", "1.1.1.1"], correct: ["192.168.1.1"], theory: "Típica IP privada hogareña." },
+            { q: "Teniendo la estructura N.N.H.H y necesito crear subredes, minimizando la cantidad de subredes. ¿De donde se piden prestados los bits?", options: ["Segundo oct der a izq", "Segundo oct izq a der", "Del tercer octeto y de izquierda a derecha", "Tercer oct der a izq", "Ultimo oct"], correct: ["Del tercer octeto y de izquierda a derecha"], theory: "En Clase B (N.N), se empieza a pedir al tercer byte barriendo de izquierda a derecha." },
+            { q: "La cantidad máxima de bits que se pueden pedir prestados para crear subredes en una dirección IP clase A es:", options: ["22", "14", "6"], correct: ["22"], theory: "Clase A: 24 bits host. 24 - 2 (para que al menos existan 2 hosts) = 22." },
+            { q: "La cantidad máxima de bits que se pueden pedir prestados para crear sub-redes en una dirección IP clase B es:", options: ["16 bits", "7 bits", "13 bits", "14 bits", "5 bits", "6 bits"], correct: ["14 bits"], theory: "Clase B: 16 bits host. 16 - 2 = 14." },
+            { q: "El ISP le asigna a una empresa la IP 190.45.96.0/22 ello implica que se dispone de:", options: ["1024 direcciones válidas", "510 direcciones válidas", "2048 direcciones válidas", "4094 direcciones válidas", "2046 direcciones válidas", "1022 direcciones de hosts válidas"], correct: ["1022 direcciones de hosts válidas"], theory: "32-22 = 10. 2^10 = 1024. Menos 2 reservadas = 1022." },
+            { q: "Empresa implementa subredes utilizando la IP 160.4.0.0/23. Ello implica:", options: ["Pierden 64 IPs", "Pierden 128", "Se pierden 256 direcciones IP del total del espacio de direccionamiento", "Pierden 510", "Pierden 512", "Ganan 510", "Ganan 256"], correct: ["Se pierden 256 direcciones IP del total del espacio de direccionamiento"], theory: "Clase B (/16). /23 pide 7 bits (128 subredes). 128 * 2 = 256 perdidas." },
+            { q: "Cuáles direcciones IP podrá utilizar un administrador, si desea implementar 20 subredes, maximizando la cantidad de hosts por subred (seleccione dos)", options: ["100.0.0.0/14", "98.0.0.0/15", "189.85.0.0/23", "140.56.0.0/22", "190.60.0.0/21", "199.60.5.0/29"], correct: ["190.60.0.0/21", "199.60.5.0/29"], theory: "Para 20 subs necesita pedir EXACTAMENTE 5 bits. Clase B (/16) + 5 = /21. Clase C (/24) + 5 = /29." },
+            { q: "¿Cuántas subredes pueden crearse si se solicitan 5 bits al HostID?", options: ["16", "18", "8", "14", "32"], correct: ["32"], theory: "2^n = 2^5 = 32 subredes." },
+            { q: "Si se realiza un AND booleano entre una dirección IPv4 de una PC y una máscara de subred, se obtiene como resultado:", options: ["Dirección del gateway", "La máscara de subred", "La máscara de red", "MAC PC", "Clase IP", "La dirección de la subred a la cual pertenece la PC"], correct: ["La dirección de la subred a la cual pertenece la PC"], theory: "El AND lógico apaga host para aislar e identificar el cajón (Subred)." },
+            { q: "Cuáles de las siguientes características corresponden a la VLANs (seleccione tres opciones)", options: ["Se implementan mediante hubs", "Se implementan mediante configuración en los switches", "Todas a misma subred", "Mismo switch físico", "Facilitan la implementación de seguridad en la empresa", "Agrupan empleados lógicamente independientemente de cuál sea su ubicación física", "protocolo 802.1d"], correct: ["Se implementan mediante configuración en los switches", "Facilitan la implementación de seguridad en la empresa", "Agrupan empleados lógicamente independientemente de cuál sea su ubicación física"], theory: "VLANs separan lógicamente los puertos de los Switches." },
+            { q: "Cuáles de las siguientes características corresponden a la VLANs (seleccione tres opciones - Técnicas)", options: ["Etiqueta paquete IPv6", "Si se definen 5 VLANs, se configurarán 5 subredes diferentes", "Cada VLAN es un dominio de broadcast", "Conectan enlaces acceso", "Implementan en NIC", "Se implementan mediante el protocolop 802.1q", "Mismo switch forzado"], correct: ["Si se definen 5 VLANs, se configurarán 5 subredes diferentes", "Cada VLAN es un dominio de broadcast", "Se implementan mediante el protocolop 802.1q"], theory: "1 VLAN = 1 Broadcast Domain = 1 Subred (Subnet). Trunking = 802.1q." },
+            { q: "Indique cuántos dominios de broadcast existen en la figura. (Repetida topología 3 vlans)", options: ["1", "3", "Ninguno"], correct: ["3"], theory: "Misma topologia 3 VLANs = 3 Dominios.", image: "{E206E5CD-D1EC-4632-8C92-CFB90A55BCB3}.png" },
+            { q: "¿Qué protocolo permite implementar VLANs en switches administrables?", options: ["IEEE 802.11", "IEEE 802.3", "IEEE 802.1Q", "IEEE 802.15"], correct: ["IEEE 802.1Q"], theory: "Protocolo DOT1Q (Etiquetado/Tagging)." },
+            { q: "Bits usados en ID de VLAN (IEEE 802.1Q):", options: ["12", "8", "16", "10"], correct: ["12"], theory: "El tag es de 4 bytes, pero el campo VLAN ID (VID) usa 12 bits." },
+            { q: "Máximo de VLANs en 802.1Q:", options: ["4096", "255", "1024", "65535"], correct: ["4096"], theory: "2^12 bits = 4096 VLANs lógicas posibles." },
+            { q: "En la creación de VLAN estática: Seleccione una:", options: ["A medida que conectan asigna disponible", "Un administrador debe crear la VLAN en el switch y luego agregar los puertos a ella", "Acuerdo protocolo tráfico", "Switch Raiz indica", "De acuerdo tipo host"], correct: ["Un administrador debe crear la VLAN en el switch y luego agregar los puertos a ella"], theory: "VLAN Basada en Puerto, configurada manualmente por CLI." },
+            { q: "Empresa posee switch 20 pc. Administrador saca cable de puerto 4 y coloca en puerto 18. Empleado no tiene red. Causa:", options: ["VLAN dinámica", "MAC", "Navegador", "802.1d", "El switch tiene implementado VLANs basadas en el puerto", "Velocidades"], correct: ["El switch tiene implementado VLANs basadas en el puerto"], theory: "Al cambiar de puerto físico, cayó lógicamente en otra VLAN (subred), perdiendo conectividad." },
+            { q: "VLAN dinámica se distingue por:", options: ["No requiere config", "Servidor VMPS", "Más lenta", "WiFi"], correct: ["Servidor VMPS"], theory: "VLAN Management Policy Server asocia la MAC de la PC a la VLAN automáticamente." },
+            { q: "¿Qué hace NAT? (inventada por IA)", options: ["Traduce IP privada a pública", "Asigna MAC", "Cifra datos", "Evita colisiones"], correct: ["Traduce IP privada a pública"], theory: "Network Address Translation (NAT) se hace en el router WAN." },
+            { q: "CIDR se caracteriza por:", options: ["Eliminar clases de IP", "Usar clase C", "Fijar tamaño de red", "Funcionar con IPv6"], correct: ["Eliminar clases de IP"], theory: "Classless Inter-Domain Routing aniquiló los límites del 1er octeto (/8, /16, /24)." },
+            { q: "A un administrador le propusieron sumarización de rutas en el router. ¿Qué benefcios tiene?", options: ["Automático", "Reduce el tamaño de las tablas de encaminamiento", "No rutas estáticas", "Más opciones"], correct: ["Reduce el tamaño de las tablas de encaminamiento"], theory: "Englobar redes ahorra memoria RAM y procesador (Supernetting)." },
+            { q: "A partir de las siguientes direcciones IP: 200.15.43.0/24, 200.15.50.0/24, 200.15.39.0/24, superred correcta:", options: ["200.15.32.0/18", "200.15.32.0/20", "200.15.48.0/20", "200.15.32.0/19", "200.15.48.0/19", "200.15.38.0/19"], correct: ["200.15.32.0/19"], theory: "Conflicto en el 3er octeto. Coinciden primeros 3 bits (001=32). Máscara 8+8+3 = /19." },
+            { q: "A partir de las siguientes direcciones IP 200.15.54.0/24, 200.15.55.0/24, 200.15.60.0/24 indique cual es la superred:", options: ["200.15.48.0/20", "200.15.32.0/19", "200.15.48.0/21", "200.15.32.0/18", "200.15.48.0/19", "200.15.32.0/20"], correct: ["200.15.48.0/20"], theory: "Conflicto 54(00110110), 55(00110111), 60(00111100). Coinciden 4 bits (0011 = 48). Máscara 8+8+4 = /20." },
+            { q: "Determine mascaras para topologia (Enlaces WAN, Cordoba[126], Rio cuarto[62], Villa maria[30]):", options: ["/30 , /25 , /26 , /27", "/24, /25 , /26 , /27", "/24 , /25 , /26 , /23"], correct: ["/30 , /25 , /26 , /27"], theory: "WAN=2 hosts(/30), Cba=126 hosts(/25), RC=62 hosts(/26), VM=30 hosts(/27).", image: "{079B4267-1F54-4974-B35D-9D9CE9FC586A}.png" },
+            { q: "Cuál de las siguientes características corresponde a VSLM (seleccione varias):", options: ["Crear para muchos hosts largas", "Permite tomar una subred y volverla a dividir en sub-redes más pequeñas", "Permite crear para pocos hosts, máscaras más largas", "Misma mascara obligatoria", "Direcciones privadas exclusivo"], correct: ["Permite tomar una subred y volverla a dividir en sub-redes más pequeñas", "Permite crear para pocos hosts, máscaras más largas"], theory: "Máscara de Subred de Longitud Variable rompe el subnetting estático optimizando bloques." },
+            { q: "Un administrador tiene que configurar 5 puestos. Omitió puerta de enlace en una. ¿Se pueden comunicar?", options: ["Si, todas se comunican entre ellas.", "Si y todas a Internet", "Ninguna", "Solo 4 con puerta enlace"], correct: ["Si, todas se comunican entre ellas."], theory: "En una red LAN (Capa 2), los switches conmutan por MAC, la IP viaja pero no requiere puerta de salida (Gateway) para el tráfico intra-red." },
+            { q: "¿Se puede determinar la clase entonces solo con la direccion ip?", options: ["Sí (Por el primer byte)", "No, falta mascara"], correct: ["Sí (Por el primer byte)"], theory: "Arquitectura 'Classful' pre-CIDR: 1-127(A), 128-191(B), 192-223(C)." },
+            { q: "¿Para qué se necesitaban ambas juntas (IP y Mascara)?", options: ["Para descubrir Subred y Host", "Para MAC"], correct: ["Para descubrir Subred y Host"], theory: "La IP es el número, la Máscara es la plantilla que indica el punto de corte (AND lógico)." },
+            { q: "¡EN TEORÍA NO VA AL PARCIAL! Cual afirmaciones describen el campo suma de verificación IPv4 (seleccione dos)", options: ["Lo calculan sólo los routers para saber si encaminar o descartar el paquete", "Se utiliza para garantizar integridad TODO", "Se calcula en el origen, el destino y dos veces en cada router", "Saber si retransmitir", "Permite detectar errores en la cabecera del paquete IPv4"], correct: ["Se calcula en el origen, el destino y dos veces en cada router", "Permite detectar errores en la cabecera del paquete IPv4"], theory: "El checksum solo protege la cabecera IPv4. Al bajar el TTL en -1 en el router, debe re-calcularse obligatoriamente." },
+            { q: "Cuál de los siguientes campos pertenece a la cabecera de un paquete IPv4 (seleccione 2)", options: ["Time to live", "Límite de salto", "Longitud de carga útil", "Longitud de cabecera"], correct: ["Time to live", "Longitud de cabecera"], theory: "TTL evita bucles infinitos. Header Length dice el tamaño base." },
+            { q: "Los mensajes ICMP se envían utilizando el encabezado IP básico", options: ["Verdadero", "Falso"], correct: ["Verdadero"], theory: "Al igual que TCP o UDP, los mensajes ICMP se encapsulan como 'Carga Útil' dentro del datagrama IP." },
+            { q: "Indique cuál es el tamaño mínimo de la cabecera de un paquete IPv4", options: ["18 bytes", "15 bytes", "20 bytes", "40 bytes", "30 bytes", "60 bytes", "25 bytes", "6 bytes"], correct: ["20 bytes"], theory: "Estructura estricta: 5 filas de 32 bits = 20 Bytes." },
+            { q: "¡EN TEORÍA NO VA AL PARCIAL! El algoritmo para determinar el checksum del IPv4 se calcula:", options: ["En el origen, en el destino, y una vez en cada salto", "En el origen, en el destino y dos veces en cada salto"], correct: ["En el origen, en el destino y dos veces en cada salto"], theory: "Se verifica al entrar al router, y se calcula al salir del router tras modificar el TTL." },
+            { q: "¿Cómo hace un router para distinguir un paquete de datos de uno que transporta un reporte ICMP?", options: ["Se remite capas sup", "Lee el campo Protocolo del encabezado IP", "Distingue por valor", "No hace nada", "Por entidades transporte"], correct: ["Lee el campo Protocolo del encabezado IP"], theory: "El campo Protocolo indica 1(ICMP), 6(TCP), o 17(UDP)." }
+        ];
+
+        // --- ESTADO DEL JUEGO ---
+        let currentQuestions = [];
+        let wrongQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let gamePhase = 'normal'; // 'normal' o 'retry'
+        let hasChecked = false;
+        let currentSelected = [];
+
+        // --- FUNCIONES DE UTILIDAD ---
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        // --- LÓGICA DEL JUEGO ---
+        function initGame() {
+            score = 0;
+            updateScore();
+            document.getElementById('score-display').classList.remove('hidden');
+            
+            wrongQuestions = [];
+            currentQuestions = shuffleArray([...allQuestions]);
+            currentIndex = 0;
+            gamePhase = 'normal';
+            
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            
+            loadQuestion();
+        }
+
+        function startGame() {
+            initGame();
+        }
+
+        function startRetryPhase() {
+            currentQuestions = shuffleArray([...wrongQuestions]);
+            wrongQuestions = [];
+            currentIndex = 0;
+            gamePhase = 'retry';
+            
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            hasChecked = false;
+            currentSelected = [];
+            const q = currentQuestions[currentIndex];
+            const isMultiple = q.correct.length > 1;
+
+            // UI Updates
+            document.getElementById('phase-indicator').innerHTML = gamePhase === 'normal' ? '<i class="fa-solid fa-graduation-cap"></i> Fase Normal' : '<i class="fa-solid fa-dumbbell"></i> Repaso';
+            document.getElementById('phase-indicator').className = gamePhase === 'normal' ? 'text-blue-600 font-bold' : 'text-red-600 font-bold';
+            document.getElementById('question-counter').textContent = `Pregunta ${currentIndex + 1} de ${currentQuestions.length}`;
+            
+            const progress = ((currentIndex) / currentQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-bar').className = gamePhase === 'normal' ? 'bg-blue-600 h-2.5 rounded-full transition-all duration-300' : 'bg-red-600 h-2.5 rounded-full transition-all duration-300';
+
+            // Text
+            document.getElementById('question-text').textContent = q.q;
+            document.getElementById('question-hint').innerHTML = isMultiple ? '<i class="fa-solid fa-list-check mr-1 text-blue-500"></i> (Puede haber más de una correcta)' : '<i class="fa-solid fa-bullseye mr-1 text-blue-500"></i> (Selecciona una única opción)';
+
+            // Image handling (Para topologías futuras si se añaden al JSON)
+            const imgContainer = document.getElementById('image-container');
+            const imgWarning = document.getElementById('image-warning');
+            const imgElement = document.getElementById('question-image');
+            
+            if (q.image) {
+                imgWarning.classList.remove('hidden');
+                document.getElementById('image-filename').textContent = q.image;
+                imgContainer.classList.remove('hidden');
+                imgElement.src = q.image;
+                imgElement.onerror = () => { imgElement.alt = "[La imagen no se encontró. Necesitas ponerla en esta misma carpeta]"; };
+            } else {
+                imgWarning.classList.add('hidden');
+                imgContainer.classList.add('hidden');
+            }
+
+            // Options
+            const optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+            const shuffledOptions = shuffleArray([...q.options]);
+            
+            shuffledOptions.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-card text-left p-4 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 bg-white shadow-sm flex items-start w-full transition-all';
+                btn.onclick = () => toggleSelection(opt, btn, isMultiple);
+                
+                const icon = document.createElement('div');
+                icon.className = `mr-3 mt-1 text-gray-400 ${isMultiple ? 'fa-regular fa-square' : 'fa-regular fa-circle'}`;
+                icon.id = `icon-${idx}`;
+                
+                const text = document.createElement('span');
+                text.className = 'text-gray-700 font-medium text-lg leading-snug';
+                text.textContent = opt;
+
+                btn.appendChild(icon);
+                btn.appendChild(text);
+                optContainer.appendChild(btn);
+            });
+
+            // Reset Button
+            const actionBtn = document.getElementById('action-btn');
+            actionBtn.innerHTML = 'Verificar Respuesta <i class="fa-solid fa-check ml-1"></i>';
+            actionBtn.disabled = true;
+            actionBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed text-lg w-full md:w-auto";
+            
+            document.getElementById('feedback-section').classList.add('hidden');
+        }
+
+        function toggleSelection(opt, btnElement, isMultiple) {
+            if (hasChecked) return;
+            const idx = currentSelected.indexOf(opt);
+            
+            if (isMultiple) {
+                if (idx > -1) {
+                    currentSelected.splice(idx, 1);
+                    btnElement.classList.remove('selected', 'bg-blue-50');
+                    btnElement.querySelector('div').className = 'mr-3 mt-1 text-gray-400 fa-regular fa-square';
+                } else {
+                    currentSelected.push(opt);
+                    btnElement.classList.add('selected', 'bg-blue-50');
+                    btnElement.querySelector('div').className = 'mr-3 mt-1 text-blue-600 fa-solid fa-square-check';
+                }
+            } else {
+                currentSelected = [opt];
+                document.querySelectorAll('.option-card').forEach(el => {
+                    el.classList.remove('selected', 'bg-blue-50');
+                    el.querySelector('div').className = 'mr-3 mt-1 text-gray-400 fa-regular fa-circle';
+                });
+                btnElement.classList.add('selected', 'bg-blue-50');
+                btnElement.querySelector('div').className = 'mr-3 mt-1 text-blue-600 fa-solid fa-circle-dot';
+            }
+
+            document.getElementById('action-btn').disabled = currentSelected.length === 0;
+        }
+
+        function handleAction() {
+            if (!hasChecked) checkAnswer();
+            else nextQuestion();
+        }
+
+        function checkAnswer() {
+            hasChecked = true;
+            const q = currentQuestions[currentIndex];
+            const isMultiple = q.correct.length > 1;
+            
+            const isCorrect = currentSelected.length === q.correct.length && currentSelected.every(val => q.correct.includes(val));
+
+            if (isCorrect) {
+                if(gamePhase === 'normal') score += 10;
+                updateScore();
+                showFeedback(true, "¡Respuesta Correcta!", "¡Excelente razonamiento! Dominaste este concepto.");
+            } else {
+                if(gamePhase === 'normal') wrongQuestions.push(q);
+                showFeedback(false, "Cuidado, hay un error", q.theory);
+            }
+
+            // Highlight logic
+            document.querySelectorAll('.option-card').forEach(btn => {
+                const optText = btn.querySelector('span').textContent;
+                
+                if (q.correct.includes(optText)) {
+                    btn.classList.add('correct-ans');
+                    btn.classList.remove('selected', 'bg-blue-50');
+                    btn.querySelector('div').className = `mr-3 mt-1 text-green-600 fa-solid ${isMultiple ? 'fa-square-check' : 'fa-circle-check'}`;
+                } else if (currentSelected.includes(optText)) {
+                    btn.classList.add('incorrect-ans');
+                    btn.classList.remove('selected', 'bg-blue-50');
+                    btn.querySelector('div').className = `mr-3 mt-1 text-red-500 fa-solid ${isMultiple ? 'fa-square-xmark' : 'fa-circle-xmark'}`;
+                }
+                btn.style.cursor = 'default';
+            });
+
+            const actionBtn = document.getElementById('action-btn');
+            actionBtn.innerHTML = 'Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-1"></i>';
+            actionBtn.disabled = false;
+        }
+
+        function showFeedback(isSuccess, title, text) {
+            const fbSec = document.getElementById('feedback-section');
+            const fbIcon = document.getElementById('feedback-icon');
+            const fbTitle = document.getElementById('feedback-title');
+            
+            fbSec.classList.remove('hidden', 'bg-green-50', 'border-green-200', 'bg-red-50', 'border-red-200');
+            
+            if (isSuccess) {
+                fbSec.classList.add('bg-green-50', 'border-green-200');
+                fbIcon.className = 'fa-solid fa-check-circle text-green-500 text-2xl mr-3 mt-1';
+                fbTitle.className = 'text-lg font-bold mb-2 text-green-800';
+            } else {
+                fbSec.classList.add('bg-red-50', 'border-red-200');
+                fbIcon.className = 'fa-solid fa-triangle-exclamation text-red-500 text-2xl mr-3 mt-1';
+                fbTitle.className = 'text-lg font-bold mb-2 text-red-800';
+                if(gamePhase === 'retry') title = "Ups, fallamos de nuevo...";
+            }
+
+            fbTitle.textContent = title;
+            document.getElementById('feedback-theory').innerHTML = `<strong>Análisis de Arquitectura:</strong> ${text}`;
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < currentQuestions.length) loadQuestion();
+            else finishPhase();
+        }
+
+        function finishPhase() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            const endScreen = document.getElementById('end-screen');
+            endScreen.classList.remove('hidden');
+            
+            const endTitle = document.getElementById('end-title');
+            const endScore = document.getElementById('end-score');
+            const retrySec = document.getElementById('retry-section');
+            const restartSec = document.getElementById('restart-section');
+            const endIcon = document.getElementById('end-icon');
+
+            if (gamePhase === 'normal') {
+                endScore.textContent = `Puntaje final: ${score} / ${allQuestions.length * 10}`;
+                if (wrongQuestions.length > 0) {
+                    endTitle.textContent = "¡Examen finalizado!";
+                    endIcon.innerHTML = "<i class='fa-solid fa-clipboard-list text-yellow-500'></i>";
+                    retrySec.classList.remove('hidden');
+                    restartSec.classList.add('hidden');
+                } else {
+                    endTitle.textContent = "¡Perfecto! Un 100%";
+                    endIcon.innerHTML = "<i class='fa-solid fa-trophy text-yellow-400'></i>";
+                    retrySec.classList.add('hidden');
+                    restartSec.classList.remove('hidden');
+                }
+            } else {
+                endTitle.textContent = "¡Repaso superado!";
+                endIcon.innerHTML = "<i class='fa-solid fa-graduation-cap text-green-500'></i>";
+                endScore.textContent = "¡El error es la mejor herramienta para fijar el conocimiento!";
+                retrySec.classList.add('hidden');
+                restartSec.classList.remove('hidden');
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score-display').textContent = `Puntaje: ${score}`;
+        }
+    </script>
+</body>
+</html>

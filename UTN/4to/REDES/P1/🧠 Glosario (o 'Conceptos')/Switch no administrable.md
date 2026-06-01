@@ -1,0 +1,1 @@
+Trampa de Hardware Es un equipo netamente _plug-and-play_ que no permite ningún tipo de configuración lógica. Se conecta a la red eléctrica y sus puertos quedan inmediatamente disponibles para conectar equipos

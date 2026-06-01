@@ -1,0 +1,1 @@
+Interfaz de red: Se refiere a los puertos físicos de un dispositivo, como en el caso del router, donde cada puerto o interfaz se conecta a una red diferente

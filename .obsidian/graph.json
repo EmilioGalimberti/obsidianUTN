@@ -1,0 +1,58 @@
+{
+  "collapse-filter": false,
+  "search": "path:UTN/4to/REDES  ",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": false,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "file:Indice",
+      "color": {
+        "a": 1,
+        "rgb": 16774912
+      }
+    },
+    {
+      "query": "path:\"Glosario\"",
+      "color": {
+        "a": 1,
+        "rgb": 14745855
+      }
+    },
+    {
+      "query": "path:\"PRACT\"",
+      "color": {
+        "a": 1,
+        "rgb": 2883328
+      }
+    },
+    {
+      "query": "path:\"TEO\"",
+      "color": {
+        "a": 1,
+        "rgb": 65505
+      }
+    },
+    {
+      "query": "",
+      "color": {
+        "a": 1,
+        "rgb": 5431473
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": true,
+  "centerStrength": 0.5,
+  "repelStrength": 9.89583333333333,
+  "linkStrength": 0.901041666666667,
+  "linkDistance": 400,
+  "scale": 0.713275462622427,
+  "close": true
+}

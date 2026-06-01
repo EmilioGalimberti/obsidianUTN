@@ -1,0 +1,9 @@
+# Ignorar el estado del espacio de trabajo (pestañas abiertas, paneles, etc.)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/workspace
+.obsidian/workspace-mobile
+
+# Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db

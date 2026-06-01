@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz SIM – Parcial 1</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f1117;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px;
+  }
+  h1 {
+    font-size: 1.6rem;
+    color: #7c9dff;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  #progress-bar-wrap {
+    width: 100%;
+    max-width: 700px;
+    background: #1e2130;
+    border-radius: 99px;
+    height: 8px;
+    margin: 12px 0 4px;
+    overflow: hidden;
+  }
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4f7cff, #a78bfa);
+    border-radius: 99px;
+    transition: width .4s ease;
+    width: 0%;
+  }
+  #progress-text {
+    font-size: .82rem;
+    color: #888;
+    margin-bottom: 20px;
+  }
+  #card {
+    background: #1a1e2e;
+    border: 1px solid #2a2f45;
+    border-radius: 16px;
+    padding: 28px 28px 22px;
+    max-width: 700px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(0,0,0,.4);
+  }
+  #question-title {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #5a6a9a;
+    margin-bottom: 8px;
+  }
+  #question-text {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #d8ddf5;
+  }
+  #hint {
+    font-size: .78rem;
+    color: #6677aa;
+    margin-bottom: 14px;
+  }
+  .option-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #22273a;
+    border: 1px solid #2e3450;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 9px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    user-select: none;
+  }
+  .option-label:hover { border-color: #4f7cff; background: #272d44; }
+  .option-label input[type=checkbox] { display: none; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 2px solid #4a5278;
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, border-color .2s;
+  }
+  .option-label.selected .check-box {
+    background: #4f7cff;
+    border-color: #4f7cff;
+  }
+  .option-label.selected .check-box::after { content: '✓'; color: #fff; font-size: 11px; }
+  /* resultado */
+  .option-label.correct   { border-color: #34d399; background: #0d2e22; }
+  .option-label.incorrect { border-color: #f87171; background: #2e1010; }
+  .option-label.missed    { border-color: #facc15; background: #2a2000; }
+  .option-label.correct   .check-box { background: #34d399; border-color: #34d399; }
+  .option-label.incorrect .check-box { background: #f87171; border-color: #f87171; }
+  .option-label.missed    .check-box { background: #facc15; border-color: #facc15; }
+  .option-label.correct   .check-box::after,
+  .option-label.incorrect .check-box::after,
+  .option-label.missed    .check-box::after { color: #000; font-size: 11px; }
+  .option-label.incorrect .check-box::after { content: '✗'; color: #fff; }
+  .option-label.missed    .check-box::after { content: '!'; }
+  .legend {
+    font-size: .73rem;
+    margin-top: 4px;
+    padding-left: 4px;
+  }
+  .option-text { font-size: .94rem; line-height: 1.4; }
+  #result-msg {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: .9rem;
+    display: none;
+  }
+  #result-msg.ok  { background: #0d2e22; border: 1px solid #34d399; color: #6ee7b7; }
+  #result-msg.bad { background: #2e1010; border: 1px solid #f87171; color: #fca5a5; }
+  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  button {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+  button:hover { opacity: .88; transform: translateY(-1px); }
+  #btn-confirm { background: linear-gradient(135deg, #4f7cff, #a78bfa); color: #fff; }
+  #btn-next    { background: #22273a; color: #aab; border: 1px solid #3a4060; display: none; }
+  #btn-restart { background: #1a1e2e; color: #7c9dff; border: 1px solid #3a4060; display: none; }
+
+  /* pantalla final */
+  #end-screen {
+    background: #1a1e2e;
+    border: 1px solid #2a2f45;
+    border-radius: 16px;
+    padding: 40px 32px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    display: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,.4);
+  }
+  #end-screen h2 { font-size: 1.5rem; margin-bottom: 10px; color: #7c9dff; }
+  #score-text { font-size: 3rem; font-weight: 700; margin: 16px 0 6px; }
+  #score-text.great { color: #34d399; }
+  #score-text.ok    { color: #facc15; }
+  #score-text.bad   { color: #f87171; }
+  #score-detail { color: #888; font-size: .9rem; margin-bottom: 28px; }
+  #btn-play-again {
+    background: linear-gradient(135deg, #4f7cff, #a78bfa);
+    color: #fff;
+    padding: 12px 32px;
+    font-size: 1rem;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+    max-width: 700px;
+    width: 100%;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: 1px solid #2e3450;
+    background: #1a1e2e;
+    color: #6677aa;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg,#4f7cff,#a78bfa);
+    color: #fff;
+    border-color: transparent;
+  }
+  .tab-section { width: 100%; max-width: 700px; display: none; }
+  .tab-section.active { display: block; }
+
+  /* ── THEORY ── */
+  #teo-nav { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .teo-cat {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #2e3450;
+    background: #1a1e2e;
+    color: #7c9dff;
+    font-size: .8rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .teo-cat.active { background:#4f7cff; color:#fff; border-color:#4f7cff; }
+
+  .fc-wrap { perspective: 900px; width:100%; margin-bottom:16px; min-height:200px; }
+  .fc {
+    width: 100%;
+    min-height: 200px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform .5s ease;
+    cursor: pointer;
+  }
+  .fc.flipped { transform: rotateY(180deg); }
+  .fc-front, .fc-back {
+    position: absolute; top:0; left:0; width:100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 6px 30px rgba(0,0,0,.4);
+    min-height: 200px;
+    display: flex; flex-direction:column; justify-content:center;
+  }
+  .fc-front {
+    background: #1a1e2e;
+    border: 1px solid #2e3450;
+  }
+  .fc-back {
+    background: linear-gradient(135deg,#0d1a3a,#1a1035);
+    border: 1px solid #4f7cff;
+    transform: rotateY(180deg);
+  }
+  .fc-tag {
+    font-size:.68rem; text-transform:uppercase;
+    letter-spacing:.1em; color:#5a6a9a; margin-bottom:10px;
+  }
+  .fc-q { font-size:1.1rem; color:#d8ddf5; line-height:1.5; }
+  .fc-hint { font-size:.75rem; color:#4a5a8a; margin-top:14px; }
+  .fc-a { font-size:.95rem; color:#c4d4ff; line-height:1.6; }
+  .fc-emoji { font-size:2rem; margin-bottom:10px; }
+  .fc-nav { display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:10px; }
+  .fc-nav button {
+    padding:8px 18px;
+    background:#22273a;
+    border:1px solid #3a4060;
+    border-radius:8px;
+    color:#aab;
+    font-size:.88rem;
+  }
+  #fc-counter { color:#6677aa; font-size:.82rem; }
+  .pill-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .pill {
+    background:#1e2540;
+    border:1px solid #3a4a70;
+    border-radius:20px;
+    padding:4px 12px;
+    font-size:.83rem;
+    color:#a0b4f0;
+  }
+  .pill.green { border-color:#34d399; color:#6ee7b7; background:#0a2018; }
+  .pill.red   { border-color:#f87171; color:#fca5a5; background:#200a0a; }
+  .pill.yellow{ border-color:#facc15; color:#fde68a; background:#201800; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+  .two-col .col-title { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; opacity:.7; }
+
+  /* ── SINGLE choice (radio style) ── */
+  .option-label.radio-opt { border-radius: 10px; }
+  .option-label.radio-opt .check-box { border-radius: 50%; }
+  .option-label.radio-opt.selected .check-box { background:#a78bfa; border-color:#a78bfa; }
+
+  /* ── ORDER (input numérico) ── */
+  .order-item {
+    display:flex; align-items:center; gap:12px;
+    background:#22273a; border:1px solid #2e3450;
+    border-radius:10px; padding:10px 14px;
+    margin-bottom:8px; transition:border-color .2s, background .2s;
+  }
+  .order-input {
+    width:46px; height:36px;
+    background:#0f1117; border:2px solid #3a4060;
+    border-radius:8px; color:#7c9dff;
+    font-size:1rem; font-weight:700;
+    text-align:center; flex-shrink:0;
+    outline:none; transition:border-color .2s;
+  }
+  .order-input:focus { border-color:#4f7cff; }
+  .order-input:disabled { opacity:.6; cursor:default; }
+  .order-item.correct-order { border-color:#34d399; background:#0d2e22; }
+  .order-item.correct-order .order-input { border-color:#34d399; color:#34d399; }
+  .order-item.wrong-order   { border-color:#f87171; background:#2e1010; }
+  .order-item.wrong-order   .order-input { border-color:#f87171; color:#f87171; }
+  .order-correct-label { font-size:.78rem; color:#6ee7b7; margin-left:4px; }
+</style>
+</head>
+<body>
+
+<h1>📚 SIM – Parcial 1</h1>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('teo')">🧠 Teoría</button>
+  <button class="tab-btn" onclick="switchTab('quiz')">🎮 Quiz</button>
+</div>
+
+<!-- ══════════════ SECCIÓN TEORÍA ══════════════ -->
+<div class="tab-section active" id="tab-teo">
+  <div id="teo-nav">
+    <button class="teo-cat active" onclick="setTeocat(0,this)">🗂 Modelos</button>
+    <button class="teo-cat" onclick="setTeocat(1,this)">⚙️ Simulación</button>
+    <button class="teo-cat" onclick="setTeocat(2,this)">🔛 Terminantes</button>
+    <button class="teo-cat" onclick="setTeocat(3,this)">➕➖ Ventajas/Desv.</button>
+    <button class="teo-cat" onclick="setTeocat(4,this)">💻 Lenguajes</button>
+    <button class="teo-cat" onclick="setTeocat(5,this)">🔟 Etapas</button>
+    <button class="teo-cat" onclick="setTeocat(6,this)">✅ Validación</button>
+    <button class="teo-cat" onclick="setTeocat(7,this)">📊 IC &amp; Muestra</button>
+  </div>
+
+  <div class="fc-wrap">
+    <div class="fc" id="flashcard" onclick="flipCard()">
+      <div class="fc-front">
+        <div class="fc-tag" id="fc-tag"></div>
+        <div class="fc-emoji" id="fc-emoji"></div>
+        <div class="fc-q" id="fc-q"></div>
+        <div class="fc-hint">👆 Click para ver la respuesta</div>
+      </div>
+      <div class="fc-back">
+        <div class="fc-tag" id="fc-tag-back"></div>
+        <div id="fc-a" class="fc-a"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fc-nav">
+    <button onclick="fcMove(-1)">← Anterior</button>
+    <span id="fc-counter"></span>
+    <button onclick="fcMove(1)">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ══════════════ SECCIÓN QUIZ ══════════════ -->
+<div class="tab-section" id="tab-quiz">
+<div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+<p id="progress-text">Pregunta 0 de 0</p>
+
+<div id="card">
+  <div id="question-title"></div>
+  <div id="question-text"></div>
+  <div id="hint"></div>
+  <div id="options-container"></div>
+  <div id="result-msg"></div>
+  <div class="btn-row">
+    <button id="btn-confirm">Confirmar respuesta</button>
+    <button id="btn-next">Siguiente →</button>
+    <button id="btn-restart">🔁 Reiniciar</button>
+  </div>
+</div>
+
+<div id="end-screen">
+  <h2>¡Quiz terminado!</h2>
+  <div id="score-text"></div>
+  <div id="score-detail"></div>
+  <button id="btn-play-again">Jugar de nuevo 🚀</button>
+</div>
+</div><!-- /tab-quiz -->
+
+<script>
+const QUESTIONS = [
+  {
+    text: "¿Cómo clasificamos los modelos?",
+    type: "multi",
+    options: [
+      "Los modelos Discretos son probabilísticos",
+      "Los modelos Continuos son determinísticos",
+      "Los modelos Discretos son determinísticos",
+      "Los modelos Continuos son probabilísticos",
+      "Los modelos estáticos no cambian su estado interno",
+      "Los modelos dinámicos varían con el tiempo",
+      "Los modelos continuos se basan en leyes de la naturaleza o en la observación"
+    ],
+    correct: [0, 1, 4, 5, 6]
+  },
+  {
+    text: "Seleccione los sistemas TERMINANTES:",
+    type: "multi",
+    options: [
+      "Por lo general no alcanza un estado estable",
+      "Su vida se prolonga en el tiempo de manera indefinida",
+      "Tiene un evento natural que determina el tiempo de vida",
+      "Al inicio presenta un estado transitorio (warm-Up)",
+      "Alcanza un estado de régimen"
+    ],
+    correct: [0, 2]
+  },
+  {
+    text: "Seleccione los sistemas NO TERMINANTES:",
+    type: "multi",
+    options: [
+      "Por lo general no alcanza un estado estable",
+      "Su vida se prolonga en el tiempo de manera indefinida",
+      "Tiene un evento natural que determina el tiempo de vida",
+      "Al inicio presenta un estado transitorio (warm-Up)",
+      "Alcanza un estado de régimen"
+    ],
+    correct: [1, 3, 4]
+  },
+  {
+    text: "Marque cuáles son las DESVENTAJAS de la Simulación:",
+    type: "multi",
+    options: [
+      "Puede aparentar reflejar con precisión un sistema real, cuando en verdad no lo hace",
+      "No es útil para la estimación de medidas de desempeño, bajo diferentes escenarios",
+      "No permite encontrar soluciones óptimas",
+      "No se puede medir el grado de imprecisión",
+      "No siempre es conveniente desde la perspectiva de los costos (económicos y en tiempo)",
+      "No es sustituto de un análisis detallado",
+      "No es apropiada para el estudio de sistemas estocásticos",
+      "Falta control sobre condiciones de entorno y de entrada"
+    ],
+    correct: [0, 2, 3, 4, 5]
+  },
+  {
+    text: "Marque cuáles son las VENTAJAS de la Simulación:",
+    type: "multi",
+    options: [
+      "Estimación de medidas de desempeño, bajo diferentes escenarios",
+      "Siempre es conveniente desde la perspectiva de costos",
+      "Manejo arbitrario del tiempo",
+      "Estudio de sistemas estocásticos",
+      "Sustituto de un análisis detallado",
+      "Permite encontrar soluciones óptimas",
+      "Control sobre condiciones de entorno y de entrada",
+      "Se puede medir el grado de imprecisión"
+    ],
+    correct: [0, 2, 3, 6]
+  },
+  {
+    text: "Marque cuáles son los PELIGROS de la Simulación:",
+    type: "multi",
+    options: [
+      "Inferir resultados con una sola corrida asumiendo independencia",
+      "Uso arbitrario de distribuciones y suposiciones",
+      "Impresionarse con el gran volumen de información que no refleja el sistema",
+      "Falta de validación del modelo",
+      "Estudio de sistemas estocásticos"
+    ],
+    correct: [0, 1, 2]
+  },
+  {
+    text: "Marque cuáles son los aspectos NEGATIVOS de los Lenguajes de Propósito General:",
+    type: "multi",
+    options: [
+      "Costo del software",
+      "Poco conocimiento del lenguaje",
+      "Es necesario desarrollar las funcionalidades requeridas para construir un modelo",
+      "Es más laboriosa la generación de datos necesarios para la simulación",
+      "Limitada flexibilidad para adaptarse a cualquier modelo",
+      "Es más laboriosa la administración y asignación de recursos de la computadora durante la corrida",
+      "Poca diversidad en el formato de salida",
+      "Tiempo de ejecución incrementado",
+      "Se necesita gestionar la recopilación y despliegue de los datos producidos"
+    ],
+    correct: [2, 3, 5, 8]
+  },
+  {
+    text: "Marque cuáles son los aspectos POSITIVOS de los Lenguajes de Propósito General:",
+    type: "multi",
+    options: [
+      "Control de la administración y asignación de recursos de la computadora durante la corrida",
+      "Por lo general se conoce muy bien el lenguaje",
+      "No hay restricciones para el formato de salida",
+      "Generación automática de ciertos datos necesarios",
+      "Menor costo del software",
+      "Recopilación y despliegue de los datos producidos",
+      "Flexibilidad para adaptarse a cualquier modelo",
+      "Tiempo de ejecución reducido",
+      "Brindan la mayoría de las funcionalidades necesarias para construir un modelo"
+    ],
+    correct: [1, 2, 4, 6, 7]
+  },
+  {
+    text: "Marque cuáles son los aspectos NEGATIVOS de los Lenguajes de Simulación:",
+    type: "multi",
+    options: [
+      "Poca diversidad en el formato de salida",
+      "Limitaciones para la generación de datos necesarios para la simulación",
+      "Limitaciones para la recopilación y despliegue",
+      "Es necesario desarrollar las funcionalidades requeridas para construir un modelo",
+      "Conocimiento del lenguaje",
+      "Costo del software",
+      "Limitada flexibilidad para adaptarse a cualquier modelo",
+      "Tiempo de ejecución incrementado",
+      "Dificulta la administración y asignación de recursos de la computadora durante la corrida"
+    ],
+    correct: [0, 4, 5, 6, 7]
+  },
+  {
+    text: "Marque cuáles son los aspectos POSITIVOS de los Lenguajes de Simulación:",
+    type: "multi",
+    options: [
+      "Brindan la mayoría de las funcionalidades necesarias para construir un modelo",
+      "Tiempo de ejecución reducido",
+      "Generación automática de ciertos datos necesarios",
+      "Por lo general se conoce muy bien el lenguaje",
+      "No hay restricciones del formato de salida",
+      "Recopilación y despliegue de los datos producidos",
+      "Menor costo del software",
+      "Control de administración y asignación de recursos de la computadora durante la corrida",
+      "Flexibilidad para adaptarse a cualquier modelo"
+    ],
+    correct: [0, 2, 5, 7]
+  },
+  {
+    text: "Ordená las 10 etapas del proceso de Simulación en el orden correcto (arrastrá los ítems):",
+    type: "order",
+    options: [
+      "Definición del problema",
+      "Formulación del modelo conceptual",
+      "Adquisición y preparación de datos",
+      "Traslación / Programación del modelo",
+      "Validación del modelo",
+      "Planeación táctica y estratégica",
+      "Experimentación",
+      "Interpretación y análisis de resultados",
+      "Implantación",
+      "Documentación"
+    ],
+    correct: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  },
+  {
+    text: "¿Cuáles son los 3 OBJETIVOS de la Simulación?",
+    type: "multi",
+    options: [
+      "Describir el comportamiento de sistemas",
+      "Reemplazar el análisis analítico en todos los casos",
+      "Postular teorías o hipótesis que expliquen el comportamiento observado",
+      "Garantizar soluciones óptimas al sistema",
+      "Usar teorías para predecir el comportamiento futuro ante cambios en el sistema",
+      "Reducir el costo del software de simulación",
+      "Eliminar la necesidad de validar el modelo"
+    ],
+    correct: [0, 2, 4]
+  },
+  {
+    text: "¿Cuándo se recurre a la Simulación? Marcá los 3 casos correctos:",
+    type: "multi",
+    options: [
+      "Cuando el sistema aún no existe (es imposible operar con él)",
+      "Cuando el sistema es extremadamente simple y predecible",
+      "Cuando probar cambios en producción real genera riesgos económicos o de tiempo (es costoso)",
+      "Cuando el sistema ya posee una solución analítica exacta",
+      "Cuando el sistema posee demasiadas variables que impiden un análisis analítico simple (es complejo)",
+      "Cuando se quiere evitar documentar el proceso",
+      "Cuando los resultados deben ser exactos y no estadísticos"
+    ],
+    correct: [0, 2, 4]
+  },
+  {
+    text: "¿Qué es la Simulación? Elegí la definición correcta:",
+    type: "single",
+    options: [
+      "La acción de construir un programa de computadora y hacer evolucionar un modelo matemático a lo largo del tiempo para observar cómo reacciona y obtener datos que ayuden a la toma de decisiones.",
+      "Un método que reemplaza completamente al sistema real y garantiza encontrar soluciones óptimas sin margen de error.",
+      "Una técnica de análisis analítico que usa ecuaciones diferenciales para modelar el comportamiento de sistemas determinísticos.",
+      "Un proceso de prueba y error sobre el sistema real para evaluar distintos escenarios de operación.",
+      "Un lenguaje de programación específico para modelar sistemas estocásticos en tiempo continuo."
+    ],
+    correct: [0]
+  },
+  {
+    text: "¿Qué es un Modelo? Elegí la definición correcta:",
+    type: "single",
+    options: [
+      "Un programa de computadora que ejecuta simulaciones de sistemas reales con resultados exactos.",
+      "Una representación simplificada o abstracción de la realidad que busca representar a un Sistema.",
+      "Un conjunto de ecuaciones diferenciales que describen el comportamiento de sistemas continuos exclusivamente.",
+      "Un sistema físico construido a escala para estudiar el comportamiento de un sistema mayor.",
+      "Una base de datos que almacena los resultados históricos de un sistema real para su análisis futuro."
+    ],
+    correct: [1]
+  },
+  {
+    text: "Acerca de la Validación del modelo – ¿Cuáles son los puntos clave que se deben validar?",
+    type: "multi",
+    options: [
+      "Verificación de Supuestos (se debe involucrar al cliente)",
+      "Valores de entrada",
+      "Valores de salida",
+      "Documentación del modelo",
+      "Costo del proyecto"
+    ],
+    correct: [0, 1, 2]
+  },
+  {
+    text: "¿Cuáles son las técnicas de validación de modelos?",
+    type: "multi",
+    options: [
+      "Intuición de experto (alguien que conozca el modelo real)",
+      "Mediciones en el sistema real",
+      "Resultados teóricos",
+      "Análisis de sensibilidad",
+      "Análisis de costos",
+      "Simulación de Monte Carlo"
+    ],
+    correct: [0, 1, 2, 3]
+  },
+  {
+    text: "¿Cuál o cuáles de estos parámetros / variables estadísticas pueden tomar eventualmente valores negativos?",
+    type: "multi",
+    options: [
+      "Media de una distribución Normal (no estándar)",
+      "Límite inferior de una distribución uniforme (a, b)",
+      "Límites inferior y superior de una distribución uniforme (a, b)",
+      "Varianza de una distribución Normal",
+      "Desvío estándar de cualquier distribución"
+    ],
+    correct: [0, 1, 2]
+  }
+];
+
+// ── Estado ──────────────────────────────────────────────────────────────────
+let shuffledQ = [];
+let currentIdx = 0;
+let currentOptions = []; // opciones en orden aleatorio para la pregunta actual
+let correctCount = 0;
+let confirmed = false;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  shuffledQ = shuffle(QUESTIONS);
+  currentIdx = 0;
+  correctCount = 0;
+  document.getElementById('end-screen').style.display = 'none';
+  document.getElementById('card').style.display = 'block';
+  document.getElementById('btn-restart').style.display = 'none';
+  renderQuestion();
+}
+
+
+function renderQuestion() {
+  confirmed = false;
+  const q = shuffledQ[currentIdx];
+  const total = shuffledQ.length;
+
+  document.getElementById('progress-text').textContent = `Pregunta ${currentIdx + 1} de ${total}`;
+  document.getElementById('progress-bar').style.width = `${((currentIdx) / total) * 100}%`;
+  document.getElementById('question-title').textContent = `Pregunta ${currentIdx + 1} / ${total}`;
+  document.getElementById('question-text').textContent = q.text;
+  document.getElementById('result-msg').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('btn-confirm').style.display = 'inline-block';
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+
+  if (q.type === 'order') {
+    document.getElementById('hint').textContent = '✏️ Escribí el número de orden (1 a 10) en el cuadro de cada etapa';
+    currentOptions = shuffle(q.options.map((text, idx) => ({ text, origIdx: idx })));
+    currentOptions.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'order-item';
+      div.dataset.i = i;
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.min = 1; inp.max = q.options.length;
+      inp.className = 'order-input'; inp.id = `oinp_${i}`;
+      inp.placeholder = '#';
+      const span = document.createElement('span');
+      span.className = 'option-text'; span.textContent = opt.text;
+      div.appendChild(inp); div.appendChild(span);
+      container.appendChild(div);
+    });
+
+  } else if (q.type === 'single') {
+    document.getElementById('hint').textContent = 'Elegí UNA sola opción correcta';
+    currentOptions = shuffle(q.options.map((text, idx) => ({ text, origIdx: idx })));
+    currentOptions.forEach((opt, i) => {
+      const label = document.createElement('label');
+      label.className = 'option-label radio-opt';
+      label.dataset.i = i;
+      label.innerHTML = `<input type="radio" name="single" value="${i}"><span class="check-box"></span><span class="option-text">${opt.text}</span>`;
+      label.addEventListener('click', (e) => {
+        if (confirmed) return;
+        e.preventDefault();
+        document.querySelectorAll('.option-label.radio-opt').forEach(l => l.classList.remove('selected'));
+        label.classList.add('selected');
+      });
+      container.appendChild(label);
+    });
+
+  } else {
+    // multi
+    const cnt = q.correct.length;
+    document.getElementById('hint').textContent = `Seleccioná todas las que correspondan (${cnt} correctas)`;
+    currentOptions = shuffle(q.options.map((text, idx) => ({ text, origIdx: idx })));
+    currentOptions.forEach((opt, i) => {
+      const label = document.createElement('label');
+      label.className = 'option-label';
+      label.dataset.i = i;
+      label.innerHTML = `<input type="checkbox" value="${i}"><span class="check-box"></span><span class="option-text">${opt.text}</span>`;
+      label.addEventListener('click', (e) => {
+        if (confirmed) return;
+        e.preventDefault();
+        label.classList.toggle('selected');
+      });
+      container.appendChild(label);
+    });
+  }
+}
+
+document.getElementById('btn-confirm').addEventListener('click', () => {
+  if (confirmed) return;
+  confirmed = true;
+
+  const q = shuffledQ[currentIdx];
+  const msg = document.getElementById('result-msg');
+  let allCorrect = true;
+
+  if (q.type === 'order') {
+    const items = [...document.querySelectorAll('.order-item')];
+    // build a map: origIdx -> typed position (1-based)
+    const typedPos = {}; // origIdx -> number entered
+    let inputError = false;
+    items.forEach((div, i) => {
+      const inp = div.querySelector('.order-input');
+      inp.disabled = true;
+      const val = parseInt(inp.value);
+      if (isNaN(val) || val < 1 || val > q.options.length) { inputError = true; return; }
+      typedPos[currentOptions[i].origIdx] = val;
+    });
+    if (inputError) {
+      confirmed = false; // allow retry
+      document.getElementById('btn-confirm').style.display = 'inline-block';
+      items.forEach(div => div.querySelector('.order-input').disabled = false);
+      msg.textContent = '⚠️ Completá todos los números (1 a ' + q.options.length + ') antes de confirmar.';
+      msg.className = 'result-msg bad'; msg.style.display = 'block';
+      return;
+    }
+    // check each item: the typed position should equal (origIdx+1) since correct order is 0,1,2...
+    items.forEach((div, i) => {
+      const opt = currentOptions[i];
+      const typed = typedPos[opt.origIdx]; // position user assigned to this item
+      const expected = opt.origIdx + 1;    // correct position (1-based)
+      if (typed === expected) {
+        div.classList.add('correct-order');
+      } else {
+        div.classList.add('wrong-order');
+        allCorrect = false;
+        // show the correct number
+        const lbl = document.createElement('span');
+        lbl.className = 'order-correct-label';
+        lbl.textContent = `→ era el ${expected}`;
+        div.appendChild(lbl);
+      }
+    });
+    if (allCorrect) {
+      msg.textContent = '✅ ¡Orden perfecto!';
+      msg.className = 'result-msg ok'; correctCount++;
+    } else {
+      msg.textContent = '❌ Algunos números estaban mal. Los correctos están en verde, los incorrectos en rojo con el número que correspondía.';
+      msg.className = 'result-msg bad';
+    }
+
+  } else {
+    // single & multi share same label-based logic
+    const labels = document.querySelectorAll('.option-label');
+    const correctOrigIdxSet = new Set(q.correct);
+    labels.forEach(label => {
+      const i = parseInt(label.dataset.i);
+      const opt = currentOptions[i];
+      const isSelected = label.classList.contains('selected');
+      const isCorrect = correctOrigIdxSet.has(opt.origIdx);
+      if (isSelected && isCorrect)       { label.classList.add('correct'); }
+      else if (isSelected && !isCorrect) { label.classList.add('incorrect'); allCorrect = false; }
+      else if (!isSelected && isCorrect) { label.classList.add('missed');    allCorrect = false; }
+    });
+    if (allCorrect) {
+      msg.textContent = '✅ ¡Perfecto! Respuesta correcta.';
+      msg.className = 'result-msg ok';
+      correctCount++;
+    } else {
+      const lbls = [...labels];
+      const sc = lbls.filter(l => l.classList.contains('correct')).length;
+      const missed = lbls.filter(l => l.classList.contains('missed')).length;
+      const wrong  = lbls.filter(l => l.classList.contains('incorrect')).length;
+      msg.textContent = q.type === 'single'
+        ? `❌ Incorrecto. La opción correcta está marcada en verde.`
+        : `❌ Casi. Correctas: ${sc}/${q.correct.length}. Incorrectas: ${wrong}. Faltaron: ${missed}. 🟡=faltaban, 🔴=incorrectas, 🟢=correctas.`;
+      msg.className = 'result-msg bad';
+    }
+  }
+
+  msg.style.display = 'block';
+  document.getElementById('btn-confirm').style.display = 'none';
+  const isLast = currentIdx === shuffledQ.length - 1;
+  document.getElementById('btn-next').textContent = isLast ? 'Ver resultados finales →' : 'Siguiente →';
+  document.getElementById('btn-next').style.display = 'inline-block';
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  currentIdx++;
+  if (currentIdx >= shuffledQ.length) {
+    showEndScreen();
+  } else {
+    renderQuestion();
+  }
+});
+
+document.getElementById('btn-restart').addEventListener('click', startQuiz);
+document.getElementById('btn-play-again').addEventListener('click', startQuiz);
+
+function showEndScreen() {
+  document.getElementById('card').style.display = 'none';
+  document.getElementById('end-screen').style.display = 'block';
+  const total = shuffledQ.length;
+  const pct = Math.round((correctCount / total) * 100);
+  const scoreEl = document.getElementById('score-text');
+  scoreEl.textContent = `${correctCount} / ${total}`;
+  scoreEl.className = pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'bad';
+  document.getElementById('score-detail').textContent =
+    `${pct}% de respuestas perfectas. ${pct >= 80 ? '¡Excelente trabajo! 🎉' : pct >= 50 ? 'Bien, pero podés mejorar 💪' : 'Seguí estudiando, vos podés 📚'}`;
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('progress-text').textContent = `Completado: ${total} de ${total}`;
+}
+
+// Inicio
+startQuiz();
+
+// ══════════════ TABS ══════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ══════════════ FLASHCARDS ══════════════
+const TEOCARDS = [
+  // 0 Modelos
+  [
+    { q:'¿Qué es un Modelo?', emoji:'🗂', a:'Representación <b>simplificada o abstracción</b> de la realidad que busca representar a un Sistema.' },
+    { q:'¿Cómo se clasifican los modelos?', emoji:'🌳',
+      aHtml: `<div class='two-col'><div><div class='col-title'>Discretos (Probabilísticos)</div><div class='pill'>Estáticos — misma entrada = misma salida</div><div class='pill' style='margin-top:6px'>Dinámicos — estado interno cambia con cada entrada</div></div><div><div class='col-title'>Continuos (Determinísticos)</div><div class='pill'>Leyes de la naturaleza (ec. diferenciales)</div><div class='pill' style='margin-top:6px'>Observación (sist. económicos, políticos)</div></div></div>` },
+    { q:'¿Cuál es la diferencia entre modelo Estático y Dinámico?', emoji:'⚡',
+      a:'<b>Estático:</b> misma entrada siempre da la misma salida. Su estado interno NO cambia.<br><b>Dinámico:</b> el estado interno cambia con cada entrada, por eso la misma entrada puede dar resultados distintos.' }
+  ],
+  // 1 Simulación
+  [
+    { q:'¿Qué es la Simulación?', emoji:'💻', a:'Construir un programa de computadora y hacer evolucionar un modelo matemático a lo largo del tiempo para <b>observar su comportamiento</b> y obtener datos para tomar decisiones.' },
+    { q:'¿Cuáles son los 3 objetivos de la Simulación?', emoji:'🎯',
+      aHtml:`<div class='pill-list'><span class='pill green'>1. Describir el comportamiento del sistema</span><span class='pill green'>2. Postular hipótesis que expliquen el comportamiento</span><span class='pill green'>3. Predecir comportamiento futuro ante cambios</span></div>` },
+    { q:'¿Cuándo se recurre a la Simulación?', emoji:'🤔',
+      aHtml:`<div class='pill-list'><span class='pill yellow'>Imposible: el sistema aún no existe</span><span class='pill yellow'>Costoso: probar en producción real genera riesgos</span><span class='pill yellow'>Complejo: demasiadas variables para análisis analítico simple</span></div>` }
+  ],
+  // 2 Terminantes
+  [
+    { q:'¿Qué es un Sistema TERMINANTE?', emoji:'🏁',
+      a:'Tiene un <b>evento natural predefinido</b> que determina el final de la simulación. Por lo general <b>NO alcanza un estado estable</b>. Ej: banco con horario fijo, fábrica con orden específica.' },
+    { q:'¿Qué es un Sistema NO TERMINANTE?', emoji:'♾️',
+      a:'Su vida se prolonga <b>indefinidamente</b>. Suele alcanzar un <b>estado estable (régimen)</b> pero presenta un <b>estado transitorio inicial (Warm-Up)</b>. Ej: central telefónica, sala de emergencias.' },
+    { q:'¿Qué es el Estado Transitorio (Warm-Up)?', emoji:'🌡️',
+      a:'Etapa inicial inestable donde las variables <b>fluctúan agresivamente</b> antes de estabilizarse. Para evitar sesgo: usar corridas largas, truncar datos iniciales, o hacer <b>warm start</b>.' }
+  ],
+  // 3 Ventajas/Desventajas
+  [
+    { q:'¿Cuáles son las VENTAJAS de la Simulación? (4 en UV)', emoji:'✅',
+      aHtml:`<div class='pill-list'><span class='pill green'>Estimación de medidas de desempeño bajo diferentes escenarios</span><span class='pill green'>Manejo arbitrario del tiempo</span><span class='pill green'>Estudio de sistemas estocásticos</span><span class='pill green'>Control sobre condiciones de entorno y de entrada</span></div>` },
+    { q:'¿Cuáles son las DESVENTAJAS de la Simulación? (5 en UV)', emoji:'❌',
+      aHtml:`<div class='pill-list'><span class='pill red'>Puede aparentar reflejar con precisión un sistema real cuando no lo hace</span><span class='pill red'>No permite encontrar soluciones óptimas</span><span class='pill red'>No se puede medir el grado de imprecisión</span><span class='pill red'>No siempre conveniente en costos (económicos y en tiempo)</span><span class='pill red'>No es sustituto de un análisis detallado</span></div>` },
+    { q:'¿Cuáles son los PELIGROS de la Simulación?', emoji:'⚠️',
+      aHtml:`<div class='pill-list'><span class='pill yellow'>Inferir resultados con una sola corrida asumiendo independencia</span><span class='pill yellow'>Uso arbitrario de distribuciones y suposiciones</span><span class='pill yellow'>Impresionarse con gran volumen de info que no refleja el sistema</span></div>` }
+  ],
+  // 4 Lenguajes
+  [
+    { q:'PROS de Lenguajes de Propósito General', emoji:'🟢',
+      aHtml:`<div class='pill-list'><span class='pill green'>Sin restricciones en formato de salida</span><span class='pill green'>Por lo general se conoce bien el lenguaje</span><span class='pill green'>Menor costo del software</span><span class='pill green'>Flexibilidad para adaptarse a cualquier modelo</span><span class='pill green'>Tiempo de ejecución reducido</span></div>` },
+    { q:'CONTRAS de Lenguajes de Propósito General', emoji:'🔴',
+      aHtml:`<div class='pill-list'><span class='pill red'>Necesario desarrollar todas las funcionalidades del modelo</span><span class='pill red'>Más laboriosa la generación de datos para la simulación</span><span class='pill red'>Más laboriosa la administración de recursos durante la corrida</span><span class='pill red'>Se necesita gestionar recopilación y despliegue de datos</span></div>` },
+    { q:'PROS de Lenguajes de Simulación', emoji:'🟢',
+      aHtml:`<div class='pill-list'><span class='pill green'>Brindan la mayoría de funcionalidades para construir el modelo</span><span class='pill green'>Generación automática de ciertos datos necesarios</span><span class='pill green'>Recopilación y despliegue de los datos producidos</span><span class='pill green'>Control de administración y asignación de recursos durante la corrida</span></div>` },
+    { q:'CONTRAS de Lenguajes de Simulación', emoji:'🔴',
+      aHtml:`<div class='pill-list'><span class='pill red'>Poca diversidad en el formato de salida</span><span class='pill red'>Conocimiento del lenguaje (curva de aprendizaje)</span><span class='pill red'>Costo del software</span><span class='pill red'>Limitada flexibilidad para adaptarse a cualquier modelo</span><span class='pill red'>Tiempo de ejecución incrementado</span></div>` }
+  ],
+  // 5 Etapas
+  [
+    { q:'¿Cuáles son las 10 etapas del Proceso de Simulación?', emoji:'🔟',
+      aHtml:`<ol style='padding-left:18px;line-height:2'><li>Definición del problema</li><li>Formulación del modelo conceptual</li><li>Adquisición y preparación de datos</li><li>Traslación / Programación del modelo</li><li style='color:#facc15;font-weight:600'>✨ Validación del modelo ← punto crítico</li><li>Planeación táctica y estratégica</li><li>Experimentación</li><li>Interpretación y análisis de resultados</li><li>Implantación</li><li>Documentación</li></ol>` },
+    { q:'¿Por qué la Validación es el punto crítico del proceso?', emoji:'🔍',
+      a:'Si el modelo <b>no representa fielmente la realidad</b>, se debe volver a etapas anteriores. El proceso es <b>iterativo, no lineal</b>. La validación puede forzar a reformular el modelo desde cero.' }
+  ],
+  // 6 Validación
+  [
+    { q:'¿Qué puntos clave se validan en un modelo?', emoji:'✅',
+      aHtml:`<div class='pill-list'><span class='pill green'>Verificación de Supuestos (involucrar al cliente)</span><span class='pill green'>Valores de entrada</span><span class='pill green'>Valores de salida</span></div>` },
+    { q:'¿Cuáles son las técnicas de Validación?', emoji:'🔬',
+      aHtml:`<div class='pill-list'><span class='pill'>Intuición de experto (alguien que conozca el sistema real)</span><span class='pill'>Mediciones en el sistema real</span><span class='pill'>Resultados teóricos</span><span class='pill'>Análisis de sensibilidad</span></div>` },
+    { q:'¿Qué es el Análisis de Sensibilidad?', emoji:'📡',
+      a:'Verifica que el modelo <b>reaccione proporcionalmente</b> a cambios en sus variables de entrada. Si un pequeño cambio produce una respuesta desproporcionada, hay un <b>problema en el modelo</b>.' }
+  ],
+  // 7 IC & Muestra
+  [
+    { q:'¿Qué es un Intervalo de Confianza?', emoji:'📊',
+      a:'Rango numérico en el que, con cierta probabilidad (1−α, ej. 95%), se ubica el <b>valor real</b> de la variable buscada.<br>P{L_inf ≤ X ≤ L_sup} = 1 − α' },
+    { q:'¿Cuándo usar T de Student vs Distribución Normal (Z)?', emoji:'⚖️',
+      aHtml:`<div class='two-col'><div><div class='col-title'>T de Student</div><span class='pill red'>N &lt; 30 corridas</span></div><div><div class='col-title'>Normal (Z)</div><span class='pill green'>N ≥ 30 corridas</span></div></div><br>⚠️ Confundirlas es un <b>error gravísimo</b> en el parcial.` },
+    { q:'¿Cuáles son las 3 fórmulas para calcular el Tamaño de Muestra n?', emoji:'🧮',
+      aHtml:`<div style='line-height:2'><b>1. σ conocida:</b> n = (Z·σ/ε)²<br><b>2. σ desconocida, N&lt;30:</b> n = (t·s/ε)²<br><b>3. Chebyshev (sin distribución):</b> n = (1/α)·(s/ε)²</div><div class='pill yellow' style='margin-top:10px'>Chebyshev es el más conservador: da el n más grande</div>` }
+  ]
+];
+
+let teoCatIdx = 0;
+let teoCardIdx = 0;
+
+function setTeocat(idx, el) {
+  teoCatIdx = idx;
+  teoCardIdx = 0;
+  document.querySelectorAll('.teo-cat').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderCard();
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function fcMove(dir) {
+  const cards = TEOCARDS[teoCatIdx];
+  teoCardIdx = (teoCardIdx + dir + cards.length) % cards.length;
+  document.getElementById('flashcard').classList.remove('flipped');
+  setTimeout(renderCard, 50);
+}
+
+function renderCard() {
+  const cards = TEOCARDS[teoCatIdx];
+  const c = cards[teoCardIdx];
+  const catNames = ['Modelos','Simulación','Terminantes','Ventajas & Desventajas','Lenguajes','Etapas','Validación','IC & Muestra'];
+  document.getElementById('fc-tag').textContent = catNames[teoCatIdx];
+  document.getElementById('fc-tag-back').textContent = catNames[teoCatIdx];
+  document.getElementById('fc-emoji').textContent = c.emoji || '📖';
+  document.getElementById('fc-q').textContent = c.q;
+  document.getElementById('fc-a').innerHTML = c.aHtml || c.a;
+  document.getElementById('fc-counter').textContent = `${teoCardIdx + 1} / ${cards.length}`;
+}
+
+renderCard();
+</script>
+</body>
+</html>

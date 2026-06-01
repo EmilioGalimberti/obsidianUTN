@@ -1,0 +1,1 @@
+Es el sistema o protocolo que le otorga una dirección única a cada equipo de la red para identificarlo, funcionando mediante una analogía exacta a la dirección de un domicilio particular
