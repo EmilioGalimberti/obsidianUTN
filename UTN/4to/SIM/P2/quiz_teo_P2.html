@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Simulación 2do Parcial Teórico</title>
+    <meta name="description" content="Quiz de práctica para el 2do parcial teórico de Simulación">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #111128;
+            --bg-card: rgba(20, 20, 50, 0.6);
+            --bg-card-hover: rgba(30, 30, 70, 0.7);
+            --border-card: rgba(100, 100, 255, 0.15);
+            --accent-primary: #6c5ce7;
+            --accent-secondary: #a29bfe;
+            --accent-glow: rgba(108, 92, 231, 0.3);
+            --text-primary: #e8e8f0;
+            --text-secondary: #9999bb;
+            --text-muted: #666688;
+            --correct: #00b894;
+            --correct-bg: rgba(0, 184, 148, 0.12);
+            --correct-border: rgba(0, 184, 148, 0.35);
+            --incorrect: #e17055;
+            --incorrect-bg: rgba(225, 112, 85, 0.12);
+            --incorrect-border: rgba(225, 112, 85, 0.35);
+            --warning: #fdcb6e;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse 600px 600px at 20% 20%, rgba(108, 92, 231, 0.08), transparent),
+                radial-gradient(ellipse 500px 500px at 80% 80%, rgba(162, 155, 254, 0.06), transparent),
+                radial-gradient(ellipse 400px 400px at 50% 50%, rgba(0, 184, 148, 0.04), transparent);
+            pointer-events: none;
+            z-index: 0;
+            animation: bgPulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: rgba(108, 92, 231, 0.15);
+            border: 1px solid rgba(108, 92, 231, 0.25);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-secondary);
+            margin-bottom: 1.2rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-badge .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            margin: 0 -1.5rem 2rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-info span:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(100, 100, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Question Cards */
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: var(--transition);
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .question-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(100, 100, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(108, 92, 231, 0.1);
+        }
+
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .question-type-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            background: rgba(253, 203, 110, 0.12);
+            border: 1px solid rgba(253, 203, 110, 0.25);
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--warning);
+            vertical-align: middle;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        /* Options */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+            padding: 0.9rem 1.1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(100, 100, 255, 0.08);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-label:hover {
+            background: rgba(108, 92, 231, 0.08);
+            border-color: rgba(108, 92, 231, 0.2);
+        }
+
+        .option-label.selected {
+            background: rgba(108, 92, 231, 0.12);
+            border-color: rgba(108, 92, 231, 0.35);
+            box-shadow: 0 0 0 1px rgba(108, 92, 231, 0.15);
+        }
+
+        .option-label input[type="checkbox"],
+        .option-label input[type="radio"] {
+            display: none;
+        }
+
+        .custom-check {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border: 2px solid rgba(100, 100, 255, 0.25);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            margin-top: 1px;
+        }
+
+        .option-label input[type="radio"] + .custom-check {
+            border-radius: 50%;
+        }
+
+        .option-label.selected .custom-check {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .custom-check svg {
+            width: 14px;
+            height: 14px;
+            fill: none;
+            stroke: white;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            transform: scale(0);
+            transition: var(--transition);
+        }
+
+        .option-label.selected .custom-check svg {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        .option-label.selected .option-text {
+            color: var(--text-primary);
+        }
+
+        /* Results styling on options */
+        .option-label.result-correct {
+            background: var(--correct-bg) !important;
+            border-color: var(--correct-border) !important;
+        }
+
+        .option-label.result-correct .option-text {
+            color: var(--correct) !important;
+        }
+
+        .option-label.result-correct .custom-check {
+            background: var(--correct) !important;
+            border-color: var(--correct) !important;
+        }
+
+        .option-label.result-incorrect {
+            background: var(--incorrect-bg) !important;
+            border-color: var(--incorrect-border) !important;
+        }
+
+        .option-label.result-incorrect .option-text {
+            color: var(--incorrect) !important;
+            text-decoration: line-through;
+        }
+
+        .option-label.result-incorrect .custom-check {
+            background: var(--incorrect) !important;
+            border-color: var(--incorrect) !important;
+        }
+
+        .option-label.result-missed {
+            border-color: var(--correct-border) !important;
+            border-style: dashed !important;
+        }
+
+        .option-label.result-missed .option-text {
+            color: var(--correct) !important;
+            font-style: italic;
+        }
+
+        .question-result-badge {
+            display: none;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .question-result-badge.correct {
+            display: inline-flex;
+            background: var(--correct-bg);
+            color: var(--correct);
+            border: 1px solid var(--correct-border);
+        }
+
+        .question-result-badge.incorrect {
+            display: inline-flex;
+            background: var(--incorrect-bg);
+            color: var(--incorrect);
+            border: 1px solid var(--incorrect-border);
+        }
+
+        .question-result-badge.partial {
+            display: inline-flex;
+            background: rgba(253, 203, 110, 0.12);
+            color: var(--warning);
+            border: 1px solid rgba(253, 203, 110, 0.35);
+        }
+
+        /* Submit Button */
+        .submit-section {
+            text-align: center;
+            margin-top: 2.5rem;
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 0.02em;
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(108, 92, 231, 0.45);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-submit svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-retry {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.8rem 2rem;
+            background: transparent;
+            color: var(--accent-secondary);
+            border: 1px solid rgba(162, 155, 254, 0.3);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .btn-retry:hover {
+            background: rgba(162, 155, 254, 0.08);
+            border-color: rgba(162, 155, 254, 0.5);
+        }
+
+        /* Results Panel */
+        .results-panel {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-align: center;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .results-panel.visible {
+            display: block;
+        }
+
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .score-circle svg {
+            width: 160px;
+            height: 160px;
+            transform: rotate(-90deg);
+        }
+
+        .score-circle .bg-circle {
+            fill: none;
+            stroke: rgba(100, 100, 255, 0.1);
+            stroke-width: 8;
+        }
+
+        .score-circle .fg-circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .results-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .stat-value.correct { color: var(--correct); }
+        .stat-value.incorrect { color: var(--incorrect); }
+        .stat-value.partial { color: var(--warning); }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 500;
+        }
+
+        .results-message {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card:nth-child(1) { animation-delay: 0.05s; }
+        .question-card:nth-child(2) { animation-delay: 0.1s; }
+        .question-card:nth-child(3) { animation-delay: 0.15s; }
+        .question-card:nth-child(4) { animation-delay: 0.2s; }
+        .question-card:nth-child(5) { animation-delay: 0.25s; }
+        .question-card:nth-child(6) { animation-delay: 0.3s; }
+        .question-card:nth-child(7) { animation-delay: 0.35s; }
+        .question-card:nth-child(8) { animation-delay: 0.4s; }
+
+        /* Confetti */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            opacity: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.7rem; }
+            .question-card { padding: 1.4rem; }
+            .results-stats { gap: 1.2rem; }
+            .score-circle { width: 130px; height: 130px; }
+            .score-circle svg { width: 130px; height: 130px; }
+            .score-number { font-size: 2.2rem; }
+        }
+
+        /* Shuffle indicator */
+        .shuffle-info {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .shuffle-info svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--text-muted);
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 44px;
+            height: 44px;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+            transition: var(--transition);
+        }
+
+        .scroll-top.visible { display: flex; }
+        .scroll-top:hover { transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <div class="header-badge">
+            <span class="dot"></span>
+            Simulación — 2do Parcial
+        </div>
+        <h1>Quiz Teórico</h1>
+        <p>8 preguntas · Selección múltiple y única</p>
+    </header>
+
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-info">
+            <span id="progressText">0 de 8 respondidas</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div class="shuffle-info">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+        </svg>
+        Las preguntas y opciones se muestran en orden aleatorio
+    </div>
+
+    <div id="questionsContainer"></div>
+
+    <div class="results-panel" id="resultsPanel">
+        <div class="score-circle">
+            <svg viewBox="0 0 160 160">
+                <circle class="bg-circle" cx="80" cy="80" r="70" />
+                <circle class="fg-circle" id="scoreCircle" cx="80" cy="80" r="70" />
+            </svg>
+            <div class="score-text">
+                <div class="score-number" id="scoreNumber">0%</div>
+                <div class="score-label">Puntaje</div>
+            </div>
+        </div>
+        <div class="results-stats">
+            <div class="stat-item">
+                <div class="stat-value correct" id="statCorrect">0</div>
+                <div class="stat-label">Correctas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value partial" id="statPartial">0</div>
+                <div class="stat-label">Parciales</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value incorrect" id="statIncorrect">0</div>
+                <div class="stat-label">Incorrectas</div>
+            </div>
+        </div>
+        <div class="results-message" id="resultsMessage"></div>
+    </div>
+
+    <div class="submit-section">
+        <button class="btn-submit" id="btnSubmit" onclick="submitQuiz()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            Corregir Quiz
+        </button>
+        <br>
+        <button class="btn-retry" id="btnRetry" style="display:none;" onclick="retryQuiz()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            Intentar de nuevo
+        </button>
+    </div>
+</div>
+
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+</button>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+// ============================================================
+// QUESTIONS DATA
+// ============================================================
+const questionsData = [
+    {
+        id: 1,
+        type: "multiple", // multiple correct answers
+        question: "En un sistema de colas con múltiples servidores en serie...",
+        options: [
+            { text: "El tiempo de atención total es la suma de los tiempos de atención de todos los servidores", correct: true },
+            { text: "Todos los clientes pasan por cada servidor uno tras otro", correct: true },
+            { text: "Los servidores deben atender en paralelo", correct: false },
+            { text: "Cada servidor tiene su propia cola individual", correct: true },
+            { text: "No se puede modelar con simulación", correct: false }
+        ]
+    },
+    {
+        id: 2,
+        type: "multiple",
+        question: "Según la notación de Kendall A/B/s, ¿cuál de las siguientes opciones es correcta?",
+        options: [
+            { text: "s se refiere al tiempo entre llegadas", correct: false },
+            { text: "A representa la disciplina de la cola", correct: false },
+            { text: "A no es relevante en sistemas con múltiples colas", correct: false },
+            { text: "B se refiere a la distribución de los tiempos de servicio", correct: true },
+            { text: "s indica el número de servidores", correct: true }
+        ]
+    },
+    {
+        id: 3,
+        type: "single", // single correct answer
+        question: "¿Cómo se gestionan dos eventos que se producen exactamente en el mismo momento?",
+        options: [
+            { text: "Se aumenta la cantidad de decimales empleados en la generación de los tiempos hasta que se encuentra alguna diferencia entre ambos tiempos de ejecución, y luego se ejecuta el primero de ellos.", correct: false },
+            { text: "Se ejecuta uno primero, realizando todos los cambios consecuentes en el sistema, y luego se ejecuta el otro, sin avanzar el reloj.", correct: true },
+            { text: "Se ejecutan simultáneamente, realizando todos los cambios consecuentes en el sistema.", correct: false },
+            { text: "Se ejecuta uno primero, realizando todos los cambios consecuentes en el sistema, y luego se ejecuta el otro, avanzando el reloj lo mínimo posible.", correct: false },
+            { text: "Se elige uno de ellos y se le regenera el momento de ejecución para que no coincidan.", correct: false }
+        ]
+    },
+    {
+        id: 4,
+        type: "multiple",
+        question: 'Considerando el "Paso de integración h" de un proceso de integración numérica de un modelo continuo... (Seleccione la o las respuestas correctas)',
+        options: [
+            { text: "Es la medida en que avanza la variable independiente con cada iteración.", correct: true },
+            { text: "No tiene relación con la unidad de integración.", correct: false },
+            { text: "Establece en cuántas iteraciones se incrementa en 1 la unidad de integración.", correct: true },
+            { text: "Equivale a la unidad de integración.", correct: false },
+            { text: "Es la medida en que avanza la variable dependiente con cada iteración.", correct: false }
+        ]
+    },
+    {
+        id: 5,
+        type: "multiple",
+        question: "Cuando se dispone de un modelo que consiste de una ecuación diferencial...",
+        options: [
+            { text: "Si se dispone de la solución analítica, siempre es conveniente realizar una integración numérica con métodos de 4to orden.", correct: false },
+            { text: "Si se dispone de la solución analítica, siempre es preferible a una integración numérica.", correct: true },
+            { text: "Si NO se dispone de la solución analítica, es conveniente realizar una integración numérica con métodos de 4to orden.", correct: true },
+            { text: "Si NO se dispone de la solución analítica, una integración numérica no es de gran utilidad.", correct: false },
+            { text: "Si se dispone de la solución analítica, hay que evaluar si es conveniente realizar una integración numérica.", correct: false }
+        ]
+    },
+    {
+        id: 6,
+        type: "multiple",
+        question: "Respecto del Error Absoluto y el Error Relativo... (Seleccione la o las respuestas correctas)",
+        options: [
+            { text: "El Error Relativo se expresa en porcentaje.", correct: true },
+            { text: "El Error Absoluto se expresa en las mismas unidades que la variable.", correct: true },
+            { text: "El Error Relativo aumenta cuando el valor de la variable es cercano a cero.", correct: true },
+            { text: "El Error Relativo se expresa en las mismas unidades que la variable.", correct: false },
+            { text: "El Error Absoluto aumenta cuando el valor de la variable es cercano a cero.", correct: false },
+            { text: "El Error Absoluto se expresa en porcentaje.", correct: false }
+        ]
+    },
+    {
+        id: 7,
+        type: "multiple",
+        question: 'Cuando ocurre un evento "Llegada de cliente", SIEMPRE se debe...',
+        options: [
+            { text: "Preguntar si hay clientes en la cola.", correct: false },
+            { text: "Generar inmediatamente una nueva Llegada.", correct: true },
+            { text: "Generar un Fin de Atención.", correct: false },
+            { text: "Preguntar si el servidor está disponible.", correct: true }
+        ]
+    },
+    {
+        id: 8,
+        type: "single",
+        question: 'Cuando ocurre un evento "Fin de atención", SIEMPRE se debe...',
+        options: [
+            { text: "Preguntar si la cola está llena.", correct: false },
+            { text: "Generar inmediatamente otro evento Fin de Atención.", correct: false },
+            { text: "Preguntar si el servidor está disponible.", correct: false },
+            { text: "Preguntar si hay clientes en la cola.", correct: true }
+        ]
+    }
+];
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// ============================================================
+// RENDER QUIZ
+// ============================================================
+let shuffledQuestions = [];
+
+function renderQuiz() {
+    shuffledQuestions = shuffleArray(questionsData).map(q => ({
+        ...q,
+        options: shuffleArray(q.options)
+    }));
+
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+
+    shuffledQuestions.forEach((q, qIdx) => {
+        const inputType = q.type === 'single' ? 'radio' : 'checkbox';
+        const typeBadge = q.type === 'multiple'
+            ? '<span class="question-type-badge">Múltiple respuesta</span>'
+            : '<span class="question-type-badge">Respuesta única</span>';
+
+        let optionsHTML = '';
+        q.options.forEach((opt, oIdx) => {
+            const inputName = q.type === 'single' ? `q${qIdx}` : `q${qIdx}_o${oIdx}`;
+            const inputId = `q${qIdx}_o${oIdx}`;
+            optionsHTML += `
+                <label class="option-label" id="label_${inputId}" onclick="toggleOption(this, '${inputType}', '${inputId}', ${qIdx})">
+                    <input type="${inputType}" name="${q.type === 'single' ? 'q' + qIdx : inputId}" id="${inputId}" value="${oIdx}">
+                    <span class="custom-check">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </span>
+                    <span class="option-text">${opt.text}</span>
+                </label>
+            `;
+        });
+
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `question_${qIdx}`;
+        card.innerHTML = `
+            <span class="question-number">${qIdx + 1}</span>
+            ${typeBadge}
+            <p class="question-text">${q.question}</p>
+            <div class="options-list" id="options_${qIdx}">
+                ${optionsHTML}
+            </div>
+            <div class="question-result-badge" id="badge_${qIdx}"></div>
+        `;
+        container.appendChild(card);
+    });
+
+    updateProgress();
+}
+
+function toggleOption(label, type, inputId, qIdx) {
+    const input = document.getElementById(inputId);
+
+    if (type === 'radio') {
+        // Deselect all in same question
+        const allLabels = document.querySelectorAll(`#options_${qIdx} .option-label`);
+        allLabels.forEach(l => l.classList.remove('selected'));
+        label.classList.add('selected');
+        input.checked = true;
+    } else {
+        // Toggle checkbox
+        input.checked = !input.checked;
+        label.classList.toggle('selected', input.checked);
+    }
+
+    updateProgress();
+}
+
+function updateProgress() {
+    let answered = 0;
+    const total = shuffledQuestions.length;
+
+    shuffledQuestions.forEach((q, qIdx) => {
+        if (q.type === 'single') {
+            const checked = document.querySelector(`input[name="q${qIdx}"]:checked`);
+            if (checked) answered++;
+        } else {
+            const anyChecked = document.querySelectorAll(`#options_${qIdx} input:checked`);
+            if (anyChecked.length > 0) answered++;
+        }
+    });
+
+    const pct = Math.round((answered / total) * 100);
+    document.getElementById('progressText').textContent = `${answered} de ${total} respondidas`;
+    document.getElementById('progressPercent').textContent = `${pct}%`;
+    document.getElementById('progressFill').style.width = `${pct}%`;
+}
+
+// ============================================================
+// SUBMIT & EVALUATE
+// ============================================================
+function submitQuiz() {
+    let totalCorrect = 0;
+    let totalPartial = 0;
+    let totalIncorrect = 0;
+
+    shuffledQuestions.forEach((q, qIdx) => {
+        const optionsContainer = document.getElementById(`options_${qIdx}`);
+        const labels = optionsContainer.querySelectorAll('.option-label');
+        const badge = document.getElementById(`badge_${qIdx}`);
+
+        let isFullyCorrect = true;
+        let hasAnyCorrectSelected = false;
+        let hasAnyIncorrectSelected = false;
+
+        labels.forEach((label, oIdx) => {
+            const input = label.querySelector('input');
+            const isSelected = input.checked;
+            const isCorrect = q.options[oIdx].correct;
+
+            // Disable input
+            input.disabled = true;
+            label.style.cursor = 'default';
+            label.onclick = null;
+
+            if (isSelected && isCorrect) {
+                label.classList.add('result-correct');
+                hasAnyCorrectSelected = true;
+            } else if (isSelected && !isCorrect) {
+                label.classList.add('result-incorrect');
+                hasAnyIncorrectSelected = true;
+                isFullyCorrect = false;
+            } else if (!isSelected && isCorrect) {
+                label.classList.add('result-missed');
+                isFullyCorrect = false;
+            }
+        });
+
+        if (isFullyCorrect) {
+            totalCorrect++;
+            badge.className = 'question-result-badge correct';
+            badge.innerHTML = '✓ Correcta';
+        } else if (hasAnyCorrectSelected && !hasAnyIncorrectSelected) {
+            totalPartial++;
+            badge.className = 'question-result-badge partial';
+            badge.innerHTML = '◐ Parcialmente correcta';
+        } else {
+            totalIncorrect++;
+            badge.className = 'question-result-badge incorrect';
+            badge.innerHTML = '✗ Incorrecta';
+        }
+    });
+
+    // Show results
+    const total = shuffledQuestions.length;
+    const score = Math.round(((totalCorrect + totalPartial * 0.5) / total) * 100);
+
+    document.getElementById('statCorrect').textContent = totalCorrect;
+    document.getElementById('statPartial').textContent = totalPartial;
+    document.getElementById('statIncorrect').textContent = totalIncorrect;
+    document.getElementById('scoreNumber').textContent = `${score}%`;
+
+    // Score circle color
+    const circle = document.getElementById('scoreCircle');
+    const circumference = 2 * Math.PI * 70; // r=70
+    const offset = circumference - (score / 100) * circumference;
+
+    let strokeColor;
+    if (score >= 80) strokeColor = 'var(--correct)';
+    else if (score >= 50) strokeColor = 'var(--warning)';
+    else strokeColor = 'var(--incorrect)';
+
+    circle.style.stroke = strokeColor;
+    document.getElementById('scoreNumber').style.color = strokeColor;
+
+    // Message
+    const msgEl = document.getElementById('resultsMessage');
+    if (score >= 90) msgEl.textContent = '🎉 ¡Excelente! Estás muy preparado para el parcial.';
+    else if (score >= 70) msgEl.textContent = '👍 ¡Buen trabajo! Revisá las preguntas falladas.';
+    else if (score >= 50) msgEl.textContent = '📖 Necesitás repasar algunos temas.';
+    else msgEl.textContent = '💪 ¡A estudiar! Revisá bien la teoría y volvé a intentar.';
+
+    const panel = document.getElementById('resultsPanel');
+    panel.classList.add('visible');
+
+    // Animate circle after visible
+    requestAnimationFrame(() => {
+        circle.style.strokeDashoffset = offset;
+    });
+
+    // Scroll to results
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Hide submit, show retry
+    document.getElementById('btnSubmit').style.display = 'none';
+    document.getElementById('btnRetry').style.display = 'inline-flex';
+
+    // Confetti if good score
+    if (score >= 70) launchConfetti();
+}
+
+function retryQuiz() {
+    document.getElementById('resultsPanel').classList.remove('visible');
+    document.getElementById('btnSubmit').style.display = 'inline-flex';
+    document.getElementById('btnRetry').style.display = 'none';
+
+    // Reset score circle
+    const circle = document.getElementById('scoreCircle');
+    circle.style.strokeDashoffset = 440;
+
+    renderQuiz();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// CONFETTI EFFECT
+// ============================================================
+function launchConfetti() {
+    const container = document.getElementById('confettiContainer');
+    const colors = ['#6c5ce7', '#a29bfe', '#00b894', '#fdcb6e', '#e17055', '#74b9ff', '#ff7675', '#55efc4'];
+    const count = 80;
+
+    for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const delay = Math.random() * 0.5;
+        const duration = 2 + Math.random() * 2;
+        const size = 6 + Math.random() * 8;
+        const rotation = Math.random() * 360;
+
+        confetti.style.cssText = `
+            left: ${left}%;
+            top: -10px;
+            width: ${size}px;
+            height: ${size * 0.6}px;
+            background: ${color};
+            transform: rotate(${rotation}deg);
+            animation: confettiFall ${duration}s ${delay}s ease-out forwards;
+        `;
+        container.appendChild(confetti);
+    }
+
+    // Inject animation if not yet
+    if (!document.getElementById('confettiStyle')) {
+        const style = document.createElement('style');
+        style.id = 'confettiStyle';
+        style.textContent = `
+            @keyframes confettiFall {
+                0% { opacity: 1; top: -10px; transform: rotate(0deg) translateX(0); }
+                100% { opacity: 0; top: 110vh; transform: rotate(720deg) translateX(${Math.random() > 0.5 ? '' : '-'}80px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setTimeout(() => { container.innerHTML = ''; }, 5000);
+}
+
+// ============================================================
+// SCROLL TO TOP BUTTON
+// ============================================================
+window.addEventListener('scroll', () => {
+    const btn = document.getElementById('scrollTopBtn');
+    btn.classList.toggle('visible', window.scrollY > 400);
+});
+
+// ============================================================
+// INIT
+// ============================================================
+renderQuiz();
+</script>
+</body>
+</html>

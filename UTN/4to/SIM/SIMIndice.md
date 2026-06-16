@@ -7,3 +7,4 @@
 
 # Parcial 1 
 [[P1IndiceSIM]]
+[[P2IndiceSIM]]

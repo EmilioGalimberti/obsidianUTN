@@ -1,6 +1,6 @@
 {
   "collapse-filter": false,
-  "search": "path:UTN/4to/REDES  ",
+  "search": "path:UTN/4to",
   "showTags": false,
   "showAttachments": false,
   "hideUnresolved": false,
@@ -53,6 +53,6 @@
   "repelStrength": 9.89583333333333,
   "linkStrength": 0.901041666666667,
   "linkDistance": 400,
-  "scale": 0.713275462622427,
+  "scale": 0.2588386562181567,
   "close": true
 }
