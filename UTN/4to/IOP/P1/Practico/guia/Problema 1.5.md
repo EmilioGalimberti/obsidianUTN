@@ -15,8 +15,11 @@ g) Defina las variables de holgura
 
 
 ---
-- **Lectura y Comprensión:** La profesora recalca que no se debe saltar a formular el modelo sin antes leer y expresar verbalmente el objetivo y las restricciones.
+La profesora enfatizó que no se debe saltar directamente a escribir ecuaciones sin antes realizar un análisis comprensivo del enunciado. Textualmente indicó: _"no subestimen estos pasos de leer y analizar el problema e identificar con palabras qué es lo que tengo es muy importante y en medida que los problemas se hacen más complicados más importantes se vuelven estos pasos"_.
 
+>[!tip] Metodología de Resolución Antes de plantear variables matemáticas (x1​,x2​), debes escribir verbalmente cuál es la meta del decisor y cuáles son los límites físicos o económicos que enfrenta
+
+# U2
 a) Describa el objetivo en forma verbal
 	Maximazar el rendimiento del dinero invertido
 
@@ -28,47 +31,42 @@ b) Defina las variables de decisión del problema.
 	    - Se debió definir la variable utilizando una unidad monetaria:
 		    - x1="Pesos a invertir en la acción tipo A")
 		    - x2="Pesos a invertir en la acción tipo B")
->[!danger] Trampa de Parcial (El uso de la palabra "Cantidad") Un error grave y frecuente es definir las variables como "cantidad de acciones a comprar". Esto es **INCORRECTO** en este caso específico porque el enunciado no nos proporciona el precio unitario de cada acción. Como el beneficio (30% y 10%) se calcula sobre el capital invertido, la variable debe definirse usando una unidad monetaria para mantener la coherencia del [[Análisis Dimensional]]
 
+>[!danger] Trampa de Parcial (Definición de Variables) La profesora advirtió firmemente que definir una variable como "cantidad del producto" es un error conceptual. Explicó que _"cantidad no es una unidad a la cual esta medida"_. Por ejemplo, en lugar de decir "cantidad de dinero a invertir", se debe ser exacto y definir "pesos a invertir", o en lugar de "cantidad de sillas", usar "unidades de sillas a producir". Esto garantiza la correcta aplicación del [[Análisis Dimensional]].
 - **Formas de Definición de Variables:**
     - **[[Definición por Extensión]]:** Detallar cada variable individualmente (Ej: x1​ = pesos invertidos en acción A).
     - **[[Definición por Comprensión]]:** Usar una notación general (Ej: xi​ = pesos a invertir en la acción tipo i, para i=1,2).
 
 c) ¿Al describir las variables utilizó alguna unidad de tiempo? Si la respuesta es afirmativa indique cual es en cada variable y cual corresponderá a la función objetivo
+	NO SE TIENE UN PERIDO SOBRE EL CUAL ESTAN INVERTIDOS
 
 d) Formule la función objetivo explicando el valor de cada uno de los coeficientes.
-
-
----
-> [!note] Modelo Matemático Formulado: Problema 5 **[[Función Objetivo]]:** (Maximizar el rendimiento total) MaxZ=0.30x1​+0.10x2​ **[[Restricciones]]:** x1​+x2​≤1000 (Capital disponible en miles) x1​≤600 (Máximo a invertir en A) x2​≥200 (Mínimo a invertir en B) x1​−x2​≥0 (Condición: Inversión en A ≥ Inversión en B) x1​,x2​≥0 ([[Condición de No Negatividad]]).
-
-- **Concepto de Resolver:** Se define teóricamente que "resolver" el modelo es encontrar los valores numéricos de las variables que cumplan todas las inecuaciones y optimicen la función.
----
+	Max z=0,30 * X_1+0,10 * X_2
+		C1=Representa la [Tasa de Retorno] anual de la acción A (30%). Indica que por cada mil pesos invertidos en x1​, el beneficio se incrementará en 0.30 miles de pesos
+		C2=Representa la [Tasa de Retorno] anual de la acción B (10%). Indica el aporte marginal al beneficio por cada mil pesos invertidos en x2
 
 e) Plantee las restricciones en forma literal y en forma de ecuaciones o inecuaciones lineales, explicando c/u de ellas.
 	Restriccion 1:
-		como máximo 600 mil en la compra de acciones A
+		Maximo para invertir en total 1 millon de pesos
 	Restriccion 2:
+		como máximo 600 mil en la compra de acciones A
+	Restriccion 3:
 		por lo menos, 200 mil en la compra de acciones B
-	Restriccion 3
-		la cantidad invertida en A sea, por lo menos, igual a lo invertido en B.==
+	Restriccion 4
+		la cantidad invertida en A sea, por lo menos, igual a lo invertido en B.
+	En forma de ecuaciones
+			x_1+x_2<= 1.000.000
+			x_1<=600.000
+			x_2 >=200.000
+			X_1>=X_2 -> x_1-x_2 >=
+			x_1;x_2>= 0  
+
+f) Plantee el problema como un modelo de programación lineal.
+	![[{0A42B011-5A5D-4770-BD68-D0AE687B8BD2}.png|504]]
 
 
+pregunta de la profe: que significa resolver un modelo de pl?
+	RESOLVERLO es encontrar encontrar los valores de las variables x1,x2  , que sasfifacen todas las restricciones y que optmizen la funcion objetivo
 
 
-
----
-1. La Importancia del Análisis Previo a la Formulación
-
-La profesora enfatizó que no se debe saltar directamente a escribir ecuaciones sin antes realizar un análisis comprensivo del enunciado. Textualmente indicó: _"no subestimen estos pasos de leer y analizar el problema e identificar con palabras qué es lo que tengo es muy importante y en medida que los problemas se hacen más complicados más importantes se vuelven estos pasos"_.
-
-[!tip] Metodología de Resolución Antes de plantear variables matemáticas (x1​,x2​), debes escribir verbalmente cuál es la meta del decisor y cuáles son los límites físicos o económicos que enfrenta.
-
-2. El Error Crítico de Usar la Palabra "Cantidad"
-
-Un punto de gran énfasis, basado en errores detectados en cuestionarios anteriores, es la definición de las [[Variables de Decisión]].
-
-[!danger] Trampa de Parcial (Definición de Variables) La profesora advirtió firmemente que definir una variable como "cantidad del producto" es un error conceptual. Explicó que _"cantidad no es una unidad a la cual esta medida"_. Por ejemplo, en lugar de decir "cantidad de dinero a invertir", se debe ser exacto y definir "pesos a invertir", o en lugar de "cantidad de sillas", usar "unidades de sillas a producir". Esto garantiza la correcta aplicación del [[Análisis Dimensional]].
-
----
-[!question] Pregunta 1: Notación de Variables (Por Extensión vs. Comprensión) **Alumno:** Al ver cómo la profesora definía matemáticamente las variables genéricas, el alumno consultó cómo se llamaba esa forma de anotación en contraposición a listar x1​ y x2​. **Respuesta de la Profesora:** Explicó que definir xi​ como _"pesos a invertir en la acción tipo i (para i=1, 2)"_ se denomina **[[Definición por Comprensión]]**, mientras que listar x1​ y x2​ de forma individual es **[[Definición por Extensión]]**. Recomendó la forma por comprensión cuando existen múltiples variables (ej: 6 u 8 acciones) para ahorrar tiempo y mantener la claridad]
+g) Defina las variables de holgura
