@@ -361,3 +361,202 @@ t=...+3  Fin PA → evFinPA()
 
 > [!TIP]
 > Los acumuladores se actualizan en `acumular(dt)` ANTES de procesar cada evento, usando el **estado previo** del sistema durante el intervalo `[lastClock, ev.time]`.
+
+---
+
+## El auto nunca se divide en dos objetos
+
+Cuando el auto termina el QA y se "separa" en carrocería y alfombras, **no se crean dos objetos nuevos**. Es el **mismo objeto `auto`** referenciado simultáneamente por dos recursos distintos.
+
+```js
+function evFinQA() {
+    const auto = QA.auto;  // UN solo objeto auto
+
+    // El MISMO auto va a dos recursos distintos
+    iniciarAspirado(auto);   // → AA.auto = auto   (alfombras)
+    iniciarLavado(auto, 0);  // → lugares[0].auto = auto   (carrocería)
+}
+```
+
+En un momento dado, esto es lo que hay en memoria:
+
+```
+AA.auto          → apunta al objeto auto #3  (procesando alfombras)
+lugares[0].auto  → apunta al objeto auto #3  (lavando carrocería)
+```
+
+El mismo objeto `auto` aparece en dos lugares a la vez. El sistema lo coordina con dos flags booleanas:
+
+```js
+auto.matsReady = false   // ¿terminó el aspirado?
+auto.bodyReady = false   // ¿terminó el secado?
+```
+
+`intentarPA()` es el punto de reunificación — el que llega **último** encuentra ambas flags en `true` y dispara el PA:
+
+```js
+function intentarPA(auto) {
+    if (auto.bodyReady && auto.matsReady && !auto.paIniciado) {
+        auto.paIniciado = true;
+        if (!PA.ocupado) iniciarPA(auto);
+        else colaPA.push(auto.id);
+    }
+    // Si solo uno está listo → no hace nada, el otro lo llamará después
+}
+```
+
+---
+
+## El falso paralelismo — cómo funciona realmente
+
+JavaScript es **single-threaded**. No hay hilos reales. El "paralelismo" entre el flujo de la carrocería y el de las alfombras es una ilusión del motor de eventos.
+
+### Qué hace evFinQA() en realidad
+
+No "ejecuta" el aspirado ni el lavado. Solo **escribe dos números** (tiempos futuros) en variables y termina:
+
+```js
+function iniciarAspirado(auto) {
+    S.finAA = clock + U(3,5);       // ← escribe un número, nada más
+}
+
+function iniciarLavado(auto, idx) {
+    lugares[idx].finLavado = clock + U(6,12);  // ← escribe otro número
+}
+```
+
+### Cómo queda la lista de eventos después
+
+Antes de `evFinQA()` (clock = 10):
+```
+S.finAA              = Infinity
+lugares[0].finLavado = Infinity
+S.proxLlegada        = 22.0
+```
+
+Después de `evFinQA()`:
+```
+S.finAA              = 14.2   ← aspirado programado
+lugares[0].finLavado = 18.5   ← lavado programado
+S.proxLlegada        = 22.0
+```
+
+El paralelismo son **dos números flotando en memoria**. Nada más.
+
+### El bucle los procesa de a uno, en orden
+
+```
+proximoEvento() → mínimo(14.2, 18.5, 22.0) = 14.2
+  → clock = 14.2 → evFinAA()
+    matsReady = true, intentarPA() → bodyReady=false ❌ → no hace nada
+
+proximoEvento() → mínimo(18.5, 22.0) = 18.5
+  → clock = 18.5 → evFinLavado()
+    lanza RK4, programa finSecado = 20.8
+
+proximoEvento() → mínimo(20.8, 22.0) = 20.8
+  → clock = 20.8 → evFinSecado()
+    bodyReady = true, intentarPA() → matsReady=true ✅ → PA!
+```
+
+> [!NOTE]
+> `intentarPA()` no bloquea ni espera. Si solo un flujo terminó, simplemente se va. El otro lo llamará cuando le toque. El segundo en llegar siempre encuentra al primero ya marcado.
+
+---
+
+## Los servidores del sistema
+
+En simulación, un **servidor** es un recurso que procesa entidades. El programa tiene 5 servidores (6 si se cuentan los 2 lugares de lavado por separado):
+
+| Servidor | Variable en código | Capacidad | Cola | Tiempo futuro |
+|---|---|---|---|---|
+| Quitar Alfombras | `QA` | 1 | `colaQA` | `S.finQA` |
+| Aspirado | `AA` | 1 | `colaAspirado` | `S.finAA` |
+| Lavado (lugar 1) | `lugares[0]` | 1 | `colaLavado` | `lugares[0].finLavado` |
+| Lavado (lugar 2) | `lugares[1]` | 1 | (misma) | `lugares[1].finLavado` |
+| Secadora | `secadora` | 1 | (ninguna*) | `lugares[i].finSecado` |
+| Poner Alfombras | `PA` | 1 | `colaPA` | `S.finPA` |
+
+`*` La secadora no tiene cola propia. Cuando se libera, `evFinSecado()` busca activamente quién lleva más tiempo secándose solo (FIFO por `dryingStart`).
+
+### Cómo está definido cada servidor en el código
+
+```js
+// QA, AA y PA — los más simples
+const QA = { ocupado: false, auto: null };
+const AA = { ocupado: false, auto: null };
+const PA = { ocupado: false, auto: null };
+
+// Secadora — sabe qué LUGAR la está usando, no el auto directamente
+const secadora = { ocupada: false, lugar: null };
+
+// Lugares de lavado — más ricos, tienen dos fases (lavar + secar)
+const lugares = [
+    { estado: 'Libre', auto: null, finLavado: INF, finSecado: INF, secado: null },
+    { estado: 'Libre', auto: null, finLavado: INF, finSecado: INF, secado: null },
+];
+
+// Colas FIFO (solo guardan IDs)
+const colaQA        = [];
+const colaAspirado  = [];
+const colaLavado    = [];
+const colaPA        = [];
+
+// Tiempos futuros de eventos globales
+const S = { proxLlegada: INF, finQA: INF, finAA: INF, finPA: INF };
+```
+
+### Atributos de cada objeto servidor
+
+**QA / AA / PA:**
+| Atributo | Qué guarda |
+|---|---|
+| `ocupado` | `true` / `false` |
+| `auto` | referencia al objeto auto siendo atendido (o `null`) |
+
+**`lugares[i]`:**
+| Atributo | Qué guarda |
+|---|---|
+| `estado` | `'Libre'` / `'Lavando'` / `'SecandoCon'` / `'SecandoSin'` |
+| `auto` | referencia al auto en ese lugar |
+| `finLavado` | tiempo futuro de fin de lavado |
+| `finSecado` | tiempo futuro de fin de secado |
+| `secado` | objeto con fases RK4 (tablas de Runge-Kutta) |
+
+**`secadora`:**
+| Atributo | Qué guarda |
+|---|---|
+| `ocupada` | `true` / `false` |
+| `lugar` | índice `0` o `1` del lugar que la tiene (`null` si libre) |
+
+> [!NOTE]
+> La secadora no tiene referencia directa al auto. Para saber qué auto la usa: `lugares[secadora.lugar].auto`.
+
+### Qué guarda el objeto auto vs. qué guarda el servidor
+
+```
+SERVIDOR         →  guarda el tiempo FUTURO
+──────────────────────────────────────────────────────
+S.finAA               cuándo termina el aspirado
+S.finQA               cuándo termina el QA
+S.finPA               cuándo termina el PA
+S.proxLlegada         cuándo llega el próximo auto
+lugares[i].finLavado  cuándo termina el lavado del lugar i
+lugares[i].finSecado  cuándo termina el secado del lugar i
+
+AUTO             →  guarda la HISTORIA y FLAGS
+──────────────────────────────────────────────────────
+auto.llegada          cuándo llegó al sistema
+auto.qaEnd            cuándo terminó el QA
+auto.washEnd          cuándo terminó el lavado
+auto.dryEnd           cuándo terminó el secado
+auto.aspEnd           cuándo terminaron las alfombras
+auto.bodyReady        flag "carrocería seca y lista"
+auto.matsReady        flag "alfombras aspiradas y listas"
+auto.esperaQA         tiempo de espera en cola QA
+auto.esperaLavado     tiempo de espera en cola Lavado
+auto.esperaAspirado   tiempo de espera en cola Aspirado
+auto.esperaPA         tiempo de espera en cola PA
+```
+
+`proximoEvento()` mira **solo los servidores** (S + lugares), nunca mira adentro del auto. El auto es un "pasajero" — el servidor sabe cuándo va a terminar con él; el auto solo sabe qué le pasó hasta ahora.
