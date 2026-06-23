@@ -1,0 +1,7 @@
+# Enunciado
+Una empresa desea planificar su producción para la próxima semana. Esta empresa produce un producto envasado en tres tamaños diferentes: ==de 120 gramos, de 200 gr. y de 360 gr==. En la bodega dispone de ==3 toneladas del producto a envasar==. 
+No puede producir más de él, debido a que requiere de un proceso de cocción lento. El otro insumo para el envasado son los envases vacíos de cada tipo. Hoy se tienen 3000 envases de 120 gr; 2000 de 200 gr. y 1500 de 360 gr. La única máquina que posee la empresa trabaja 20 horas al día de lunes a viernes; 12 horas los sábados y 8 horas los domingos. Para envasar los productos se requiere de 1 minuto para el envase de 120 gr; 2 minutos para el de 200 gr; y 4 minutos para el de 360 gr.
+Se tiene comprometida una venta de 300 unidades de envases de 200 gr a un conocido supermercado. Cada unidad del envase de 120 gr. genera un ingreso neto de $25; el de 200 gr. un ingreso neto de $50; el de 360 gr. un ingreso neto de $110.
+
+a) Formule el modelo matemático que permita realizar la planificación de producción
+b) Si un proveedor le ofrece envases de 120 gr. vacíos a un precio de $1 cada uno, describa lo que haría para determinar si le conviene comprarlos o no
