@@ -14,9 +14,12 @@ máximo==?
 # U2
 objetivo verbal
 
-- **Identificación del Objetivo:** maximizar el beneficio ,obtener de la fabricacion y venta de las casas tipo 1 y tipo 2
+- **Identificación del Objetivo:** **maximizar el [[Beneficio Total]]** obtenido a partir de la construcción y venta de las viviendas tipo 1 (un dormitorio) y tipo 2 (dos dormitorios).
+
+> [!danger] Trampa Teórica: Beneficio vs. Ingreso Muchos alumnos confunden ingresos con beneficios. La profesora aclaró en clase que, al tener el precio de venta y el costo de fabricación, el modelo debe apuntar a la ganancia neta (la diferencia entre ambos)
 
 definicion de variables
+Siguiendo las reglas estrictas de la cátedra para la formulación, las variables no pueden definirse simplemente como "cantidad de casas". Debemos asignarles la unidad física exacta
 * x_1=Unidades de viviendas de un dormitorio tipo 1 a construir
 * x_2=Unidades de viviendas de dos dormitorio tipo 2 a construir
 

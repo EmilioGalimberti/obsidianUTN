@@ -137,7 +137,7 @@ x2:unidades a producir del producto 2
 ![[{153E8551-062C-4B95-84AD-DE3CFFCAE152}.png]]
 ## 6. Actividad Práctica y Revisión de Errores (58:00 - Fin)
 
-[[Problema 1.12]]
+[[✅Problema 1.12]]
 
 Los alumnos realizaron un cuestionario en el aula virtual sobre un problema de producción de motores, tras lo cual el profesor analizó los errores más comunes.
 

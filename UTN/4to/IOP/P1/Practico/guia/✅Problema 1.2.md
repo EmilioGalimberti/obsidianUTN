@@ -32,21 +32,28 @@ soluciones del punto e).
 # u2
 
 a) Formule el objetivo de la gerencia respecto a este problema.
-	Maximizar la Utilidad Total semanal por la producción y venta de motores M1 y M2
+	Maximizar la Utilidad Total semanal por la producción y venta de motores tipo M1 y M2
+
+>[!danger] Trampa de Examen (Objetivo Físico vs. Económico) Es un error común indicar que el objetivo es "maximizar la producción". La profesora advirtió que no es lo mismo maximizar la suma de unidades físicas que maximizar la utilidad, ya que cada motor aporta un valor monetario diferente ($100 vs $120). Al tener datos de costos e ingresos, el objetivo real siempre es económico.
+
+
 b) Describa las variables de decisión. 
-	Las variables de decision pueden definirse como:
 	*  x1 = unidades de Motores tipo 1 a fabricar semanalmente y
 	* x2 = unidades de Motores tipo 2 a fabricar semanalmente
 	* o
 	* xj = unidades de Motores tipo j a fabricar semanalmente para j =1, 2
+	
+>[!note] Las variables representan las incógnitas que el modelo matemático debe determinar para alcanzar el objetivo. Para que estén correctamente definidas según los criterios de la cátedra, deben poseer una anatomía estricta de tres partes: unidad de medida, ítem/acción y período de tiempo
+
+>[!danger] Trampa de Parcial (El uso de la palabra "Cantidad") Jamás definas la variable como "Cantidad de motores M1". La cátedra penaliza este error conceptual porque _"cantidad no es una unidad a la cual está medida"_ y vuelve difusa a la variable. Usa siempre la métrica exacta: **Unidades**.
 
 c) Plantee un programa lineal que optimice las utilidades.
 	max z = 100 x1 + 120 x2
 	s.a
 	 4x1+8x2<= 480 (hs proceso de maquinado)
-	 5x1+6x2<= 600 (hs procesod e armado)
+	 5x1​+6x2​≤600(Horas de Armado)
 	 12x1+8x2<= 540 (hs de montaje)
-	 x1;x2>=0
+	 x1;x2>=0 (NO NEGATIVIDAD)
 
 
 >[!question]- De acuerdo con la restricción de No Negatividad, los valores de las variables de todo programa lineal deben ser positivas.?
@@ -54,6 +61,8 @@ c) Plantee un programa lineal que optimice las utilidades.
 >Falso
 >
 >No negatividad esta incluido el cero, por lo tanto esa es una variable no positiva
+
+>[!tip] Tip Metodológico (El "Tachado") Al multiplicar el requerimiento de 4 Horas/Unidad por la variable medida en Unidades, la palabra "Unidades" se simplifica (se tacha) y el término resultante queda puramente en **Horas**. Esto coincide perfectamente con el límite derecho de 480 Horas, validando matemáticamente tu inecuación
 
 ![[{1C3E7E5F-3166-4AA9-BC3C-0B51B074E2CA}.png|505]]
 ![[Pasted image 20260615164101.png|504]]

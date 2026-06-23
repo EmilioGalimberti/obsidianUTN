@@ -21,7 +21,7 @@ La clase inició con una advertencia metodológica muy clara: no se puede estand
 > [!tip] Tip de la Profesora (Afrontar el Parcial) La mejor estrategia no es memorizar, sino enfrentarse a la hoja en blanco e intentar plantear problemas aunque estén "totalmente mal" al principio. Corregir esos errores es lo que realmente afianza la lógica matemática.
 
 ## 2. Formulación Compleja: Problema 6 "Energy S.A." (8:41 - 30:39)
-[[problema 1.6]]
+[[problema 1.6 TRANSPORTE (RARO)]]
 
 Se aborda un problema donde tres plantas generadoras de energía deben satisfacer la demanda de cuatro ciudades.
 

@@ -9,7 +9,7 @@ Esta sesión fue sumamente práctica y la profesora se enfocó en desarrollar tu
 
 ## 2. Modelización Básica: Problema 5 "Inversión en Acciones" (10:13 - 35:26)
 
-[[Problema 1.5]]
+[[✅Problema 1.5]]
 
 Se aborda el primer ejercicio práctico: invertir 1 millón de pesos en acciones tipo A y tipo B, maximizando el rendimiento anual.
 
@@ -28,7 +28,7 @@ Se aborda el primer ejercicio práctico: invertir 1 millón de pesos en acciones
 ---
 
 ## 3. Formulación Intermedia: Problema 12 "Constructor de Viviendas" (35:26 - 58:44)
-[[Problema 1.12]]
+[[✅Problema 1.12]]
 Aumenta la complejidad con un problema de construcción de casas prefabricadas (1 y 2 dormitorios), donde se introducen proporciones.
 
 - **Cálculo del Beneficio:** El objetivo es maximizar el beneficio, el cual se calcula restando el costo al precio de venta para cada tipo de vivienda.
