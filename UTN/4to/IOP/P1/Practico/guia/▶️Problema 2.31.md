@@ -135,3 +135,12 @@ Las respuestas correctas son: Se pueden producir no más de 650 litros de concen
 #### rta
 Las respuestas correctas son: 0,65  x1 ≤ 650, 
 1/60 x1 + 1/50 x2 ≤ 30
+
+
+
+# B) Resuelva gráficamente.
+![[{B936B44D-7653-4008-9513-6456C104B5F7}.png]]![[{E7D7F83D-56FA-40F6-82EE-BB8676AEE328}.png]]
+La profesora pausa la exposición para que los alumnos resuelvan el caso "Fruits SA" en el Aula Virtual (UV). Al regresar, se analizan los fallos.
+
+- **El Error de la Pendiente:** Varios alumnos eligieron un vértice equivocado. La profesora detectó que dibujaron mal la inclinación de la recta Z. _"El óptimo depende de la inclinación de la recta Z... por eso hay que prestar atención al dibujarla"_.
+- **Cálculos Posteriores (Salidas):** Se recordó que si el problema pide "litros de concentrado producidos", no basta con el valor de la variable (que era "litros de pulpa ingresada"), sino que hay que aplicar la tasa de transformación (merma).
