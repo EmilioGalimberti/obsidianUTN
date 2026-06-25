@@ -41,7 +41,7 @@ Aumenta la complejidad con un problema de construcción de casas prefabricadas (
 ---
 
 ## 4. Desafío Productivo Complejo: Problema "Fruits SA" (58:44 - 1:24:10)
-[[▶️Problema 2.31]]
+[[✅Problema 2.31 formulacion pl]]
 
 Se plantea un problema de destilación de jugos concentrados (Arándanos y Frambuesas) para introducir conceptos reales de manufactura.
 

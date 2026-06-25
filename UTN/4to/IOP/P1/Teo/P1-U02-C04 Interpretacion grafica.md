@@ -59,7 +59,7 @@ se procede a buscar el punto que maximice el beneficio.
 ![[{7ADA4171-5585-4B1B-B16F-C2835F8236A8}.png|431]]
 
 ## 3. Práctica Autónoma y Revisión de Errores (28:56 - 1:08:31)
-[[▶️Problema 2.31]]
+[[✅Problema 2.31 formulacion pl]]
 
 La profesora pausa la exposición para que los alumnos resuelvan el caso "Fruits SA" en el Aula Virtual (UV). Al regresar, se analizan los fallos.
 
@@ -109,18 +109,21 @@ y aca faltarian todas las otras, es una por restriccion
 
 ## 6. Taxonomía y [[Clasificación de Soluciones]] (1:22:15 - 1:59:35)
 
-El último bloque fue puramente teórico, apoyado en el software PHPSimplex para visualizar los conceptos. Para clasificar soluciones, el modelo debe estar estandarizado. 
+> _**Forma Estándar**: Ocurre cuando un modelo de programación lineal ha incorporado todas las variables de holgura y excedente necesarias para que sus restricciones queden expresadas matemáticamente solo como igualdades._
+
+Una vez que el modelo se encuentra expresado en forma estándar (donde _n_ es el número total de variables sumando las de holgura/excedente, y _m_ es el número total de restricciones), se definen formalmente los tipos de soluciones del sistema:
 
 ![[{6AE03917-39EC-4C88-98F6-99AD34AB21B1}.png]]
-
+![[Pasted image 20260624175541.png|472]]
 - **[[Solución Factible]]:** Cualquier punto dentro del poliedro verde o en sus lados (cumple todas las restricciones y la no negatividad).
-- **[[Solución Básica]]:** Todas las intersecciones posibles entre las rectas. Muchas de ellas caen fuera de la región válida (tienen valores negativos y son **no factibles**). (C;G;D O; I;B;F....)
-	- **[[Solución Factible Básica]]:** Son exclusivamente los **vértices** del poliedro de soluciones.  (O;EC;D;I)    (TIENE COMO MAXIMO m valores positivos, que son los vertices del poliedro de soluciones)
+- Soluciones No Factibles: Aquellas que no cumplen con las restricciones del sistema (por ejemplo, caen fuera de la región factible o tienen valores negativos)
+- **[[Solución Básica]]:** Corresponden a todas las intersecciones entre las rectas del gráfico y con los ejes.. Muchas de ellas caen fuera de la región válida (tienen valores negativos y son **no factibles**). (C;G;D O; I;B;F....)
+	- **[[Solución Factible Básica]]:** son exclusivamente los vértices del poliedro de soluciones. Se caracterizan por tener, como máximo, m valores positivos. Los algoritmos como el Simplex trabajan únicamente explorando estas soluciones.(O;E;C;D;I)  
 	    - _No Degenerada:_ Tiene exactamente $m$ valores positivos.
 	    - _Degenerada:_ Tiene estrictamente menos de $m$ valores positivos.
 	- Solucion factibles no basicas: tiene mas de m valores positivos y son aquellas que se encunetra dentro del poliedro de soluciones y en los lados excluidos los vertices
 
-
+> [!note] Teorema de Límite de Soluciones (Combinatoria) La profesora indicó que, mientras las soluciones factibles son infinitas, el número máximo de soluciones básicas que puede tener un modelo (y su cota superior de vértices factibles) se calcula con la fórmula: $$C_{n,m} = \frac{n!}{m!(n-m)!}$$
 se definen $n$ como el número total de variables (incluyendo holguras) y $m$ como el número de restricciones sin considerar las de no negativa.
 - $n$: Total de variables (decisión + holguras/excedentes).
 	- en nuestro ejemplo n= 5
@@ -129,12 +132,19 @@ se definen $n$ como el número total de variables (incluyendo holguras) y $m$ co
 
 EJEMPLO
 ![[{9A825682-7D6D-4533-AB5F-CD41673F4214}.png|443]]
+1. tiene todos sus valores no negativos
+    1. SOLUCION FACTIBLE
+2. vemos que tiene tres valores positivo, y nuestro m =3
+    1. entonces decimos que cumple con (NO MAS DE M VALORE POSITVO)
+    2. SOLUCION FACTIBLE BASICA
+3. y ademas como tiene EXACTAMENTE 3 VALORES POSITIVOS ES
+    1. SOLUCION FACTIBLE BASICA NO DEGENERADA
 
 otros ejemplos
 ![[{BF8C398D-9255-4BD0-A7C1-98113AF0A091}.png]]
 ![[{62B31AC7-7C79-4CA9-8DC2-ACBE75F49153}.png]]
 
-> [!note] Teorema de Límite de Soluciones (Combinatoria) La profesora indicó que, mientras las soluciones factibles son infinitas, el número máximo de soluciones básicas que puede tener un modelo (y su cota superior de vértices factibles) se calcula con la fórmula: $$C_{n,m} = \frac{n!}{m!(n-m)!}$$
+
 
 ```mermaid
 mindmap

@@ -16,12 +16,12 @@ La **Programación Lineal** es un modelo de Programación Matemática donde:
 
 ### Características clave del modelo
 
-| Concepto | Significado |
-|:--|:--|
-| **Modelo Formal** | La PL "atiende a la forma" en que se modeliza, no al contenido. La misma estructura matemática sirve para planificar una dieta de cerdos o para cargar bombas en un avión militar |
-| **Modelo de Universo Cierto** | Asume **certeza total** de los parámetros que lo definen |
-| **Parámetros** | Datos conocidos con certeza ($c_j$, $a_{ij}$, $b_i$): coeficientes, tasas de transformación, disponibilidades |
-| **Variables de Decisión** | Las incógnitas puras a determinar ($x_j$) |
+| Concepto                      | Significado                                                                                                                                                                       |
+| :---------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Modelo Formal**             | La PL "atiende a la forma" en que se modeliza, no al contenido. La misma estructura matemática sirve para planificar una dieta de cerdos o para cargar bombas en un avión militar |
+| **Modelo de Universo Cierto** | Asume **certeza total** de los parámetros que lo definen                                                                                                                          |
+| **Parámetros**                | Datos conocidos con certeza ($c_j$, $a_{ij}$, $b_i$) que acompañan a las variables.: coeficientes, tasas de transformación, disponibilidades                                      |
+| **Variables de Decisión**     | Las incógnitas puras a determinar ($x_j$)                                                                                                                                         |
 
 ---
 
@@ -29,11 +29,11 @@ La **Programación Lineal** es un modelo de Programación Matemática donde:
 
 Todo modelo de PL tiene **tres componentes esenciales**:
 
-| Componente | Descripción | Ejemplo |
-|:--|:--|:--|
-| **Función Objetivo (Z)** | Expresión matemática que representa la meta del decisor (maximizar beneficio o minimizar costo) | $\max Z = 100x_1 + 120x_2$ |
-| **Restricciones** | Limitaciones físicas, operativas o lógicas del sistema que condicionan los valores de las variables | $4x_1 + 8x_2 \leq 480$ |
-| **Condición de No Negatividad** | Las variables no pueden tomar valores negativos | $x_1, x_2 \geq 0$ |
+| Componente                      | Descripción                                                                                         | Ejemplo                    |
+| :------------------------------ | :-------------------------------------------------------------------------------------------------- | :------------------------- |
+| **Función Objetivo (Z)**        | Expresión matemática que representa la meta del decisor (maximizar beneficio o minimizar costo)     | $\max Z = 100x_1 + 120x_2$ |
+| **Restricciones**               | Limitaciones físicas, operativas o lógicas del sistema que condicionan los valores de las variables | $4x_1 + 8x_2 \leq 480$     |
+| **Condición de No Negatividad** | Las variables no pueden tomar valores negativos                                                     | $x_1, x_2 \geq 0$          |
 
 ---
 
@@ -88,11 +88,11 @@ Para que el uso de PL sea válido, deben cumplirse **5 supuestos**:
 
 ### 4.2 Según el tipo de restricciones
 
-| Forma | Restricciones | Regla |
-|:--|:--|:--|
-| **Canónica** | Todas del mismo tipo | Si MAX → todas $\leq$. Si MIN → todas $\geq$ |
-| **Estándar** | Todas de **igualdad** ($=$) | Se obtiene agregando variables de holgura/excedente |
-| **Mixta** | Combinación de $\leq$, $\geq$ y $=$ | Sentidos mezclados |
+| Forma        | Restricciones                       | Regla                                               |
+| :----------- | :---------------------------------- | :-------------------------------------------------- |
+| **Canónica** | Todas del mismo tipo                | Si MAX → todas $\leq$. Si MIN → todas $\geq$        |
+| **Estándar** | Todas de **igualdad** ($=$)         | Se obtiene agregando variables de holgura/excedente |
+| **Mixta**    | Combinación de $\leq$, $\geq$ y $=$ | Sentidos mezclados                                  |
 
 > [!warning] Regla de la profesora sobre Forma Canónica
 > _"Con que **una sola restricción** ya no sea menor o igual (en MAX)... ya se considera mixta"_. Debe ser **puro** para ser canónico.
@@ -143,6 +143,8 @@ graph TD
 
 ## Paso 2: Definir el Objetivo
 
+Lee el problema e identifica escribiendo con palabras cuál es la meta del decisor (maximizar ingresos, minimizar costos) y cuáles son las limitaciones físicas, de mercado o de políticas.
+
 ### ¿Maximizar o Minimizar?
 
 | Datos disponibles en el problema | Meta a optimizar | Dirección de Z |
@@ -153,23 +155,29 @@ graph TD
 
 ### Contribución Marginal vs. Ingreso (diferencia clave)
 
-| Concepto | Definición | ¿Cuándo usarlo? |
-|:--|:--|:--|
-| **Ingreso Total** | Simplemente el Precio de Venta × unidades | Cuando el problema **solo** da precios de venta |
-| **Contribución Marginal (Beneficio/Utilidad)** | Precio de Venta **−** Costos Variables Directos | Cuando el problema da **ventas Y costos** |
+| Concepto                                       | Definición                                      | ¿Cuándo usarlo?                                 |
+| :--------------------------------------------- | :---------------------------------------------- | :---------------------------------------------- |
+| **Ingreso Total**                              | Simplemente el Precio de Venta × unidades       | Cuando el problema **solo** da precios de venta |
+| **Contribución Marginal (Beneficio/Utilidad)** | Precio de Venta **−** Costos Variables Directos | Cuando el problema da **ventas Y costos**       |
 
 > [!caution] Trampas frecuentes en el objetivo
 > - ❌ "Maximizar la producción" → El objetivo casi nunca es físico, es **económico**
 > - ❌ Confundir **Beneficio** con **Ingreso**: Solo se habla de beneficio si el enunciado da costos Y precios. Si solo da "ingreso neto", la FO maximiza **Ingresos**, NO beneficios
 > - ❌ El objetivo verbal debe incluir **qué** se optimiza + **de qué productos** + **en qué período**
 
+
 ---
 
 ## Paso 3: Definir Variables de Decisión
+Son las incógnitas del problema
 
 Las variables deben tener una **anatomía estricta de tres partes**:
 
 $$\boxed{\text{Unidad de medida} + \text{Ítem / Acción} + \text{Período de tiempo}}$$
+
+1. **Unidad de medida:** (Litros, Pesos, Unidades).
+2. **Ítem / Acción:** (del producto 1 a fabricar, a invertir en acción A).
+3. **Período de tiempo:** (semanalmente, por mes). _Nota: Si es una inversión única de capital, puede no tener período_.
 
 **Ejemplo correcto:** $x_1$ = **unidades** de motores tipo 1 **a fabricar semanalmente**
 
@@ -196,15 +204,23 @@ Si no se conoce el precio de cada unidad (ej: acciones), **no se puede definir l
 
 ---
 
+## DEF FUNCION OBJETIVO Z
+
+Identifica los parámetros económicos (precios, costos, rendimientos) y multiplícalos por tus variables.
+
+> [!note] Fórmula de la Función Objetivo General Para un problema de $n$ variables, la función toma la forma explícita: $$Max Z = c_1 x_1 + c_2 x_2 + \dots + c_n x_n$$ _(Donde $c_j$ son los coeficientes de utilidad o costo)_.
+
+> [!tip] Tip de Parcial: ¿Cuándo Maximizar o Minimizar? Si el problema te da datos de "Precios de Venta" y "Costos", tu objetivo es **Maximizar el Beneficio o Contribución**. Si el problema solo te da "Costos operativos", tu objetivo es **Minimizar Costos**.
+
 ## Paso 4: Plantear Restricciones
 
 ### Traducción de frases a signos matemáticos
 
-| Frase del enunciado | Signo | Ejemplo |
-|:--|:--|:--|
-| "dispone de", "como máximo", "no más de", "hasta", "no superar" | $\leq$ | $4x_1 + 8x_2 \leq 480$ |
-| "por lo menos", "como mínimo", "al menos" | $\geq$ | $x_2 \geq 200$ |
-| "exactamente", "debe ser igual a" | $=$ | $x_1 + x_2 = 100$ |
+| Frase del enunciado                                             | Signo  | Ejemplo                | Justificación                                 |
+| :-------------------------------------------------------------- | :----- | :--------------------- | --------------------------------------------- |
+| "dispone de", "como máximo", "no más de", "hasta", "no superar" | $\leq$ | $4x_1 + 8x_2 \leq 480$ | Limitación de recurso o capacidad.            |
+| "por lo menos", "como mínimo", "al menos"                       | $\geq$ | $x_2 \geq 200$         | Satisfacción de demanda o piso de producción. |
+| "exactamente", "debe ser igual a"                               | $=$    | $x_1 + x_2 = 100$      | Condición de equilibrio estricto.             |
 
 ### Reglas clave para restricciones
 
@@ -234,8 +250,13 @@ Si no se conoce el precio de cada unidad (ej: acciones), **no se puede definir l
 Al multiplicar un coeficiente por la variable, las unidades deben simplificarse para coincidir con el lado derecho:
 
 $$\underbrace{\frac{\text{Horas}}{\text{Unidad}}}_{\text{Coeficiente}} \times \underbrace{\text{Unidades}}_{\text{Variable}} = \underbrace{\text{Horas}}_{\text{Lado Izquierdo}} \leq \underbrace{\text{Horas}}_{\text{Lado Derecho}} \quad ✅$$
+> [!question] ¿Dudas si puedes sumar peras con manzanas? Un alumno preguntó si se podían mezclar "dinero y unidades de casa" en la misma restricción. La profesora respondió que **SÍ**. Si multiplicas un Costo ($/Unidad$) por la Variable ($Unidades$), las unidades físicas se simplifican (se tachan) y te quedan netamente "$Pesos$", validando que es matemáticamente correcto compararlo contra un Presupuesto (Límite Derecho en Pesos).
+
 
 ---
+
+DUDA
+**Paso 4: Planteo de [[Restricciones Estructurales]].** Traducir los límites físicos. **Regla de Estandarización:** Al armar la inecuación, _"del lado derecho tienen que estar todo lo que sea constante y del lado izquierdo todo lo que sea variable"_. (Ej. $x_1 \ge x_2$ se debe escribir $x_1 - x_2 \ge 0$).
 
 ## Paso 5: Condición de No Negatividad
 
@@ -249,6 +270,8 @@ $$x_1, x_2, \ldots, x_n \geq 0$$
 > _"Recuerden por favor que no negatividad quiere decir mayor o igual a 0, no quiere decir positivo, recuerden la diferencia"_ — Profesora
 
 ---
+
+
 
 # PARTE 3: PROBLEMAS RESUELTOS PASO A PASO
 
@@ -482,21 +505,27 @@ $$\text{s.a.} \begin{cases} 0.65x_1 \leq 650 \\ 0.75x_2 \leq 650 \\ \frac{1}{60}
 
 # PARTE 4: RESUMEN DE TRAMPAS DE PARCIAL
 
-| # | Trampa | Error frecuente | Correcto |
-|:--|:--|:--|:--|
-| 1 | **No Negatividad vs. Positividad** | Decir que las variables son "positivas" | Son **no negativas** ($\geq 0$), el cero ESTÁ permitido |
-| 2 | **Palabra "cantidad"** | Definir "cantidad de motores" | Usar unidad exacta: "unidades de motores" |
-| 3 | **Beneficio vs. Ingreso** | Decir "maximizar beneficio" sin datos de costo | Si solo hay ingresos netos → maximizar **Ingreso** |
-| 4 | **Dato vs. Restricción** | Marcar "1 minuto por envase" como restricción | Eso es un **parámetro**. La restricción es "120 horas de máquina" |
-| 5 | **Análisis Dimensional** | Mezclar unidades en los lados de la ecuación | Verificar que ambos lados tengan la misma unidad |
-| 6 | **Inversión de velocidad** | Usar "60 lt/h" directamente como coeficiente | Invertir: coeficiente = $\frac{1}{60}$ h/lt |
-| 7 | **Mermas / Rendimiento** | Ignorar la pérdida de agua en procesos | Multiplicar por factor de rendimiento (0.65, 0.75) |
-| 8 | **Maximizar producción** | Decir "el objetivo es maximizar la producción" | El objetivo es casi siempre **económico** (beneficio, utilidad, ingreso) |
-| 9 | **Variables sin período** | "$x_1$ = motores tipo 1" | Agregar período: "a fabricar **semanalmente**" |
-| 10 | **Restricciones proporcionales** | No saber dónde poner las variables | Formular lógicamente, luego pasar todo a la izquierda para resolver |
+| #   | Trampa                             | Error frecuente                                | Correcto                                                                 |
+| :-- | :--------------------------------- | :--------------------------------------------- | :----------------------------------------------------------------------- |
+| 1   | **No Negatividad vs. Positividad** | Decir que las variables son "positivas"        | Son **no negativas** ($\geq 0$), el cero ESTÁ permitido                  |
+| 2   | **Palabra "cantidad"**             | Definir "cantidad de motores"                  | Usar unidad exacta: "unidades de motores"                                |
+| 3   | **Beneficio vs. Ingreso**          | Decir "maximizar beneficio" sin datos de costo | Si solo hay ingresos netos → maximizar **Ingreso**                       |
+| 4   | **Dato vs. Restricción**           | Marcar "1 minuto por envase" como restricción  | Eso es un **parámetro**. La restricción es "120 horas de máquina"        |
+| 5   | **Análisis Dimensional**           | Mezclar unidades en los lados de la ecuación   | Verificar que ambos lados tengan la misma unidad                         |
+| 6   | **Inversión de velocidad**         | Usar "60 lt/h" directamente como coeficiente   | Invertir: coeficiente = $\frac{1}{60}$ h/lt                              |
+| 7   | **Mermas / Rendimiento**           | Ignorar la pérdida de agua en procesos         | Multiplicar por factor de rendimiento (0.65, 0.75)                       |
+| 8   | **Maximizar producción**           | Decir "el objetivo es maximizar la producción" | El objetivo es casi siempre **económico** (beneficio, utilidad, ingreso) |
+| 9   | **Variables sin período**          | "$x_1$ = motores tipo 1"                       | Agregar período: "a fabricar **semanalmente**"                           |
+| 10  | **Restricciones proporcionales**   | No saber dónde poner las variables             | Formular lógicamente, luego pasar todo a la izquierda para resolver      |
 
 ---
+"El objetivo es maximizar la producción".**
+    - _Por qué es falso:_ En problemas económicos, no es lo mismo maximizar la suma física de productos que maximizar su rentabilidad. Cada producto aporta un peso económico diferente, por ende, el objetivo teórico real es **Maximizar la Utilidad o Contribución Total**.
+- **Objetivo Económico vs. Físico:** En los cuestionarios, la trampa clásica es poner "Maximizar la producción". Esto suele ser incorrecto. Si el problema da costos o ingresos, la meta real es maximizar la [[Utilidad Total]] o el [[Ingreso Neto]], ya que cada producto aporta un valor monetario diferente.
 
+1. **Falta de Precio Unitario:** Si el problema exige invertir dinero pero no te da el precio de la acción, no puedes definir la variable como "acciones a comprar". Debes definirla en moneda: _"Pesos invertidos en la acción tipo A"_.
+2. **Problemas con [[Mermas]]:** Si un proceso pierde material (Ej: se pierde el $35%$ de agua al destilar), tu coeficiente de salida no es $1$. Debes multiplicar tu variable por lo que _queda_: en este caso, por $0.65$ ($1 - 0.35$) para reflejar el volumen real.
+3. **[[Velocidad de Procesamiento]]:** Si la máquina procesa $60~L/hora$, pero tu límite de tiempo está en **Horas**, debes invertir la tasa para mantener la coherencia dimensional. El coeficiente técnico será $1/60$ horas por litro.
 # PARTE 5: TABLA COMPARATIVA DE LOS PROBLEMAS
 
 | Aspecto | Prob. 1.2 (Motores) | Prob. 1.5 (Acciones) | Prob. 1.12 (Viviendas) | Prob. 1.14 (Envases) | Prob. 2.31 (Jugos) |
@@ -536,15 +565,33 @@ $$a_{ij} = \frac{1}{\text{Velocidad de procesamiento}}$$
 
 ---
 
-# PARTE 7: REGLAS ADMINISTRATIVAS Y LOGÍSTICAS DEL PARCIAL
 
-> [!important] Estas reglas fueron mencionadas explícitamente por las profesoras en clase y pueden afectar tu nota.
 
-| Regla | Detalle |
-|:--|:--|
-| **Multiple Choice penalizado** | Las respuestas incorrectas **restan puntos**. Si marcás 2 bien y 2 mal, tu puntaje puede ser 0. **No adivines por descarte** |
-| **El Recuperatorio "pisa" la nota** | Si te sacaste un 6 y vas al recuperatorio para subir, la nueva nota **reemplaza** a la anterior. Si te sacás un 2, quedás libre |
-| **Cuenta institucional obligatoria** | Para rendir parciales hay que ingresar con la **cuenta UTN**. Si entrás con Gmail o como "Invitado", irás a sala de espera y perderás tiempo valioso |
-| **80% de cuestionarios UV** | Para promoción o aprobación directa es obligatorio tener completado el **80% de los cuestionarios** del aula virtual |
-| **Baja automática del Aula Virtual** | La matriculación caduca a los **60 días sin actividad**. Ingresá semanalmente a Moodle para no ser dado de baja |
-| **Unidad 1 es evaluable** | Los contenidos de la Unidad 1 (Metodología de IO, Método Científico) son evaluables en parcial y final aunque no tengan ejercitación práctica |
+# 4. 🗣️ CÓMO JUSTIFICAR (El "Por qué")
+
+En las evaluaciones teóricas, te pedirán justificar los **Supuestos o Hipótesis del Modelo Lineal**. Aquí tienes el "Por Qué" causal de cada supuesto, extraído textualmente de las explicaciones de la profesora:
+
+**1. Supuesto de Certidumbre:**
+
+- _¿Qué asume?_ Que los parámetros ($c_j, a_{ij}, b_i$) se conocen con certeza matemática exacta.
+- _¿Cómo se justifica en un examen?_ Se debe aclarar que, dado que en la realidad esto es casi imposible (porque los recursos y tiempos son estimaciones y pueden ocurrir imprevistos como operarios enfermos), el modelo es una "foto" de un momento. _Por lo tanto_, exige que al finalizar se realice un **Análisis de Post-Optimidad** (o sensibilidad) para ver qué ocurre si esos parámetros cambian.
+
+**2. Supuesto de Divisibilidad:**
+
+- _¿Qué asume?_ Que las variables pueden asumir cualquier valor fraccionario (Ej. fabricar $37.2$ motores).
+- _¿Cómo se justifica en un examen?_ Aunque en la vida real haya productos no fraccionables, en la PL pura se permite la fracción. Si la realidad exige enteros estrictos, se debe cambiar a un modelo de _Programación Lineal Entera_. Para la formulación lineal básica, obviamos temporalmente esa restricción.
+
+**3. Supuesto de Proporcionalidad:**
+
+- _¿Qué asume?_ Que no existen las "economías de escala".
+- _¿Cómo se justifica en un examen?_ Matemáticamente significa que _todas las variables están elevadas al exponente 1_. Si gano $4 fabricando una unidad, gano $40,000 fabricando 10,000. Los costos y ganancias crecen en proporción directa.
+
+**4. Supuesto de Aditividad:**
+
+- _¿Qué asume?_ Que las contribuciones individuales se suman.
+- _¿Cómo se justifica en un examen?_ En la estructura del modelo _sólo intervienen sumas_, prohibiendo matemáticamente cualquier multiplicación entre variables ($x_1 \cdot x_2$). El uso total de recursos es igual a la suma del uso individual de cada producto.
+
+**5. Supuesto de Único Objetivo:**
+
+- _¿Qué asume?_ Que solo se maximiza o minimiza _una_ función $Z$.
+- _¿Cómo se justifica en un examen?_ Si una empresa busca maximizar beneficios Y simultáneamente minimizar contaminación ambiental de forma directa, no puede usar PL básica. Deberá recurrir a _Modelos Multi-Objetivo_.

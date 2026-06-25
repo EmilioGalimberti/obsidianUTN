@@ -133,22 +133,6 @@ y si verifico z, me da 8000
 >[!question] un alumno preguntó si, en el caso de tener tres puntos conocidos que dieran ese mismo valor, debía hacer una combinación lineal sumando los tres vectores.
 >Respuesta: Apoyándose en un gráfico en la pizarra, la profesora le aclaró que solo se necesitan tomar dos puntos cualesquiera que estén sobre la recta de isoutilidad. Al hacer una combinación lineal convexa entre dos puntos, el resultado será siempre otro punto válido situado sobre el segmento de recta que los une.
 
-# -----
-
-
-
-
-## 4. Metodología Práctica y Evaluación de Soluciones
-
-El último bloque se enfocó en un cuestionario práctico donde el profesor evidenció los errores más comunes de los alumnos al intentar aplicar la teoría. Muchos estudiantes fallaron al intentar clasificar soluciones "a ojo" o sin preparar el modelo.
-
-> [!tip] Metodología de Resolución Oficial El profesor dictó el procedimiento innegociable de 3 pasos para clasificar cualquier punto propuesto en un examen:
-> 
-> 1. **Estandarizar:** Agregar obligatoriamente las [[Variables de Holgura]] para igualar el sistema.
-> 2. **Verificar Cumplimiento:** Reemplazar los valores en el sistema para ver si se cumple la igualdad.
-> 3. **Clasificar Factibilidad:** Solo si cumple el paso 2, fijarse si hay algún valor negativo. Si lo hay, es una [[Solución No Factible]]. Si todos son $\geq 0$, es [[Solución Factible]].
-
-> [!danger] La Trampa del Valor Negativo Se preguntó en clase: _¿Por qué probar variables negativas si sabemos que deben ser $\geq 0$?_ El profesor aclaró que una variable negativa descarta que la solución sea "Factible", pero **SÍ** puede cumplir el sistema de ecuaciones y ser clasificada matemáticamente como una [[Solución Básica No Factible]]. Nunca descartes la evaluación del sistema algebraico solo por ver un número negativo.
 
 
 # ----
