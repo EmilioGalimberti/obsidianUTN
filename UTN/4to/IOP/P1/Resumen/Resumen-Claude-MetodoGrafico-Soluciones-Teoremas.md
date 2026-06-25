@@ -115,7 +115,7 @@ $$x_2 = \frac{Z}{c_2} - \frac{c_1}{c_2} x_1$$
 
 ---
 
-## 4. Clasificación de Soluciones ⚠️MEJORAR
+## 4. Clasificación de Soluciones ⚠️MEJORAR⚠️
 
 > Toda clasificación se hace sobre el modelo en **Forma Estándar** (con las variables de holgura/excedente incluidas).
 

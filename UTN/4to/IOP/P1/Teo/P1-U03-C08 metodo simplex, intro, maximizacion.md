@@ -1,9 +1,14 @@
 Parte 2: https://www.youtube.com/watch?v=kFjiVCMhAjk&list=PLYZrqm_pzRul0t_2QKU2kdHDwGkKblutk&index=8
-# clase parte2 metodo simplex
-Parte 2: https://www.youtube.com/watch?v=kFjiVCMhAjk&list=PLYZrqm_pzRul0t_2QKU2kdHDwGkKblutk&index=8
 
 ## 1. Fundamentos y Fases del Método Simplex
-El profesor introdujo el [[Algoritmo Simplex]], desarrollado por George Dantzig en 1947, destacando que permite resolver problemas de [[Programación Lineal]] sin ningún límite en la cantidad de variables o restricciones, superando así la restricción de dos variables que posee el método gráfico. Explicó que este método opera explorando un número finito de vértices o puntos extremos y su ejecución se divide estrictamente en dos etapas:
+El profesor introdujo el [[Algoritmo Simplex]], desarrollado por George Dantzig en 1947, destacando que permite resolver problemas de [[Programación Lineal]] sin ningún límite en la cantidad de variables o restricciones, superando así la restricción de dos variables que posee el método gráfico. 
+
+- **Fundamento Geométrico:** El algoritmo explora los puntos extremos (vértices) del [[Poliedro de Soluciones]] sabiendo que el óptimo se encuentra allí.
+
+Explicó que este método opera explorando un número finito de vértices o puntos extremos 
+- **Límite Combinatorio:** Reitera que el número de [[Soluciones Factibles Básicas]] es finito, limitado por la cota superior combinatoria $C = \frac{n!}{m!(n-m)!}$.
+
+y su ejecución se divide estrictamente en dos etapas:
 
 - **[Fase 1]**: Consiste en encontrar la primera [[Solución Factible Básica]] o solución de partida. En problemas canónicos de maximización, este vértice inicial se identifica fácilmente en el origen.
 - **[Fase 2]**: Es la fase iterativa. Analiza si la solución actual es óptima; si no lo es, determina cómo mejorarla pasando hacia otra solución factible básica adyacente.
@@ -11,6 +16,7 @@ El profesor introdujo el [[Algoritmo Simplex]], desarrollado por George Dantzig 
 ![[{54A1D424-3BFC-44BB-82E1-4D629B79C00D}.png]]
 
 El método Simplex, basándose en estas conclusiones generales, analiza sistemáticamente los puntos extremos de la región factible hasta identificar el punto óptimo. Asegurándose en cada paso que el vértice analizado no es peor que el anterior, esto es, que le dé a la función objetivo un valor mejor o al menos igual que el anterior.
+
 
 ## El metodo simplex tiene en cuenta las siguientes propiedades de los puntos extremos o soluciones factibles basicas
 
@@ -145,3 +151,110 @@ Durante la clase, los alumnos plantearon dudas importantes que la profesora acla
 
 # SIMPLEX aplicacion practica libro
 >[!danger] agregar ejemplo de aplicacion pagina 73
+
+
+
+
+# ---
+### 3. 🏁 Fase 1: Estandarización y Tabla Inicial (20:00 - 31:00)
+
+El profesor desarrolla el paso a paso para iniciar el algoritmo matemático.
+
+- **Transformación del Modelo:** Para iniciar el proceso (Fase 1), es un paso innegociable transformar el modelo a su [[Forma Estándar]] agregando [[Variables de Holgura]] para convertir inecuaciones en igualdades
+- **El Vértice de Partida (Origen):** En problemas de "Máximo Canónico", la primera [[Solución Factible Básica]] se encuentra anulando las variables de decisión ($x_1=0, x_2=0$). Esto deja toda la capacidad de los recursos libre para las variables de holgura ($S_1=650, S_2=650, S_3=30$).
+
+- **Vectores Unitarios:**  El profesor explicó que se debe buscar en el sistema una matriz identidad formada por vectores unitarios. Esto es vital porque define la clasificación de las variables:
+	-  **[[Variables Básicas]]** (positivas, dentro de la base): Son positivas, ingresan a la base de la tabla y se identifican mediante los vectores identidad.
+	- **[[Variables No Básicas]]** (fuera de la base, con valor cero).: No están en la base y su valor en esa iteración es estrictamente cero.
+- **Armado de la Tabla:** Estructura de filas y columnas, incluyendo el vector de lados derechos ($P_0$ o $bld$).
+
+> [!note] Fórmulas de Evaluación ($Z_j$ y $C_j - Z_j$) El profesor detalló el cálculo de las dos filas inferiores de la tabla:
+> 
+> - **Fila $Z_j$:** Se obtiene mediante la suma de los productos entre los coeficientes de las variables en la base (columna $C_b$) y los valores de cada columna respectiva.
+> - **Fila $C_j - Z_j$:** Es la [[Tasa de Crecimiento]] de la función $Z$. Indica exactamente en cuánto crecerá el beneficio total por cada unidad que se incremente una variable.
+
+
+
+
+### 4. 🔄 Fase 2: Criterios de Iteración y Pivot (31:00 - 45:00)
+Si en la tabla existen valores positivos en la fila $C_j - Z_j$ (estando en un problema de maximización), la solución no es óptima y el algoritmo debe saltar hacia un vértice adyacente. El profesor estableció las reglas matemáticas inflexibles para este movimiento:
+
+| Acción del Algoritmo               | Regla Matemática (Criterio del Profesor)                                                                                                       |
+| :--------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Variable que Entra (a la base)** | Se elige la columna con el valor **positivo mayor** en la fila $C_j - Z_j$.                                                                    |
+| **Variable que Sale (de la base)** | Se calcula el cociente ($\theta$ o Tita) entre $P_0$ y la columna de la variable entrante. Se elige el **menor valor estrictamente positivo**. |
+| **El [[Pivot]]**                   | Es el número interceptado entre la fila saliente y la columna entrante.                                                                        |
+
+- **Aplicación de [[Gauss-Jordan]]:**
+    1. Se divide toda la fila saliente por el valor del [[Pivot]] para convertirlo en $1$.
+    2. Se aplican [[Operaciones Elementales de Fila]] para convertir en $0$ el resto de los números de esa columna.
+
+
+
+### 5. 🛑 Convergencia, Lectura del Óptimo y Dudas (45:00 - 1:05:12)
+
+Tras realizar la iteración, se actualiza la tabla y se vuelve a aplicar el test de optimidad.
+
+- **Condición de Parada:** El profesor confirma que se ha llegado al óptimo cuando no queda ningún valor positivo en la fila de $C_j - Z_j$ (para problemas de maximización).
+- **Solución Final de Fruits SA:** El algoritmo arroja $x_1 = 1000$, $x_2 = 666.66$ y $Z = 33333$, coincidiendo exactamente con el resultado del [[Método Gráfico]].
+
+> [!danger] TRAMPA LETAL DE EXAMEN: ¿Dónde se leen los resultados? El profesor detuvo la clase para alertar de un error masivo en los cuestionarios: Muchos alumnos buscaron los valores de las variables en la fila de $C_j - Z_j$. ¡Error fatal! **Los valores de la solución se leen EXCLUSIVAMENTE en la columna $P_0$** (o $bld$ / $RHS$). Las variables listadas en esa columna son las básicas, y si una variable no aparece ahí (es no básica), su valor es estrictamente $0$.
+
+
+
+### 📊 DIAGRAMA DE FLUJO: El Algoritmo Operativo de la Clase
+
+```
+graph TD
+    A(Inicio: Modelo Original) --> B(Estandarización: Agregar Holguras)
+    B --> C(Armar Tabla Inicial con Matriz Identidad)
+    C --> D(Calcular Z_j y C_j - Z_j)
+    D --> E{¿Hay valores > 0 en C_j - Z_j?}
+    E -->|No| F(SOLUCIÓN ÓPTIMA ALCANZADA)
+    E -->|Sí| G(Fase 2: Iteración)
+    G --> H(Identificar Variable que Entra: Mayor Positivo)
+    H --> I(Identificar Variable que Sale: Menor Cociente Tita)
+    I --> J(Aplicar Operaciones de Gauss-Jordan con el Pivot)
+    J --> C
+```
+
+_Conceptos relacionados:_ [[Fase 1 del Simplex]], [[Fase 2 del Simplex]], [[Forma Estándar]], [[Gauss-Jordan]], [[Tasa de Crecimiento]].
+# 
+# -- dudas y pregs
+Como tu Tutor Académico de Élite, he analizado la transcripción de esta clase práctica. El profesor no solo hizo un énfasis crítico (marcando un error masivo que suele costar parciales), sino que también respondió preguntas operativas y teóricas fundamentales de los alumnos.
+
+A continuación, te presento el reporte detallado dividido en las advertencias innegociables y el registro de consultas.
+
+# 🚨 RADAR DE PARCIAL: Énfasis y Advertencias del Profesor
+
+El profesor detuvo la clase específicamente para marcar **dos temas críticos** que observó durante la corrección en vivo de los cuestionarios.
+
+### 1. La "Trampa Letal" de Lectura en la Tabla Simplex
+
+Este fue el **mayor énfasis de toda la clase**. El profesor notó que muchísimos alumnos leían mal los resultados finales y fue tajante al corregirlo.
+
+> [!danger] ZONA DE PELIGRO: ¿Dónde se leen los valores? Muchos alumnos buscaron los valores finales de la solución en la fila inferior de $C_j - Z_j$ [58:32, 58:39]. **¡Esto es un error conceptual grave!** El profesor recalcó vehementemente que los valores de las [[Variables Básicas]] y el resultado de la [[Función Objetivo]] se leen EXCLUSIVAMENTE en la columna $P_0$ (también llamada $bld$ o $RHS$) [58:16, 59:10, 1:01:22].
+
+### 2. La Advertencia Logística: "La Bola de Nieve"
+
+El profesor notó con molestia que menos de la mitad del curso había visto el material preparatorio [5:07, 6:04].
+
+> [!tip] Tip Innegociable para la [[Aprobación Directa]] Advirtió que apoyarse exclusivamente en los videos "no sirve" y que es obligatorio leer el libro [14:19, 14:35]. Sentenció que si no mantienen la materia al día, se les hará muy complicado lograr la aprobación directa [8:35, 8:42].
+
+---
+
+# 🗣️ PREGUNTAS DE LOS ALUMNOS Y RESPUESTAS DEL PROFESOR
+
+Durante la sesión, los alumnos realizaron intervenciones clave que el profesor utilizó para anclar conceptos teóricos y técnicos de la plataforma.
+
+### Pregunta 1: La Lógica del "1" en la Intersección (El [[Pivot]])
+
+> [!question] Dudas de Concepto en Clase **Alumno:** _"¿Por qué siempre tiene que quedar en 1, por ejemplo las intersecciones de la fila y la columna acá?"_ [50:16, 50:22]. **Respuesta del Profesor:** Justificó este paso vinculándolo estrictamente al método de [[Gauss-Jordan]]. Explicó que lograr ese "1" es el mecanismo algebraico para formar la [[Matriz Identidad]] [50:30, 50:39, 50:47]. Esto es vital porque permite identificar sin ambigüedades qué variable está en la base y qué valor exacto de la columna $P_0$ le corresponde [51:13, 51:40, 51:49]. Sin ese "1", no se podrían leer los resultados [52:05, 52:12].
+
+### Pregunta 2: Errores de Puntuación (Comas vs. Puntos)
+
+> [!question] Duda Técnica del Cuestionario **Alumno:** _"El problema te cuento con el punto y la coma... en una me tira error y la otra la puse con coma y no"_ [53:27, 55:01]. **Respuesta del Profesor (Tip Técnico):** Aclaró que esto no era un error matemático del alumno, sino un conflicto con la **Configuración Regional de Windows** de sus computadoras [53:34, 54:23]. El sistema Moodle lee el separador de decimales según cómo esté configurado el sistema operativo del usuario [54:30, 54:46]. _Nota adicional:_ También identificó que algunos alumnos confundieron celdas, ingresando el nombre de la variable (letras) en el casillero de "coeficientes" (números) y viceversa [56:14, 56:38, 56:47].
+
+### Pregunta 3: Las Variables Nulas (Regla de Lectura)
+
+> [!question] Duda de Clasificación **Alumno:** _"¿Entonces... y todas las otras son 0, lo que sale en $P_0$?"_ [59:42, 59:50]. **Respuesta del Profesor:** El profesor confirmó esta regla de oro. Demostró en pantalla que las variables explícitamente listadas en la base asumen los valores de la columna $P_0$ [59:59, 1:00:45]. Aquellas variables que NO figuran en ese listado son, por definición matemática, **[[Variables No Básicas]]**, y su valor es estrictamente $0$ [1:00:45, 1:00:55].
