@@ -2,7 +2,7 @@
 
 ## **Primer Parcial**
 
-**Pregunta 1:**  
+**Pregunta 1:**  ✅
 Dado un problema de minimización, si en una iteración específica de simplex no se elige como variable que entra a la que tienen la diferencia (cj \- zj) \< 0 de mayor valor absoluto, la próxima solución será:
 
 * a) Factible pero No Básica  
@@ -12,12 +12,12 @@ Dado un problema de minimización, si en una iteración específica de simplex n
 * e) No Básica y No Factible  
 * **f) Ninguna de las demás respuestas es correcta** *(Respuesta marcada)*
 
-**Pregunta 2:**  
+**Pregunta 2:**   ✅
 Dado un programa lineal de maximización formulado en forma canónica, que tiene 7 variables de decisión y 4 restricciones. ¿Una solución factible básica degenerada cuántas variables nulas debe tener?
 
-* **Respuesta (manuscrita):** Para ser Solución Factible básica degenerada debe tener más de 3 variables nulas.
 
-**Pregunta 3:**  
+
+**Pregunta 3:**   ✅
 Si un Programa Lineal es no factible significa que:
 
 * a) Al menos una variable de decisión se puede hacer tan grande como se desee en la dirección de optimización sin dejar la región factible.  
