@@ -1,13 +1,11 @@
-
+creooo que use este
+https://docs.google.com/forms/d/1Ff8WzZpTHf-9q7qRiPt70fEv6sNiVnxkYoMYuiGebK8/viewform?edit_requested=true
 
 
 
 https://drive.google.com/drive/folders/1yUZ_uBXAmObzdw-0Xh8fomxBs7aAqXGb
 
 
-
-Forms Parcial 2: https://docs.google.com/forms/d/13qRYWRvIv-La3ex8Vk9zLzouNvh_jYHFea9lxrEWJk0/edit
-Forms Parcial 3: https://docs.google.com/forms/d/1acyC-pCMi28pPTqB5EgFylC6iqsgQ4TFI-3MclbQ0iE/edit
 
 
 
