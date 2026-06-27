@@ -147,11 +147,12 @@ Lee el problema e identifica escribiendo con palabras cuál es la meta del decis
 
 ### ¿Maximizar o Minimizar?
 
-| Datos disponibles en el problema | Meta a optimizar | Dirección de Z |
-|:--|:--|:--|
-| Precios de venta **Y** costos | **Beneficio / Contribución Marginal** (Ingreso - Costo) | $\max Z$ |
-| Solo precios de venta o "ingreso neto" | **Ingreso Total** | $\max Z$ |
-| Solo costos operativos | **Costos Totales** | $\min Z$ |
+| Datos disponibles en el problema       | Meta a optimizar                                        | Dirección de Z |
+| :------------------------------------- | :------------------------------------------------------ | :------------- |
+| Precios de venta **Y** costos          | **Beneficio / Contribución Marginal** (Ingreso - Costo) | $\max Z$       |
+| Solo precios de venta o "ingreso neto" | **Ingreso Total**                                       | $\max Z$       |
+| Solo costos operativos                 | **Costos Totales**                                      | $\min Z$       |
+|                                        |                                                         |                |
 
 ### Contribución Marginal vs. Ingreso (diferencia clave)
 

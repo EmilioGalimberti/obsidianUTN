@@ -128,8 +128,8 @@ Sean $n$ = total de variables (decisión + holgura/excedente) y $m$ = número de
 | **Solución**                       | Verifica el sistema de ecuaciones (puede tener valores negativos)                          | Cualquier intersección de rectas                                       |
 | **Solución Factible (SF)**         | Verifica el sistema de ecuaciones **Y** cumple no negatividad ($x_j \geq 0$ para todo $j$) | Cualquier punto dentro del poliedro o en sus lados                     |
 | **Solución Factible Básica (SFB)** | SF con **como máximo $m$** variables positivas (o al menos $n-m$ variables nulas)          | Gráficamente, representan los vértices del [[Poliedro de Soluciones]]. |
-| — SFB No Degenerada                | Tiene **exactamente $m$** variables positivas (exactamente $n-m$ nulas)                    | Vértice donde se cruzan exactamente $m$ rectas                         |
-| — SFB Degenerada                   | Tiene **menos de $m$** variables positivas (más de $n-m$ nulas)                            | Vértice donde se cruzan **más de $m$** rectas                          |
+| — SFB No Degenerada                | Tiene **exactamente $m$** variables positivas (exactamente $n-m$ nulas)                    | cruzan dos rectas<br>(para problemas de dos dimensiones)               |
+| — SFB Degenerada                   | Tiene **menos de $m$** variables positivas (más de $n-m$ nulas)                            | cruzan 3 o mas rectas<br>(para problemas de dos dimensiones)           |
 | **Solución Factible No Básica**    | SF con **más de $m$** variables positivas                                                  | Interior del poliedro o sobre un lado (no en vértice)                  |
 | **Solución Básica No Factible**    | Verifica las ecuaciones, tiene $\leq m$ positivas, pero tiene algún valor **negativo**     | Intersección de rectas **fuera** de la región factible                 |
 |                                    |                                                                                            |                                                                        |
@@ -550,7 +550,7 @@ Al asignar un valor a $Z$ para trazar su pendiente, fijarse en la escala de los 
 ### Tip 2: Verificación cruzada con el combinatorio
 Si la fórmula $C_m^n$ te da 10 soluciones básicas como máximo, y en tu gráfico estás marcando 12 intersecciones, entonces **estás interceptando rectas que no corresponden al modelo**. Usalo como check de sensatez.
 
-### Tip 3: Atajo con restricciones limitantes
+### ==Tip 3: Atajo con restricciones limitantes
 Si identificás visualmente que el vértice óptimo se apoya sobre una recta de restricción, ya sabés de antemano que **la holgura de esa restricción es $0$** sin necesidad de calcular. Es un excelente atajo para verificar que tus cálculos posteriores son lógicos.
 
 ### Tip 4: ¿Por qué las holguras entran con coeficiente 0 en Z?
