@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Práctica - Gestión TI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-option {
+            transition: all 0.2s;
+        }
+        .btn-option:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4 text-slate-800">
+
+    <div id="app" class="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden relative">
+        
+        <!-- PANTALLA DE INICIO -->
+        <div id="start-screen" class="p-8 text-center fade-in">
+            <div class="mb-6 flex justify-center">
+                <div class="bg-indigo-100 p-4 rounded-full text-indigo-600">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-800 mb-4">Simulador de Examen</h1>
+            <p class="text-slate-600 mb-8">Practica las 62 preguntas de Gestión y Gobierno de TI. Las preguntas y opciones aparecerán de forma aleatoria.</p>
+            <button onclick="iniciarJuego(todasLasPreguntas)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-colors text-lg w-full sm:w-auto">
+                Comenzar Práctica
+            </button>
+        </div>
+
+        <!-- PANTALLA DE JUEGO -->
+        <div id="game-screen" class="hidden flex-col h-full fade-in">
+            <!-- Header & Progress -->
+            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center shadow-md">
+                <span id="progress-text" class="font-semibold">Pregunta 1 de 62</span>
+                <span id="score-text" class="bg-indigo-800 px-3 py-1 rounded-lg text-sm font-bold">Aciertos: 0</span>
+            </div>
+            <div class="w-full bg-indigo-200 h-2">
+                <div id="progress-bar" class="bg-green-400 h-2 transition-all duration-300" style="width: 0%;"></div>
+            </div>
+
+            <!-- Question Area -->
+            <div class="p-6 md:p-8 flex-grow">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-6 leading-snug">
+                    ¿Pregunta?
+                </h2>
+                
+                <div id="options-container" class="flex flex-col space-y-3">
+                    <!-- Opciones inyectadas por JS -->
+                </div>
+            </div>
+
+            <!-- Footer / Next Button -->
+            <div class="p-6 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button id="next-btn" onclick="siguientePregunta()" class="hidden bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-6 rounded-xl shadow transition-colors">
+                    Siguiente Pregunta ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA DE RESULTADOS -->
+        <div id="result-screen" class="hidden p-8 text-center fade-in">
+            <div id="result-icon" class="mb-6 flex justify-center">
+                <!-- Icono inyectado por JS -->
+            </div>
+            <h2 id="result-title" class="text-3xl font-bold text-slate-800 mb-2">¡Ronda Terminada!</h2>
+            <p id="result-score" class="text-xl text-slate-600 mb-8">Obtuviste X de Y correctas.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                <button id="retry-mistakes-btn" onclick="practicarErrores()" class="hidden bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors">
+                    Practicar las que me equivoqué
+                </button>
+                <button onclick="iniciarJuego(todasLasPreguntas)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors">
+                    Reiniciar todo
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // BASE DE DATOS DE PREGUNTAS (Adaptadas del texto proporcionado)
+        const todasLasPreguntas = [
+            {
+                q: "1. Cuál de los siguientes, son desafíos para los CIOs",
+                options: ["Las opciones a, c y e son correctas", "Mejorar la relacion entre TI y sus clientes", "Registrar las fallas de los sistemas para identificar causas", "Todas las opciones son correctas", "Las opciones a, b y g"],
+                ans: "Las opciones a, c y e son correctas"
+            },
+            {
+                q: "2. El reclutamiento de personal es interno, cuando al existir una vacante en una organización, la empresa lo intenta cubrir mediante:",
+                options: ["La reubicación de sus empleados, a través de promociones, transferencia, programas de desarrollo", "Bolsa de trabajo, universidades, agencia de empleo", "Sindicatos, asociaciones civiles, agencias de reclutamiento", "Ninguna de las opciones anteriores es correcta"],
+                ans: "La reubicación de sus empleados, a través de promociones, transferencia, programas de desarrollo"
+            },
+            {
+                q: "3. La jerarquía de necesidades de Maslow se basa en que el hombre demuestra sus necesidades en el transcurso de la vida, identificando:",
+                options: ["Necesidades de auto-realización, de estimación, de seguridad y fisiológicas", "Factores satisfactorios o 'motivadores' y factores insatisfactorios o 'higienicos'", "Factores básicos de valencia, de expectativa, de instrumentalidad"],
+                ans: "Necesidades de auto-realización, de estimación, de seguridad y fisiológicas"
+            },
+            {
+                q: "4. En la Higiene en el trabajo, qué variables se deben controlar :",
+                options: ["Las opciones a y c (El hombre y El ambiente de trabajo)", "El hombre", "El ambiente de trabajo", "Robos y Accidentes", "Las opciones b, d y e"],
+                ans: "Las opciones a y c (El hombre y El ambiente de trabajo)"
+            },
+            {
+                q: "5. ¿Cuál es el concepto de administración de salarios?",
+                options: ["Establecer o mantener estructuras salariales equitativas y justas en la organización", "Estudiar y determinar todos los requisitos, las responsabilidades y las condiciones que cada cargo exige", "Lograr el equilibrio y la uniformidad de las evaluaciones en todas las áreas", "Definir medios de complemento y apoyo, para estimular y mantener la fuerza de trabajo"],
+                ans: "Establecer o mantener structures salariales equitativas y justas en la organización"
+            },
+            {
+                q: "6. ¿Qué es una enfermedad profesional?",
+                options: ["Daño causado de una manera directa por el ejercicio de una profesión u oficio", "Hecho que, como consecuencia del trabajo, provoca una lesión corporal", "Enfermedad contraída en el ámbito familiar", "Ninguna de las opciones anteriores es correcta"],
+                ans: "Daño causado de una manera directa por el ejercicio de una profesión u oficio"
+            },
+            {
+                q: "7. ¿Qué objetivos corresponden a la evaluación de desempeño?",
+                options: ["Las opciones a, c y e son correctas (Que la persona conozca su desempeño, se sienta partícipe y emplee medios para mejorar)", "Las opciones a, b y c son correctas", "Las opciones c, d y e son correctas", "Atraer y retener a los mejores candidatos para los cargos"],
+                ans: "Las opciones a, c y e son correctas (Que la persona conozca su desempeño, se sienta partícipe y emplee medios para mejorar)"
+            },
+            {
+                q: "8. Estrategia de TI:",
+                options: [
+                    "Es un plan integrado (visión/misión, iniciativas, riesgos) y su ejecución incluye la operación de servicios TI.",
+                    "En ausencia de un CIO, el equipo de TI puede definir una estrategia de TI efectiva únicamente.",
+                    "Solo incluye la evaluación del estado actual sin mirar hacia el futuro.",
+                    "No incluye la operación de servicios TI en su ejecución."
+                ],
+                ans: "Es un plan integrado (visión/misión, iniciativas, riesgos) y su ejecución incluye la operación de servicios TI."
+            },
+            {
+                q: "9. Plan estratégico y Gobierno TI:",
+                options: [
+                    "El negocio determina eficacia de TI; Gestión decide presente en función del pasado; Gobierno decide presente en función del futuro.",
+                    "La gestión de TI se focaliza en facilitar la toma de decisiones estratégicas de TI.",
+                    "El gobierno de TI es decidir el presente en función del pasado.",
+                    "El negocio no tiene participación en determinar la eficacia de TI."
+                ],
+                ans: "El negocio determina eficacia de TI; Gestión decide presente en función del pasado; Gobierno decide presente en función del futuro."
+            },
+            {
+                q: "10. El subsistema de Organización incluye las funciones de Descripción y Diseño de Puestos de trabajo, Evaluación del Desempeño y Plan de carrera.",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "11. Gobierno y Gestión de TI (1):",
+                options: [
+                    "Gestión ejecuta y prepara propuestas. Gobierno (Directores, auditores, CIO) tiene principios (responsabilidad, estrategia...) y no es una simple herramienta.",
+                    "La gestión corporativa de TI solo monitorea rendimiento, el Gobierno ejecuta los proyectos.",
+                    "El gobierno de TI es exclusivamente una herramienta de software.",
+                    "Los actores claves del gobierno son solo los analistas y programadores."
+                ],
+                ans: "Gestión ejecuta y prepara propuestas. Gobierno (Directores, auditores, CIO) tiene principios (responsabilidad, estrategia...) y no es una simple herramienta."
+            },
+            {
+                q: "12. En relación a una Mesa de Servicios:",
+                options: [
+                    "Las herramientas ITSM son esenciales para automatizar procesos y la disponibilidad es crítica.",
+                    "Los SLA no definen los niveles de servicio acordados.",
+                    "La madurez ITSM no se relaciona con la mejora continua.",
+                    "La gestión de eventos no contribuye a la detección proactiva de problemas."
+                ],
+                ans: "Las herramientas ITSM son esenciales para automatizar procesos y la disponibilidad es crítica."
+            },
+            {
+                q: "13. La Gestión se refiere a la implementación de criterios de toma de decisión en el uso de sistemas de TI, su arquitectura y la creación y explotación de activos TI para cubrir las necesidades actuales y futuras del negocio.",
+                options: ["Verdadero", "Falso"],
+                ans: "Falso"
+            },
+            {
+                q: "14. ¿Qué diferencia existe entre la Gestión TI y el Gobierno TI?",
+                options: [
+                    "La Gestión TI se focaliza en la eficiencia operativa y el Gobierno TI en las decisiones estratégicas TI",
+                    "El Gobierno TI apunta a eficientizar el uso de la tecnología y la Gestión TI en el desarrollo",
+                    "El Gobierno TI se emplea para diseñar e implementar y la Gestión TI para soportar la operación",
+                    "El Gobierno TI se focaliza en los resultados económicos y la Gestión TI en las tareas"
+                ],
+                ans: "La Gestión TI se focaliza en la eficiencia operativa y el Gobierno TI en las decisiones estratégicas TI"
+            },
+            {
+                q: "15. Las 3 funciones principales de TI son:",
+                options: ["Infraestructura, Funcionalidad y Gobernanza", "Soporte, Funcionalidad y Gobernanza", "Soporte, Desarrollo y Toma de decisiones", "Ninguna de las opciones anteriores es correcta"],
+                ans: "Infraestructura, Funcionalidad y Gobernanza"
+            },
+            {
+                q: "16. ¿Qué se espera que modifique la cuarta revolución industrial en las organizaciones?",
+                options: ["La importancia de la tecnología en los procesos", "La descentralización de la toma de decisiones", "La reducción de la demanda de nuevas habilidades", "La centralización de la toma de decisiones", "La estandarización de los perfiles de recursos humanos"],
+                ans: "La importancia de la tecnología en los procesos"
+            },
+            {
+                q: "17. Gobierno y Gestión de TI:",
+                options: [
+                    "Gestión ejecuta proyectos/propuestas. Gobierno tiene principios, actores clave (Directores, CIO) y es un conjunto de procesos y decisiones, no una herramienta.",
+                    "La gestión corporativa de TI monitorea rendimiento y conformidad; evalúa propuestas; y dirige planes y políticas.",
+                    "El gobierno de TI es una herramienta tecnológica específica.",
+                    "La gestión de TI no tiene relación con la ejecución de proyectos."
+                ],
+                ans: "Gestión ejecuta proyectos/propuestas. Gobierno tiene principios, actores clave (Directores, CIO) y es un conjunto de procesos y decisiones, no una herramienta."
+            },
+            {
+                q: "18. Según las nuevas formas de Organizaciones, relacionar:",
+                options: [
+                    "Org 4.0 (horizontal por funciones), Planas (sin cargos), Virtuales (Outsourcing/Digitalización), Flatarchies (jerárquica + equipos plana)",
+                    "Todas combinan estructura jerárquica rígida con control estricto de horarios.",
+                    "Org 4.0 (jerárquica pura), Planas (Outsourcing total), Virtuales (sin roles)",
+                    "Ninguna de las anteriores relaciona correctamente los conceptos."
+                ],
+                ans: "Org 4.0 (horizontal por funciones), Planas (sin cargos), Virtuales (Outsourcing/Digitalización), Flatarchies (jerárquica + equipos plana)"
+            },
+            {
+                q: "19. En relación a una Mesa de Servicios:",
+                options: [
+                    "Los SLA son parte del catálogo de servicios TI y la madurez ITSM es un concepto clave.",
+                    "La mesa de servicios de TI no tiene relación con los usuarios.",
+                    "Las incidencias y problemas no son procesos operativos.",
+                    "La disponibilidad no es un aspecto relevante en la gestión de servicios TI."
+                ],
+                ans: "Los SLA son parte del catálogo de servicios TI y la madurez ITSM es un concepto clave."
+            },
+            {
+                q: "20. El rol de TI en la relación con el Negocio (4Ps) es: El proveedor, El promotor, El socio, El par?",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "21. Gestión de Servicios TI:",
+                options: [
+                    "El ITSM define procesos para la prestación y soporte de servicios de TI, y la gestión se soporta en arquitectura de silos.",
+                    "La mesa de servicios de TI no tiene como objetivo principal atender las solicitudes de los usuarios.",
+                    "Las Aplicaciones de negocio y HW no se consideran activos de TI.",
+                    "Un servicio NO es la entrega de valor al cliente."
+                ],
+                ans: "El ITSM define procesos para la prestación y soporte de servicios de TI, y la gestión se soporta en arquitectura de silos."
+            },
+            {
+                q: "22. El objetivo de la evaluación de desempeño es atraer y retener a los mejores candidatos para los cargos.",
+                options: ["Verdadero", "Falso"],
+                ans: "Falso"
+            },
+            {
+                q: "23. ¿Qué entiende por la transformación digital de una organización?",
+                options: [
+                    "Proceso de cambio organizacional, cultural que con apoyo de tecnologías genere agilidad y evolución empresarial",
+                    "Proceso de cambio de la organización para ser más eficientes",
+                    "La automatización de los procesos operativos con apoyo de IA, bots, IoT, Cloud, etc...",
+                    "La incorporación de tecnologías disruptivas únicamente"
+                ],
+                ans: "Proceso de cambio organizacional, cultural que con apoyo de tecnologías genere agilidad y evolución empresarial"
+            },
+            {
+                q: "24. Relacione el concepto de los Procesos de TI:",
+                options: [
+                    "Eventos: Detección sucesos. Incidencias: Restablecer urgente. Problemas: Analizar causas raíz. Solicitudes: Cambios bajo costo. Accesos: Dar permisos. SLAs: Acordar niveles.",
+                    "Eventos: Otorgar permisos. Incidencias: Analizar causas raíz. Problemas: Restablecer urgente.",
+                    "SLAs: Detección de sucesos. Solicitudes: Acordar niveles de servicio.",
+                    "Ninguna relación es correcta."
+                ],
+                ans: "Eventos: Detección sucesos. Incidencias: Restablecer urgente. Problemas: Analizar causas raíz. Solicitudes: Cambios bajo costo. Accesos: Dar permisos. SLAs: Acordar niveles."
+            },
+            {
+                q: "25. ¿Qué decisión, de las siguientes, forma parte del Gobierno de TI?",
+                options: [
+                    "Estrategia TI relativa al servicio de la plataforma educativa de una universidad",
+                    "Definición del backlog en una Planning de un sprint de desarrollo",
+                    "Autorización del pago a un proveedor por el servicio realizado",
+                    "Selección del proveedor de soporte TI local en una sucursal"
+                ],
+                ans: "Estrategia TI relativa al servicio de la plataforma educativa de una universidad"
+            },
+            {
+                q: "26. ¿Qué define mejor al Gobierno TI?",
+                options: ["Evaluar - Dirigir - Monitorear", "Evaluar - Sugerir - Adecuar", "Diseñar - Construir - Implementar", "Planear - Diseñar - Ejecutar"],
+                ans: "Evaluar - Dirigir - Monitorear"
+            },
+            {
+                q: "27. ¿Qué tecnologías se integran en la industria 4.0?",
+                options: ["Internet de las cosas, inteligencia artificial y Big Data", "Redes sociales y marketing digital", "Robótica y automatización únicamente", "Realidad virtual y aumentada exclusivamente"],
+                ans: "Internet de las cosas, inteligencia artificial y Big Data"
+            },
+            {
+                q: "28. ¿Qué se espera, principalmente, de un área de TI? (1)",
+                options: [
+                    "Estrategias para que el negocio pueda funcionar operativamente, gestionar mejoras y cumplir sus metas",
+                    "Un equipo de trabajo que domine las metodologías ágiles",
+                    "Soluciones de negocio que cumplan con los requisitos de los usuarios",
+                    "El desarrollo masivo de softwares"
+                ],
+                ans: "Estrategias para que el negocio pueda funcionar operativamente, gestionar mejoras y cumplir sus metas"
+            },
+            {
+                q: "29. Gobierno y Plan Estratégico TI:",
+                options: [
+                    "La transformación digital no tiene impacto en el rol de la TI en las organizaciones (Respuesta marcada como correcta en el origen)",
+                    "La planificación estratégica de TI no incluye la ejecución de la estrategia",
+                    "La estrategia de TI no se relaciona con la transformación digital",
+                    "El gobierno de TI se enfoca en la asignación progresiva de recursos"
+                ],
+                ans: "La transformación digital no tiene impacto en el rol de la TI en las organizaciones (Respuesta marcada como correcta en el origen)"
+            },
+            {
+                q: "30. El Hombre y El Ambiente de Trabajo, son las variables a controlar para preservar:",
+                options: ["Las opciones a y b son correctas (La higiene y La Seguridad en el trabajo)", "La higiene en el trabajo solamente", "La Seguridad en el trabajo solamente", "Incendios y robos", "Accidentes únicamente"],
+                ans: "Las opciones a y b son correctas (La higiene y La Seguridad en el trabajo)"
+            },
+            {
+                q: "31. Traslados/Transferencias, Rotación de labores, Plan de reemplazos; corresponden a:",
+                options: ["Ninguna de las opciones anteriores es correcta", "Mercado laboral", "Evaluación de desempeño", "Capacitación y desarrollo", "Selección y Admisión de RH"],
+                ans: "Ninguna de las opciones anteriores es correcta"
+            },
+            {
+                q: "32. El subsistema de Retención, incluye las funciones de:",
+                options: [
+                    "Administración de salarios, Servicios y Beneficios sociales, Higiene y Seguridad",
+                    "Capacitación, Desarrollo de RH, Desarrollo Organizacional",
+                    "Mercado laboral, Reclutamiento, Selección y Administración de RH",
+                    "Diseño y Descripción de puestos, Evaluación de puestos, Plan de carrera"
+                ],
+                ans: "Administración de salarios, Servicios y Beneficios sociales, Higiene y Seguridad"
+            },
+            {
+                q: "33. Defina Incapacidad permanente parcial:",
+                options: [
+                    "Es aquella en la que, al ser dado de alta el trabajador, queda con capacidad laboral reducida para su actividad normal",
+                    "Es aquella en la que el accidente tiene como resultado el fallecimiento del trabajador",
+                    "Es aquella en la que, al ser dado de alta, queda imposibilitado para realizar todos los trabajos de la misma profesión",
+                    "Es aquella en la que vuelve a su trabajo habitual sin secuelas incapacitantes"
+                ],
+                ans: "Es aquella en la que, al ser dado de alta el trabajador, queda con capacidad laboral reducida para su actividad normal"
+            },
+            {
+                q: "34. En qué función se debe tener en cuenta un equilibrio interno y externo:",
+                options: ["Administración de salarios", "Evaluación de desempeño", "Plan de carrera", "Higiene y seguridad", "Beneficios sociales"],
+                ans: "Administración de salarios"
+            },
+            {
+                q: "35. El proceso de comparación entre los requisitos del cargo y las características de los candidatos, corresponde a:",
+                options: ["Selección de personal", "Descripción de puestos de trabajo", "Reclutamiento", "Mercado laboral"],
+                ans: "Selección de personal"
+            },
+            {
+                q: "36. En la administración del Área Informática:",
+                options: [
+                    "Tradicional gestiona por Islas y siempre está detrás de necesidades. En gestión de servicios el foco está en el negocio.",
+                    "En el enfoque tradicional, la modalidad es siempre preventiva y proactiva.",
+                    "En la gestión de servicios, los procesos son completamente informales.",
+                    "En la gestión de servicios, solo se administra Infraestructura física."
+                ],
+                ans: "Tradicional gestiona por Islas y siempre está detrás de necesidades. En gestión de servicios el foco está en el negocio."
+            },
+            {
+                q: "37. Gobierno y Gestión de TI (2):",
+                options: [
+                    "Gobierno se encarga de evaluar, dirigir y monitorear. Ejecución incluye iniciativas, proyectos y la operación de servicios TI.",
+                    "El gobierno de Ti se enfoca únicamente en la asignación progresiva de recursos.",
+                    "La estrategia de TI no tiene relación con el valor de la TI.",
+                    "La ejecución de la estrategia de TI NO incluye la operación de servicios TI."
+                ],
+                ans: "Gobierno se encarga de evaluar, dirigir y monitorear. Ejecución incluye iniciativas, proyectos y la operación de servicios TI."
+            },
+            {
+                q: "38. Cuáles son las tres funciones principales de la TI:",
+                options: ["Gobernanza, Funcionalidad, Infraestructura", "Gestión, Servicios, Procesos", "Herramientas, Actividades, Tecnología", "Procesos, Servicios, Tareas"],
+                ans: "Gobernanza, Funcionalidad, Infraestructura"
+            },
+            {
+                q: "39. ¿Qué implica el nivel de madurez 2 en ITSM?",
+                options: ["Mesa de servicio de TI soporte", "Enfoque en la mera gestión de costos", "Creación de acuerdos de nivel de servicio con los clientes", "Establecimiento de umbrales y gestión de SLA", "Valor agregado demostrado en términos reales"],
+                ans: "Mesa de servicio de TI soporte"
+            },
+            {
+                q: "40. ¿Cuál es uno de los elementos clave que debe incluir un plan estratégico de TI?",
+                options: ["Evaluación del estado actual", "Evaluación del estado pasado", "Evaluación del estado futuro excluyendo el actual", "Ninguna de las opciones anteriores es correcta"],
+                ans: "Evaluación del estado actual"
+            },
+            {
+                q: "41. ¿Qué tipo de iniciativas estrategicas pueden incluirse en un plan de implementación de TI?",
+                options: ["Proyectos, programas o mejoras de procesos", "Proyectos a largo plazo únicamente", "Proyectos a corto plazo únicamente", "Proyectos sin relación con la estrategia"],
+                ans: "Proyectos, programas o mejoras de procesos"
+            },
+            {
+                q: "42. ¿Qué debe incluir un plan de implementación detallado, en un plan estratégico de TI?",
+                options: ["Cronogramas, hitos e indicadores de desempeño", "Solo los pasos generales a seguir", "Solo los recursos financieros necesarios", "Solos recursos humanos necesarios"],
+                ans: "Cronogramas, hitos e indicadores de desempeño"
+            },
+            {
+                q: "43. ¿Por qué es importante tener una estrategia de gestión de riesgos, en un plan estratégico de TI?",
+                options: ["Para minimizar los riesgos potenciales", "Para ignorar los riesgos potenciales", "Para maximizar los riesgos potenciales", "No es necesaria una estrategia de riesgos"],
+                ans: "Para minimizar los riesgos potenciales"
+            },
+            {
+                q: "44. ¿Que proceso se debe incluir en un plan estrategico de TI para monitorear y revisar el progreso del plan?",
+                options: ["Revision periodicas", "Revisiones anuales unicamente", "Revisiones mensuales unciamente", "Sin proceso de revisión"],
+                ans: "Revision periodicas"
+            },
+            {
+                q: "45. ¿Qué tecnologías se mencionan, como parte de las estrategias de innovación, en la gestión de servicios de TI?",
+                options: ["Softwares de ITSM", "Softwares de RRHH", "Softwares de CRM", "Softwares de Contabilidad"],
+                ans: "Softwares de ITSM"
+            },
+            {
+                q: "46. La evaluación del estado actual en un plan estratégico de TI incluye un análisis de las capacidades de hardware, software y procesos de la organización.",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "47. La transformacion digital implica repensar el negocio a través de cambios profundos que impactan en la cultura de la organización",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "48. En el principio de Adquisición, del gobierno de TI, se evalúa la opción para la compra de insumos TI.",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "49. ¿Qué recursos se deben considerar tanto interna como externamente, al desarrollar un plan estrategico TI?",
+                options: ["Recursos financieros y de personal internos y externos", "Solo recursos internos", "Solo recursos externos", "No se consideran los recursos"],
+                ans: "Recursos financieros y de personal internos y externos"
+            },
+            {
+                q: "50. Gobernanza se refiere a la implementación de criterios de toma de decisión en el uso de sistemas de TI, su arquitectura y la creación y explotación de activos tecnológicos para cubrir las necesidades presentes y futuras del negocio.",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "51. Un Plan Estratégico de TI es:",
+                options: [
+                    "Es el documento integral que sirve como hoja de ruta para la estrategia, y describe cómo se usará la tecnología para lograr objetivos.",
+                    "Es un documento estratégico que define cómo se proporcionará asistencia técnica a los usuarios exclusivamente.",
+                    "Es un documento que atiende directamente a los usuarios y detalla recursos de asistencia eficiente.",
+                    "No es un documento, es una metodología ágil."
+                ],
+                ans: "Es el documento integral que sirve como hoja de ruta para la estrategia, y describe cómo se usará la tecnología para lograr objetivos."
+            },
+            {
+                q: "52. El rol de TI en relacion con el negocio (4ps) es:",
+                options: ["Proveedor, Promotor, Socio, Par", "Soporto, estrategia, planificacion", "Soporte tecnico, promotor, estrategia", "Procesos, Personas, Productos, Partners"],
+                ans: "Proveedor, Promotor, Socio, Par"
+            },
+            {
+                q: "53. El subsistema de Retención, incluye las funciones de Administración de salarios, Servicios y Beneficios sociales, Higiene y Seguridad.",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "54. El 'Conjunto de normas y procedimientos que protegen la integridad física y mental del trabajador, preservándolo de los riesgos inherentes a las tareas...'. Corresponde a Higiene en el trabajo.",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "55. Características y funciones del CIO:",
+                options: [
+                    "Encausa beneficios de IT hacia resolución de problemas y genera soluciones tecnológicas que pueden cambiar el plan estratégico.",
+                    "Solo define procedimientos de trabajo rutinarios del Área Informática.",
+                    "No participa activamente en los nuevos proyectos de negocios.",
+                    "Su única función es administrar el soporte técnico básico."
+                ],
+                ans: "Encausa beneficios de IT hacia resolución de problemas y genera soluciones tecnológicas que pueden cambiar el plan estratégico."
+            },
+            {
+                q: "56. La digitalización ayuda a las organizaciones a seguir siendo competitivas en el mercado y libera a los trabajadores para que se centren en actividades de valor añadido.",
+                options: ["Verdadero", "Falso"],
+                ans: "Falso" // Marcado Falso según tus respuestas provistas
+            },
+            {
+                q: "57. Conflictos interpersonales:",
+                options: [
+                    "Interdependencia genera conflictos. El método perder-perder pierde confianza y cooperación. Se pueden prevenir seleccionando personas que concuerden con las necesidades.",
+                    "El Trabajo a reglamento es una forma de resolver conflictos interpersonales ganando todos.",
+                    "La interdependencia de tareas NUNCA genera conflictos laborales interpersonales.",
+                    "El método ganar-ganar destruye la confianza de la organización."
+                ],
+                ans: "Interdependencia genera conflictos. El método perder-perder pierde confianza y cooperación. Se pueden prevenir seleccionando personas que concuerden con las necesidades."
+            },
+            {
+                q: "58. ¿Qué decisión, de las siguientes, forma parte del Gobierno de TI? (Pregunta repetida)",
+                options: [
+                    "Estrategia TI relativa al servicio de la plataforma educativa de una universidad",
+                    "Definición del backlog en una Planning de un sprint de desarrollo",
+                    "Autorización del pago a un proveedor por el servicio realizado",
+                    "Selección del proveedor de soporte TI local"
+                ],
+                ans: "Estrategia TI relativa al servicio de la plataforma educativa de una universidad"
+            },
+            {
+                q: "59. La Estrategia TI permite:",
+                options: [
+                    "Trazar el norte hacia donde se quiere llevar al negocio desde una mirada tecnológica",
+                    "Definir un plan de mejoras para los próximos meses",
+                    "Tomar las decisiones para eficientizar los procesos de negocio únicamente",
+                    "Evaluar el desarrollo de un sistema específico"
+                ],
+                ans: "Trazar el norte hacia donde se quiere llevar al negocio desde una mirada tecnológica"
+            },
+            {
+                q: "60. ¿Cuál de las siguientes opciones es un ejemplo de evaluación de desempeño?",
+                options: [
+                    "Un supervisor revisa los objetivos y logros de un empleado al final del año.",
+                    "Un equipo de trabajo organiza reuniones semanales para mejorar la comunicación interna.",
+                    "Un empleado asiste a un curso de capacitación para mejorar sus habilidades.",
+                    "Una empresa decide cambiar su estrategia de negocio para aumentar sus ganancias."
+                ],
+                ans: "Un supervisor revisa los objetivos y logros de un empleado al final del año."
+            },
+            {
+                q: "61. El 'Conjunto de normas y procedimientos que protegen la integridad física y mental del trabajador...'. Corresponde a Higiene en el trabajo. (Repetida)",
+                options: ["Verdadero", "Falso"],
+                ans: "Verdadero"
+            },
+            {
+                q: "62. ¿Qué se espera, principalmente, de un área de TI? (2)",
+                options: [
+                    "Servicios para que el negocio pueda funcionar operativamente, gestionar mejoras y cumplir sus metas",
+                    "El desarrollo de softwares",
+                    "Un equipo de trabajo que domina las metodologias agiles",
+                    "Soluciones de negocio que cumplan con los requisitos de los usuarios"
+                ],
+                ans: "Servicios para que el negocio pueda funcionar operativamente, gestionar mejoras y cumplir sus metas"
+            }
+        ];
+
+        // VARIABLES DE ESTADO
+        let poolPreguntas = [];
+        let preguntasIncorrectas = [];
+        let indiceActual = 0;
+        let puntaje = 0;
+        let respondido = false;
+
+        // ELEMENTOS DEL DOM
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        
+        const progressText = document.getElementById('progress-text');
+        const scoreText = document.getElementById('score-text');
+        const progressBar = document.getElementById('progress-bar');
+        
+        // FUNCIONES AUXILIARES
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        // LÓGICA DEL JUEGO
+        function iniciarJuego(preguntas) {
+            // Clonar y mezclar el arreglo de preguntas
+            poolPreguntas = shuffleArray([...preguntas]);
+            preguntasIncorrectas = [];
+            indiceActual = 0;
+            puntaje = 0;
+            
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+            
+            cargarPregunta();
+        }
+
+        function practicarErrores() {
+            if (preguntasIncorrectas.length === 0) return;
+            iniciarJuego(preguntasIncorrectas);
+        }
+
+        function cargarPregunta() {
+            respondido = false;
+            nextBtn.classList.add('hidden');
+            
+            const pActual = poolPreguntas[indiceActual];
+            
+            // Actualizar UI de progreso
+            progressText.innerText = `Pregunta ${indiceActual + 1} de ${poolPreguntas.length}`;
+            scoreText.innerText = `Aciertos: ${puntaje}`;
+            progressBar.style.width = `${((indiceActual) / poolPreguntas.length) * 100}%`;
+            
+            // Cargar texto
+            questionText.innerText = pActual.q;
+            
+            // Mezclar opciones y renderizar
+            const opcionesMezcladas = shuffleArray([...pActual.options]);
+            optionsContainer.innerHTML = '';
+            
+            opcionesMezcladas.forEach(opcion => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option text-left p-4 rounded-xl border-2 border-gray-200 bg-white hover:border-indigo-400 hover:bg-indigo-50 font-medium text-slate-700 w-full transition-colors';
+                btn.innerText = opcion;
+                btn.onclick = () => seleccionarOpcion(opcion, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function seleccionarOpcion(opcionElegida, btnElement) {
+            if (respondido) return;
+            respondido = true;
+            
+            const pActual = poolPreguntas[indiceActual];
+            const esCorrecta = (opcionElegida === pActual.ans);
+            
+            const todosLosBotones = optionsContainer.querySelectorAll('button');
+            
+            if (esCorrecta) {
+                puntaje++;
+                scoreText.innerText = `Aciertos: ${puntaje}`;
+                btnElement.classList.replace('border-gray-200', 'border-green-500');
+                btnElement.classList.replace('bg-white', 'bg-green-100');
+                btnElement.classList.replace('hover:bg-indigo-50', 'text-green-800');
+            } else {
+                btnElement.classList.replace('border-gray-200', 'border-red-500');
+                btnElement.classList.replace('bg-white', 'bg-red-100');
+                btnElement.classList.replace('hover:bg-indigo-50', 'text-red-800');
+                
+                // Guardar en incorrectas si no está ya
+                if (!preguntasIncorrectas.includes(pActual)) {
+                    preguntasIncorrectas.push(pActual);
+                }
+                
+                // Mostrar cuál era la correcta
+                todosLosBotones.forEach(b => {
+                    if (b.innerText === pActual.ans) {
+                        b.classList.replace('border-gray-200', 'border-green-500');
+                        b.classList.replace('bg-white', 'bg-green-100');
+                        b.classList.add('text-green-800');
+                    }
+                });
+            }
+            
+            // Deshabilitar todos los botones
+            todosLosBotones.forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50', 'btn-option');
+                if(!b.classList.contains('bg-green-100') && !b.classList.contains('bg-red-100')) {
+                    b.classList.add('opacity-50');
+                }
+            });
+            
+            nextBtn.classList.remove('hidden');
+            progressBar.style.width = `${((indiceActual + 1) / poolPreguntas.length) * 100}%`;
+        }
+
+        function siguientePregunta() {
+            indiceActual++;
+            if (indiceActual < poolPreguntas.length) {
+                cargarPregunta();
+            } else {
+                mostrarResultados();
+            }
+        }
+
+        function mostrarResultados() {
+            gameScreen.classList.remove('flex');
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            
+            const porcentaje = Math.round((puntaje / poolPreguntas.length) * 100);
+            const resultTitle = document.getElementById('result-title');
+            const resultScore = document.getElementById('result-score');
+            const resultIcon = document.getElementById('result-icon');
+            const retryBtn = document.getElementById('retry-mistakes-btn');
+            
+            resultScore.innerHTML = `Obtuviste <b>${puntaje}</b> correctas de <b>${poolPreguntas.length}</b> (${porcentaje}%).`;
+            
+            if (preguntasIncorrectas.length > 0) {
+                resultTitle.innerText = "¡Buen esfuerzo!";
+                resultIcon.innerHTML = `<div class="bg-orange-100 p-4 rounded-full text-orange-500"><svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>`;
+                retryBtn.classList.remove('hidden');
+                retryBtn.innerText = `Practicar mis ${preguntasIncorrectas.length} errores`;
+            } else {
+                resultTitle.innerText = "¡Excelente! Perfección.";
+                resultIcon.innerHTML = `<div class="bg-green-100 p-4 rounded-full text-green-500"><svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg></div>`;
+                retryBtn.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
