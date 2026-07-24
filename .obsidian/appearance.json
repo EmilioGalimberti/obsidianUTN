@@ -1,1 +1,11 @@
-{}
+{
+  "cssTheme": "AnuPpuccin",
+  "textFontFamily": "Rubik",
+  "monospaceFontFamily": "Noto Serif",
+  "interfaceFontFamily": "Overpass",
+  "enabledCssSnippets": [
+    "Minimal"
+  ],
+  "theme": "moonstone",
+  "accentColor": ""
+}
