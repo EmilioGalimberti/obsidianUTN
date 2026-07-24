@@ -1,4 +1,5 @@
 ---
+aliases:
 subject:
 year:
 exam: PARCIAL
@@ -7,9 +8,8 @@ type:
 zk_type:
 status:
 date:
-tags:
-aliases:
 source:
+tags:
 ---
 ---
 

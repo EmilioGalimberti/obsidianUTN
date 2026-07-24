@@ -1,7 +1,9 @@
 # {{Title}}
 
 ## Parcial 1
+### Fleeting Notes
 
+### Permanent Notes
 
 ## Parcial 2
 

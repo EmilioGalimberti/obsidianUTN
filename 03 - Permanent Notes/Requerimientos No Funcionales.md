@@ -1,4 +1,6 @@
 ---
+aliases:
+  - DSI - PARCIAL2 - UNIDAD02&03 REQUERIMIENTOS NO FUNCIONALES
 subject: DSI
 year: "3"
 exam: PARCIAL2
@@ -8,8 +10,6 @@ zk_type: permanent
 status: in progress
 date: 2026-07-23
 tags:
-aliases:
-  - DSI - PARCIAL2 - UNIDAD02&03 REQUERIMIENTOS NO FUNCIONALES
 ---
 ---
 
