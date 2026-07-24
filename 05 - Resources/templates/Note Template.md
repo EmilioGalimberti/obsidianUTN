@@ -1,6 +1,6 @@
 ---
 aliases:
-subject:
+subject: DSI
 year:
 exam: PARCIAL
 unit:
