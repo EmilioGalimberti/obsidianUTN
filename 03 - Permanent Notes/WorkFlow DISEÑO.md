@@ -13,8 +13,23 @@ aliases:
 ---
 ---
 
+# Entrada
 
 
+# Propósito y Definición
+
+# Salida
+
+
+# Análisis VS Diseño *preg de parcial*
+
+
+# Que aspectos deben diseñarse *preg de parcial*
+## Diseño arquitectónico (este es el principal)
+## Diseño de procesos
+## Diseño de Experiencia de usuario
+## Diseño formas de entrada/salida
+## Diseño de los procedimientos manuales
 
 
 ---
