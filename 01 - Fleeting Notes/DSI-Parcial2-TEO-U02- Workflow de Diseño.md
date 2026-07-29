@@ -39,6 +39,8 @@ es decir que tenemos como entrada al proceso de diseño, un modelo logico, que e
 
 ![image.png](image%201.png)
 
+---
+
 - definicion de diseño
     
     Es un proceso iterativo que transforma un modelo logico en un modelo fisico, tenienod en cuenta las retricciones del negocio(la tecnologia, la implementacion, aspectos de calidad)
@@ -49,13 +51,14 @@ es decir que tenemos como entrada al proceso de diseño, un modelo logico, que e
     ![image.png](image%202.png)
     
     ![image.png](image%203.png)
-    
-- proposito del diseño
+---
+- proposito del diseño✔
 	    ![[Pasted image 20260727193000.png]]
     ![image.png](image%204.png)
     ![[Pasted image 20260727193006.png]]
     ![image.png](image%205.png)
-    
+
+---
 - modelo de diseño
     ![[Pasted image 20260727193016.png]]
     ![image.png](image%206.png)
@@ -84,16 +87,16 @@ aca seguimos refinnado, es decir incorporamos mas detalles  es decir tiene menos
 el modelo de diseño es mas detallado que el modelo de analisis y comienza a tener mas cosas en cuenta (retricciones de implementacion, rnf, estructura, tecnologia)
 
 ---
-
 se mantiene el analisis separado para hacer implementado en distintac tecnologias, es decir
 
 que para un mismo modelo de analisis puedo plantear distintas dise;os que me resuelvan el problema de maneras diferentes
 
----
+
 
 entonces del dise;o el modelo fisico que tenemos es para algo en particular (por ejemplo una infraestructura)
 
-- que aspectos deben diseñarse? →preg de parcial
+---
+- que aspectos deben diseñarse? →preg de parcial ✔
     ![[Pasted image 20260727193051.png]]
     ![image.png](image%2010.png)
     
@@ -167,7 +170,7 @@ entonces del dise;o el modelo fisico que tenemos es para algo en particular (por
 	   ![[Pasted image 20260727193242.png]] 
     ![image.png](image%2022.png)
     
-- DISEÑO como proceso del pud
+- DISEÑO como proceso del pud✔
     - PROPOSITO
         - Adquirir una compresión en profundidad de los aspectos relacionados con los
         requerimientos no funcionales y restricciones tecnológicas.
