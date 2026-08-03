@@ -33,23 +33,23 @@ https://www.youtube.com/watch?v=Ue-jhSgi3IE
     
     Requerimientos no funcionales el como → nos referimos a la parte tecnologica de implementacion
     
-    ![image.png](image%2029.png)
+    ![[Pasted image 20260803160648.png]]
     
 
-![image.png](image%2030.png)
+
 
 - Familia de normas ISO/IEC 25000
     
     nos proporciona una guia para identificar los requerimientos y se basan en la calidad del producto
     
-    ![image.png](image%2031.png)
+    ![[Pasted image 20260803160735.png]]
     
     hay varias y nostros nos basamos en la del calidad del producto: discribe el modelo de calidad para el producto software
     
-    ![image.png](image%2032.png)
+    ![[Pasted image 20260803160743.png]]
     
 
-![image.png](image%2033.png)
+![[Pasted image 20260803160753.png]]
 
 - adecuacion funcilan no va en diseño (ya la vimos antes en asi)
     
@@ -65,15 +65,15 @@ https://www.youtube.com/watch?v=Ue-jhSgi3IE
     
     o Comportamiento temporal: el grado con el cual la respuesta, los tiempos de procesamiento, tasas de rendimiento de un producto o sistema cuando ejecuta sus funciones cumple con los requerimientos.
     
-    ![image.png](image%2034.png)
+    ![[Pasted image 20260803160810.png]]
     
     o Utilización de recursos: el grado con el cual las cantidades y los tipos de recursos utilizados por un producto o sistema cuando ejecuta sus funciones cumplen con los requerimientos
     
-    ![image.png](image%2035.png)
+    ![[Pasted image 20260803160817.png]]
     
     o Capacidad: el grado con el cual los límites máximos de los parámetros de un producto o sistema cumplen con los requerimientos. Los parámetros pueden ser ítems almacenados, usuarios concurrentes, ancho de banda, rendimiento de las transacciones y tamaño de base de datos
     
-    ![image.png](image%2036.png)
+    ![[Pasted image 20260803160823.png]]
     
 - Compatibilidad
     
@@ -81,13 +81,13 @@ https://www.youtube.com/watch?v=Ue-jhSgi3IE
     
     o Coexistencia: el grado con el cual un producto puede ejecutar sus funciones requeridas mientras comparte el entorno y los recursos con otros productos sin impactar en detrimento de los otros productos.
     
-    ![image.png](image%2037.png)
+    ![[Pasted image 20260803160838.png]]
     
     o Inter-operatividad: el grado con el cual dos o más productos, sistemas o componentes puedenintercambiar información y utilizar esa información intercambiada.
     
-    ![image.png](image%2038.png)
+    ![[Pasted image 20260803160850.png]]
     
-    ![image.png](image%2039.png)
+    ![[Pasted image 20260803160901.png]]
     
 - Usabilidad
     
@@ -117,7 +117,7 @@ https://www.youtube.com/watch?v=Ue-jhSgi3IE
     
     o Capacidad de recuperación: el grado en el cual en un evento de interrupción o falla, un producto o sistema puede restaurar la información afectada y reestablecer el estado deseado del sistema.
     
-    ![image.png](image%2040.png)
+    ![[Pasted image 20260803160942.png]]
     
 - Seguridad
     
@@ -125,7 +125,7 @@ https://www.youtube.com/watch?v=Ue-jhSgi3IE
     
     o Confidencialidad: el grado con el que un producto o sistema asegura que los datos son accesibles sólo a aquellos autorizados a acceder.
     
-    ![image.png](image%2041.png)
+    ![[Pasted image 20260803161029.png]]
     
     o Integridad: el grado con el que un producto, sistema o componente previene el acceso no autorizado o modificaciones a un programa de computadoras o datos.
     o No repudio: el grado con el que acciones o eventos pueden ser probados que existieron de manera que esas acciones o eventos no puedan ser luego repudiados.
@@ -157,11 +157,11 @@ https://www.youtube.com/watch?v=Ue-jhSgi3IE
     o Capacidad de ser reemplazado: el grado con el cual un producto puede reemplazar otro producto de software específico con el mismo propósito y en el mismo entorno.
     
 
-![image.png](image%2042.png)
+![[Pasted image 20260803161045.png]]
 
-![image.png](image%2043.png)
+![[Pasted image 20260803161052.png]]
 
-![image.png](image%2044.png)
+![[Pasted image 20260803161058.png]]
 
 Al tener más de un RNF crítico, comienzan los conflictos:
 

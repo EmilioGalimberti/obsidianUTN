@@ -30,7 +30,7 @@ El  diseño de software crea una representacion o modelo del software que propoc
 **objetivo**: achicar el puente que existe entre el modelo de análisis y la etapa de codificación o implementación
 
 **propósito**:
-* Comprender en profundidad los aspectos relacionados con los [[Requisitos No Funcionales]]  y restricciones tecnológicas
+* Comprender en profundidad los aspectos relacionados con los [[Requerimientos No Funcionales]]  y restricciones tecnológicas
 * Producir una entrada apropiada y un punto de partida para el workflow  de implementación (preparar el "plano" para el código)
 	* *CUAL ES EL PLANO?*
 	* *1. - Respuesta: El "plano" de implementación es el **Modelo de Diseño** en su conjunto (principalmente los _Diagramas de Clases de Diseño_, _Diagramas de Secuencia de Diseño_, la especificación de _Subsistemas/Componentes_ y el documento de _Descripción de la Arquitectura de Software_).**
@@ -61,7 +61,7 @@ El análisis solo se ocupó de los requerimientos funcionales; ahora el diseño
 transforma ese modelo lógico en un modelo físico.
 ## Entradas
 - **Modelo de Análisis** (Realización de Casos de Uso de Análisis, Diagrama de Clases de Análisis).
-- **Especificación de Requisitos del Software** (principalmente Requisitos No Funcionales y Restricciones Tecnológicas).
+- **Especificación de Requisitos del Software** (principalmente [[Requerimientos No Funcionales]] y Restricciones Tecnológicas).
 - **Descripción de la Arquitectura de Referencia / Entorno de Implementación**.
 
 ## Salidas
@@ -76,7 +76,7 @@ transforma ese modelo lógico en un modelo físico.
 Enfocado en la distribución del software sobre los nodos de hardware necesarios para que funcione.
 
 # Análisis VS Diseño *preg de parcial*
-mientras que el análisis se enfoca en el _qué_ debe hacer el sistema (requerimientos funcionales, *modela la solución en términos lógicos*), el diseño define el **cómo** el sistema logrará hacer eso, dando respuesta arquitectónica y estructural a los requerimientos no funcionales, **modela la solución en términos físicos**
+mientras que el análisis se enfoca en el _qué_ debe hacer el sistema (requerimientos funcionales, *modela la solución en términos lógicos*), el diseño define el **cómo** el sistema logrará hacer eso, dando respuesta arquitectónica y estructural a los [[Requerimientos No Funcionales]], **modela la solución en términos físicos**
 
 | Analisis                                                                                         | Diseño                                                       |
 | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
