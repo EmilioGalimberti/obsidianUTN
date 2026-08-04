@@ -20,7 +20,7 @@ tags:
     
     Es el conjunto de decisiones significativas que tomamos respecto de como resolver de los rnf  escenciales para la arquitcutra, teniendo en cuenta las retricciones del negocio
     
-    ![image.png](image%2046.png)
+    ![[Pasted image 20260804170554.png]]
     
 - arquitectura de software
     
@@ -50,11 +50,11 @@ tags:
         3. **Aborda los Requisitos No Funcionales:** Mientras que la funcionalidad se describe en los casos de uso, la arquitectura crea la plataforma que garantiza que dicha funcionalidad se entregue cumpliendo con los requisitos de calidad, como el rendimiento, la distribución física, la seguridad o la capacidad de respuesta.
         4. **Es una Abstracción:** La arquitectura simplifica la complejidad de un sistema al ocultar los detalles internos de los componentes y centrarse en sus propiedades visibles y sus interacciones. Esto permite que diferentes personas (desarrolladores, jefes de proyecto, clientes) entiendan el sistema desde diferentes niveles de detalle, facilitando la comunicación y el trabajo en equipo.
 
-![image.png](image%2047.png)
+![[Pasted image 20260804170622.png]]
 
 ---
 
-![image.png](image%2048.png)
+![[Pasted image 20260804170638.png]]
 
 - ROL del ARQUITECTO
     
@@ -62,15 +62,15 @@ tags:
     
     - ▪ Revisa y negocia los requerimientos
         
-        ![image.png](image%2049.png)
+        ![[Pasted image 20260804170655.png]]
         
     - ▪ Documentar la Arquitectura
         
-        ![image.png](image%2050.png)
+        ![[Pasted image 20260804170707.png]]
         
     - ▪ Comunica la arquitectura, asegurándose que los involucrados comprendan.
         
-        ![image.png](image%2051.png)
+        ![[Pasted image 20260804170718.png]]
         
     
     ▪ Direcciona requerimientos no funcionales a la arquitectura
@@ -85,7 +85,7 @@ tags:
 
 - contexto de la arquitectura (como que yo inserto en un proceso de desarrollo de software esto del diseño arquitectonico )
     
-    ![image.png](image%2052.png)
+    ![[Pasted image 20260804170730.png]]
     
     de la izquierda toma como decisciones del disño de arquitectura la arquitctura del hardware, porque los recursos no son ilimitados y son cosas que afectan a nuestra arquitectura
     
@@ -95,7 +95,7 @@ tags:
     
     una vez que el proceso de diseño arquitectonico genera esta versiond e la arquitectura de software entonces ya entramos a las estapas finales del proceso que serian el diseño detallado, codificacion,etc
     
-    ![image.png](image%2053.png)
+    ![[Pasted image 20260804170739.png]]
     
 
 ### PROCESO DE DISEÑO DE LA ARQUITECTURA DE SOFTWARE
@@ -114,11 +114,11 @@ tags:
     
     **El proceso de diseño inicial para identificar estos subsistemas y establecer un marco de trabajo para control y comunicación de los subsistemas se llama Diseño Arquitectónico**4
     
-    ![image.png](image%2054.png)
+    ![[Pasted image 20260804170759.png]]
     
-    ![image.png](image%2055.png)
+    ![[Pasted image 20260804170806.png]]
     
-    ![image.png](image%2056.png)
+    ![[Pasted image 20260804170823.png]]
     
 - descripcion del proceso de diseño arquitectonico
     
@@ -136,7 +136,7 @@ tags:
     Para guiar al arquitecto hacia la definición de la arquitectura de la aplicación es útil seguir un proceso definido.
     ● La siguiente figura muestra un proceso de arquitectura iterativo en tres pasos que puede ser usado para guiar las actividades durante el diseño
     
-    ![image.png](image%2057.png)
+    ![[Pasted image 20260804170840.png]]
     
     este proceso tienen 3 actividades
     
@@ -153,11 +153,11 @@ tags:
             Las principales fuentes de los requerimientos arquitectónicos son el documento de
             requerimientos funcionales y otros documentos que capturan varias necesidades de las partes interesadas. La salida de este paso es un documento que determina los requerimientos arquitectónicos para la aplicación.
             
-            ![image.png](image%2058.png)
+            ![[Pasted image 20260804170900.png]]
             
         - 1.2 Priorización de requerimientos arquitectónicos
             
-            ![image.png](image%2059.png)
+            ![[Pasted image 20260804170911.png]]
             
         - ELECCIÓN DEL MODELO ARQUITECTÓNICO Y LOS REQUERIMIENTOS NO FUNCIONALE (como afecta el tema de los rnf a la arquitectura)
             
@@ -187,7 +187,7 @@ tags:
             
             ### Conflictos Arquitectónicos
             
-            ![image.png](image%2060.png)
+            ![[Pasted image 20260804170930.png]]
             
             El texto concluye destacando que es imposible optimizar todos los atributos a la vez. El trabajo del arquitecto es gestionar estos conflictos:
             
@@ -197,7 +197,7 @@ tags:
         
     - 2da actividad diseño arquitectonico
         
-        ![image.png](image%2061.png)
+        ![[Pasted image 20260804170946.png]]
         
         Implica la definición de la estructura y las responsabilidades de los componentes que constituirán la arquitectura. 
         
@@ -207,7 +207,7 @@ tags:
         
         - actividad: eligir framework de arquitectura
             
-            ![image.png](image%2062.png)
+            ![[Pasted image 20260804171003.png]]
             
             La elección del framework de arquitectura se conforma con un conjunto de Patrones Arquitectonicos, esto es porque:
             
@@ -216,7 +216,7 @@ tags:
             - No hay una fórmula mágica para diseñar un framework de arquitectura. Un pre-requisito es conocer los patrones arquitectónicos para abordar ciertos atributos de calidad.
             - Un pre-requisito: conocer los estilos arquitectónicos principales para abordar ciertos atributos de calidad.
                 
-                ![image.png](image%2063.png)
+                ![[Pasted image 20260804171011.png]]
                 
         
         ---
@@ -242,13 +242,13 @@ tags:
             - ▪ Utilizar la descomposición para estructurar componentes jerárquicamente.
             - ▪ Minimizar las llamadas entre componentes
             
-            ![image.png](image%2064.png)
+            ![[Pasted image 20260804171026.png]]
             
             Una vez que se ha seleccionado el framework de arquitectura, basado en uno o más patrones arquitectónicos, la siguiente tarea es definir los componentes principales que comprenderá el diseño.
             
             El framework define la comunicación general para los componentes, debe identificarse lo siguiente:
             
-            ![image.png](image%2065.png)
+            ![[Pasted image 20260804171034.png]]
             
             - Identificar los principales componentes de la aplicación y cómo se insertan en el framework.
             - Identificar la interfaz o los servicios que soporta cada componente.
@@ -256,7 +256,7 @@ tags:
             - Identificación de dependencias entre componentes.
             - Identificar particiones en la arquitectura que son candidatas para la distribución a través de servidores en una red.
             
-            ![image.png](image%2066.png)
+            ![[Pasted image 20260804171045.png]]
             
         
         ---
@@ -275,7 +275,7 @@ tags:
         
     - 3era act validacion
         
-        ![image.png](image%2067.png)
+        ![[Pasted image 20260804171059.png]]
         
         ▪ Ayuda a incrementar la confianza del equipo de diseño en que la arquitectura cumpla con su propósito.
         ▪ Debe realizarse con las restricciones de tiempo y presupuesto del proyecto.
@@ -345,21 +345,21 @@ tags:
         ▪ Cuáles procesos se ejecutarán en qué procesadores y que tanta comunicación se requerirá entre ellos
         
     
-    ![image.png](image%2068.png)
+    ![[Pasted image 20260804171119.png]]
     
     - concepto de subsistema
         
-        ![image.png](image%2069.png)
+        ![[Pasted image 20260804171129.png]]
         
     
-    ![image.png](image%2070.png)
+    ![[Pasted image 20260804171136.png]]
     
 
 ## Producto
 
 - TIPOS DE SISTEMAS
     
-    ![image.png](image%2071.png)
+    ![[Pasted image 20260804171146.png]]
     
 - SISTEMAS DISTRIBUIDOS
     
@@ -371,7 +371,7 @@ tags:
     
     - Caracteristicas
         
-        ![image.png](image%2072.png)
+        ![[Pasted image 20260804171203.png]]
         
         1. Compartición de recursos: Permite usar hardware y software entre varias computadoras. Esto permite aprovechar recursos que no disponemos físicamente y sí están en otro lugar, lo cual aporta a la capacidad de procesamiento.
         2. Apertura: Basados en estándares para interoperabilidad.
@@ -387,7 +387,7 @@ tags:
         
     - ATAQUES DE LOS QUE DEBEN DEFENDERSE LOS SISTEMAS DISTRIBUIDOS
         
-        ![image.png](image%2073.png)
+        ![[Pasted image 20260804171253.png]]
         
         Amenazas
         
@@ -399,11 +399,11 @@ tags:
     - FALACIAS DE LOS SISTEMAS DISTRIBUIDOS
         1. La red está siempre disponible
             
-            ![image.png](image%2074.png)
+            ![[Pasted image 20260804171306.png]]
             
         2. Latencia cero: Siempre hay retrasos en la comunicación.
             
-            ![image.png](image%2075.png)
+            ![[Pasted image 20260804171314.png]]
             
         3. Ancho de banda infinito
         4. La red es segura: Las redes son vulnerables a ataques y requieren medidas de protección.
@@ -418,7 +418,7 @@ tags:
     externas que la complementen.
     La capacidad más notable que tiene es la INDEPENDENCIA
     
-    ![image.png](image%2076.png)
+    ![[Pasted image 20260804171326.png]]
     
     - En un servicio monolítico, la mayor parte del código del lado del servidor está en un programa que se comunica con una o más bases de datos
     - Dentro de un servidor monolítico, el código aún podría dividirse en componentes y separarse en módulos individuales.
@@ -427,13 +427,13 @@ tags:
         - B) Entre el servidor y las bases de datos (en cualquier lenguaje de consulta)
         - C) Entre el servidor y sus dependencias externas
         
-        ![image.png](image%2077.png)
+        ![[Pasted image 20260804171338.png]]
         
-        ![image.png](image%2078.png)
+        ![[Pasted image 20260804171349.png]]
         
         - pro y contras
             
-            ![image.png](image%2079.png)
+            ![[Pasted image 20260804171404.png]]
             
 ## Patrones y Estilos Arquitectonicos
 
@@ -441,11 +441,11 @@ sobre esto hace foco la 3era clase, recordar que es una actividad del proceso de
 
 ---
 
-![image.png](image%2080.png)
+![[Pasted image 20260804171412.png]]
 
 - patrones
     
-    ![image.png](image%2081.png)
+    ![[Pasted image 20260804171429.png]]
     
     Los patrones arquitectonicos son patrones de alto nivel que afectan a nivel de capas/nivel de susbistemas/ de grandes bloques y como se comunican esos bloques o como se organizan
     
@@ -463,15 +463,16 @@ sobre esto hace foco la 3era clase, recordar que es una actividad del proceso de
     - Los patrones están en una escala menor que los estilos. Múltiples patrones pueden aparecer en un mismo diseño.
     - En contraste, un sistema usualmente tiene un único estilo arquitectónico dominante
     
-    ![image.png](image%2082.png)
+    ![[Pasted image 20260804171447.png]]
     
 - patron arquitectonico
     
-    ![image.png](image%2083.png)
+    ![[Pasted image 20260804171457.png]]
     
 - estilo arquitectonico
     
-    ![image.png](image%2084.png)
+    ![[Pasted image 20260804171509.png]]
+    
     
 - platonicos vs Embebidos (teoria vs la realidad)
     - Platónicos: idealizados, se los ve en los libros y rara vez de igual forma en el código.

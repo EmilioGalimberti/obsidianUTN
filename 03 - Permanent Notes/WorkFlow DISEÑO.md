@@ -100,6 +100,8 @@ Por lo tanto el el modelo físico producto del diseño es para algo en particula
 ![[Pasted image 20260728181558.png|533]]
 ## Diseño arquitectónico (este es el principal)
 [[Diseño Arquitectónico]]
+Se debe empezar por este y luego los demás, ya que los otros aspectos son más  detallados y deben respetar la arquitectura establecida.
+
 ## Diseño de Datos
 Transformar los requerimientos en las estructura de datos necesarias para hacer persistente al software
 El diseño de datos crea modelo de datos o información en un nivel de abstracción elevado (punto de vista del usuario)

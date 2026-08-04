@@ -1,21 +1,29 @@
-## Diseño arquitectónico (este es el principal)
-Se debe empezar por este y luego los demás, ya que los otros aspectos son más 
-detallados y deben respetar la arquitectura establecida.
-La arquitectura es el modelo que da respuesta a los RNF esenciales para la arquitectura.
+---
+aliases:
+subject: DSI
+year: "3"
+exam: PARCIAL2
+unit: "3"
+type: TEO
+zk_type: permanent
+status: in-progress
+date: 2026-08-04
+source:
+  - "[[DSI-Parcial2-TEO-U03  diseño de arquitectura de software o diseño arquitectonico]]"
+tags:
+---
+---
+**Que es la arquitectura de software?**
+[[Arquitectura De Software]]
+
+# Diseño arquitectónico (este es el principal)
+Da repuesta a los requerimientos de calidad de software, con decisiones estratégicas.
+
+Define la relacion entre los elementos principales de la estructura de software, los estilos y patrones de arquitectura considerando los [[Requerimientos No Funcionales]] y restricciones
+*Cuales son los elementos principales?, y a que se refiere con que define la relacion?*
 
 
-diseño arquitectonico (este es el principal)
-        
-se debe empezar por este y luego sigen los otros, ya que los otros son mas detallados y deben respetar la arquitectura
-        
-![[Pasted image 20260727193106.png]]
-        
-        
-- que hace la arquitectura?
-            
-es el modelo que le da repuesta los rnf escenciales para la arquitectura
-            
-![[Pasted image 20260727193115.png]]
-
-
-"da respuesta a los RNF esenciales"
+---
+# References
+## Father
+## child

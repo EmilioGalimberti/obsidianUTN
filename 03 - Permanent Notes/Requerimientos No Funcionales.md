@@ -7,7 +7,7 @@ exam: PARCIAL2
 unit: 2,3
 type: TEO
 zk_type: permanent
-status: in progress
+status: done
 date: 2026-07-23
 tags:
 source:
