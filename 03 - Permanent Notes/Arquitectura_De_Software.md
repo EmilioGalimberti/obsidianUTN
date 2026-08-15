@@ -19,6 +19,10 @@ Es el conjunto de decisiones significativas que se toma para satisfacer los requ
 
 Es un conjunto de decisiones significativas porque es sobre donde se construirá todo el software, por ello las decisiones arquitectónicas son las mas importantes y difícil de cambiar una vez implementadas
 
+estas decisiones se van a ver reflejados en un conjunto de vistas, donde estas vistas nos permiten ver el software desde distintos angulos y las que nosotros construiremos son vistas arquitectonicas (seran vistas desde diferentes perspectivas considerando la arquitectura de software)
+
+Es decir se ven reflejados en un conjunto de [[Componentes]], en como se relacionan los componentes y las partes del sistemas
+
 ## Características fundamentales de la arquitectura:
 * Define la estructura: Como se organizan los componentes
 	* divide la aplicación en un conjunto de componentes (módulos, objetos, etc.) y asignarles responsabilidades claras

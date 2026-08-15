@@ -14,7 +14,7 @@ tags:
 ---
 ---
 **Que es la arquitectura de software?**
-[[Arquitectura De Software]]
+[[Arquitectura_De_Software]]
 
 # Diseño arquitectónico (este es el principal)
 Da repuesta a los requerimientos de calidad de software, con decisiones estratégicas.
