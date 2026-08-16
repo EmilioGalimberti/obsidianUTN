@@ -15,9 +15,45 @@ source:
 ---
 ---
 **Recordatorio de que eran los REQUERIMIENTOS:**
-* *Requerimiento funcional* se centran en el que → y no teníamos que tener en cuenta en el como (en cuanto tecnología)
-* *Requerimientos no funcionales* el como → nos referimos a la parte tecnológica de implementación
+* *Requerimiento funcional* se centran en el que hace el sistema→ y no teníamos que tener en cuenta en el como (en cuanto tecnología)
+* *Requerimientos no funcionales* el como debe comportarse bajo determinadas restricciones → nos referimos a la parte tecnológica de implementación
 
+Los RNF son los verdaderos **conductores o motores de la arquitectura** (_architectural drivers_). Las decisiones estructurales más difíciles de cambiar se toman específicamente para dar respuesta a los RNF críticos:
+- Un requerimiento crítico de **Desempeño** sugiere componentes de granularidad gruesa (para reducir la sobrecarga de la comunicación remota).
+- Un requerimiento crítico de **Seguridad** sugiere una arquitectura organizada en capas estrictas con altos niveles de validación interna.
+- Un requerimiento crítico de **Disponibilidad** sugiere el uso de infraestructura con redundancia física y bases de datos espejo (_shadow_).
+
+# TRADE-OFFS
+El arquitecto raramente se enfrenta a un escenario ideal. **Muchos RNF entran en conflicto directo entre sí**, lo que obliga a tomar decisiones de compromiso (_trade-offs_) para buscar soluciones mediadoras
+
++Desempeño: numero reducido de subsistemas, grano grueso (-disponibilidad, -mantenibilidad)
+
++Seguridad: estructura en capas, alto nivel de validación (-desempeño, -mantenibilidad)
+
++Protección: las operaciones de protección se localicen en un solo subsistema o pocos (-disponibilidad, -desempeño)
+
++Mantenibilidad: debo tener componentes de grano fino que puedan modificarse con facilidad (-desempeño, -disponibilidad)
+
++Disponibilidad: debe incluir componentes redundantes para poder actualizar los componentes sin detener el sistema (-desempeño, -mantenibilidad)
+
+---
+Trade-off
+
+- **Desempeño (Performance) vs. Mantenibilidad:** Si se utilizan **componentes de granularidad alta** (gruesa), el **rendimiento** del sistema puede **mejorar**, ya que se reduce la comunicación entre subsistemas. Sin embargo, esto a su vez **reduce la mantenibilidad**,  haciendo que el sistema sea más difícil de corregir o modificar.
+- **Disponibilidad vs. Seguridad:** La **introducción de datos redundantes** puede **mejorar la disponibilidad** del sistema, asegurando que la información esté accesible incluso si un componente falla. No obstante, esta redundancia puede hacer que la **seguridad sea más compleja**, ya que hay más puntos que proteger y asegurar.
+- **Seguridad vs. Desempeño (Performance):** La **localización de aspectos relacionados con la seguridad**, como la adición de más capas de validación o protección, generalmente implica **más comunicación** dentro del sistema. Esta comunicación adicional **degrada el desempeño** general, haciendo que el sistema sea más lento.
+
+Estos conflictos demuestran que es imposible optimizar todos los atributos de calidad simultáneamente, y el trabajo del arquitecto es gestionar estas compensaciones.
+
+
+
+
+# 4. Priorización en Ciclos Iterativos
+En el Proceso Unificado de Desarrollo (PUD), el arquitecto debe clasificar los RNF significativos para la arquitectura en tres prioridades:
+
+1. **Prioridad Alta:** RNF críticos que condicionan la arquitectura desde la primera iteración. Postergarlos causaría un costoso retrabajo técnico (ej. si el sistema debe operar en dispositivos móviles, la tecnología base debe soportarlo desde el día uno).
+2. **Prioridad Media:** Deben ser soportados eventualmente en el ciclo de desarrollo, pero no obligatoriamente en el primer lanzamiento ejecutable.
+3. **Prioridad Baja:** Peticiones deseables ("lista de deseos") que no guían activamente las decisiones de diseño arquitectónico.
 # Normas de calidad ISO/IEC 25000
 Es una familia de normas cuyo objetivo principal es guiar el desarrollo de los productos de software mediante
 * Especificación de requisitos de calidad
@@ -44,7 +80,7 @@ Desempeño relativo a la  cantidad de recursos utilizados bajo determinadas cond
 ## Compatibilidad
 el grado con el que sistema puede intercambiar información con otros sistemas ejecutando sus funciones requeridas mientras comparte el mismo hardware o entorno operativo.
 
-* Coexistencia: El sistema deberá ser capaz de compartir recursos con otros sistemas sin deteriorar el rendimiento 
+* Coexistencia: Capacidad de compartir recursos de hardware y software con otros programas en el mismo entorno
 	* *El sistema de gestión comercial deberá acceder a la misma BD que el sistema contable*
 * Interoperabilidad: La capacidad de dos o mas sistemas, intercambia y utilizar información entre ellos
 	* *El sistema tomara los datos de E/S del personal del sistema de registro de asistencias*
@@ -97,20 +133,22 @@ Capacidad del sistema de ser transferido de forma efectiva y eficiente de un ent
 
 ---
 
-# TRADE-OFFS
-> **Al tener más de un RNF crítico, comienzan los conflictos:**
-> 1. Si quiero tener buen **desempeño**, tengo componentes de granularidad alta que afectan la **mantenibilidad**
-> 2. Si introduzco **datos redundantes**, mejora la **disponibilidad**, pero hago más compleja la **seguridad**
-> 3. La localización de aspectos de **seguridad** relacionados significa más comunicación, es decir, peor **desempeño**
-
-WARNING
-
-Este punto de los **trade-offs/conflictos entre atributos de calidad** es conceptualmente muy importante para un parcial. Es el tipo de pregunta que suelen hacer para evaluar comprensión profunda (ej: _"¿Qué conflicto puede surgir entre desempeño y mantenibilidad?"_).
-
 # Ejemplo DE RNF
 ![[Pasted image 20260803180011.png]]
 ![[Pasted image 20260803180027.png]]
-# References
-## Father
-[[DSI-Parcial2-TEO-U02&U03- Req No Fun]]
-## child
+
+
+
+
+# Vinculación de los RNF con la Funcionalidad (Casos de Uso)
+Un error conceptual común es pensar que los RNF se resuelven de forma abstracta en "el aire". En el software real, **los RNF siempre se implementan y validan a través de la funcionalidad**. Por ello, el arquitecto construye la **[[Vista_Arquitectonica_de_la_funcionalidad]]**, seleccionando el conjunto más pequeño posible de casos de uso representativos que muestren cómo se resuelven los RNF críticos del negocio:
+
+- El RNF de **"Autenticación de usuarios"** se implementa y visualiza en el caso de uso _Iniciar sesión_.
+- El RNF de **"Seguimiento en línea mediante GPS"** se materializa en el caso de uso _Visualizar mapa de entregas_.
+- El RNF de **"Procesamiento masivo"** (ej. lotes de cobro offline) se implementa en el caso de uso _Procesar comprobantes de cobro offline_.
+
+# Preguntas de parcial
+https://app.notion.com/p/Resumen-por-preguntas-25a93f1051dc803aa8e8f246251e2f70
+2- Explique que son los requerimientos no funcionales, que dificultades encontramos asociadas a los requerimientos no funcionales a la hora de diseñar software y como impactan en el modelado de la arquitectura. (pregunta de meles xd)
+
+Conflictos entre RNF:Proporcione ejemplos de cómo diferentes RNF pueden entrar en conflicto (3).

@@ -2,6 +2,8 @@
 
 
 # Parcial 2
+![[DSI-P2-MapaMental.excalidraw]]
+
 ## Practico
 ```dataview
 TABLE type AS "Practico", status AS "Estado"
