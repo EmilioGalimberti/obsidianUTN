@@ -1,3 +1,20 @@
+---
+aliases:
+  - configuracionVlans
+subject: REDES
+year: "4"
+exam: PARCIAL2
+unit:
+type: PRACTICO
+zk_type: fleeting
+status: done
+date: 2026-08-17
+source:
+  - "[[P2-C02-Preguntas Diagnostico - Segmentación de redes - Trunking.pdf]]"
+  - "[[P2-C02-Segmentación de redes - Trunking.pdf]]"
+tags:
+---
+---
 ![[P2-C02-Segmentación de redes - Trunking.pdf]]
 
 # 🏢 Redes de Datos — Segmentación de Redes y Trunking (VLANs)
@@ -723,3 +740,9 @@ Al existir un **enlace troncal IEEE 802.1Q** entre los switches, ambos switches 
 | **PC asignada al puerto incorrecto del switch**                  | Conectar ADMIN1 en `eth1` (VLAN 20) manteniendo su IP `192.168.10.10`.      | La PC queda aislada; no responde a nadie de VLAN 10 ni de VLAN 20.       | Asignar el puerto correcto a la VLAN o cambiar la IP de la PC a la subred de esa VLAN.         |
 | **VLAN no permitida en el Trunk**                                | Olvidar agregar VLAN 20 en la lista de *Tagged VLANs* de `eth7`.            | `ADMIN1` llega a `ADMIN2`, pero `VENTAS1` no llega a `VENTAS`.           | Verificar que el puerto troncal tenga ambas VLANs (10 y 20) permitidas y etiquetadas.          |
 | **Olvidar guardar en RVL**                                       | Los simuladores virtuales pierden el estado volátil al reiniciar la sesión. | Al volver al laboratorio, las IPs y configuraciones de VLAN desaparecen. | Hacer clic en **Guardar Escenario / Laboratorio** antes de salir.                              |
+
+
+
+
+
+---
