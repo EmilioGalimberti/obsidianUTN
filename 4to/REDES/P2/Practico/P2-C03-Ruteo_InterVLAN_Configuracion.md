@@ -1,3 +1,20 @@
+---
+aliases:
+  - vlan
+subject: REDES
+year: "4"
+exam: PARCIAL2
+unit:
+type: PRACTICO
+zk_type: fleeting
+status: done
+date: 2026-08-17
+source:
+  - "[[P2-C03-Preguntas Diagnostico-Ruteo entre redes aplicando VLANs.pdf]]"
+  - "[[P2-C03--Ruteo entre redes aplicando VLANs.pdf]]"
+tags:
+---
+---
 ![[P2-C03--Ruteo entre redes aplicando VLANs.pdf]]
 
 # 🌐 Redes de Datos — Ruteo Entre Redes Aplicando VLANs (Router-on-a-Stick)
@@ -545,3 +562,9 @@ iface eth0.300 inet static
     netmask 255.255.255.0
     vlan-raw-device eth0
 ```
+
+
+
+
+
+---
