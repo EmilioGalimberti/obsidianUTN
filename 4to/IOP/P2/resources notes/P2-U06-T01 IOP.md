@@ -1733,3 +1733,217 @@ luego hasta luego
 
 
 ---
+
+# Transcripción
+
+> [!INFO] Ficha de la Clase
+> - **Materia:** Investigación Operativa (IOP)
+> - **Unidad:** Unidad 6 – Modelos de Redes / Teoría de Grafos
+> - **Clase:** T01 – Introducción a Redes y Conceptos Fundamentales
+> - **Modalidad:** Taller interactivo de aprendizaje colaborativo + Exposición teórica formal
+
+---
+
+```mermaid
+mindmap
+  root((Unidad 6: Modelos de Redes))
+    Conceptos Elementales
+      Definición formal R = (X, U)
+      Aplicación Gamma
+      Arcos Incidentes
+      Caminos, Longitud y Valor
+    Árboles de Expansión
+      Árbol de Expansión Mínima (MST)
+      Algoritmos Kruskal / Prim
+    Problemas de Ruta Más Corta
+      Algoritmo de Dijkstra
+      Camino de valor mínimo
+    Redes de Flujo
+      Flujo Máximo (Ford-Fulkerson)
+      Flujo de Costo Mínimo
+```
+
+---
+
+## 1. Apertura y Consultas Previas: Sensibilidad y Parciales (00:00 – 03:45)
+
+La clase inicia resolviendo consultas puntuales de los alumnos sobre el cierre del primer cuatrimestre (**Programación Lineal y Análisis de Sensibilidad**), seguido de pautas operativas para los exámenes parciales.
+
+### 📌 Dudas sobre Análisis de Sensibilidad
+- **Incremento/Disminución vs. Valor Final del Coeficiente:**
+  - Se aclara la confusión frecuente entre el *delta* permitido ($\Delta c_j$) y el *valor extremo/cota* del coeficiente ($c_j^{mín}, c_j^{máx}$).
+  - Una cosa es *disminuir hasta $-2$* (cota inferior del coeficiente) y otra *disminuir en $2$* (amplitud de variación permitida). El software de optimización suele reportar el monto admisible de incremento/disminución como un valor positivo.
+- **Cotas infinitas en variables básicas:**
+  - Se confirma que un intervalo de sensibilidad para el coeficiente de una variable básica **sí puede tener una cota que sea $+\infty$ o $-\infty$**.
+
+> [!WARNING] Protocolo de Exámenes Parciales
+> - **Cuenta institucional obligatoria:** Todos los estudiantes deben conectarse e ingresar a las instancias evaluativas con la cuenta institucional de la facultad (no como invitados).
+> - **Bandeja de entrada:** Verificar periódicamente espacio disponible y revisar carpeta de *Spam* para no perder notificaciones oficiales.
+> - **Alcance temático del parcial:** Cubre toda la primera parte de la materia (Programación Matemática y Programación Lineal).
+
+---
+
+## 2. Dinámica Pedagógica del 2° Cuatrimestre (03:45 – 10:04)
+
+El docente explica la metodología de trabajo para la segunda mitad del año:
+
+- **Enfoque de Aula Invertida / Resolución Práctica:** A diferencia del primer semestre (donde la programación lineal demandaba un desarrollo teórico muy pesado en clase), en esta etapa se trabajará con lecturas y videos previos en el aula virtual para enfocar las clases sincrónicas directamente en la **resolución de problemas aplicados**.
+- **Taller de Aprendizaje Colaborativo:** Se divide a los estudiantes en **17 salas/grupos de trabajo** con una hoja de cálculo compartida en Drive.
+- **Consigna:** Elaborar y contrastar las definiciones formales y conceptuales de la Teoría de Redes a partir de la bibliografía básica, con sus propias palabras, para consolidar el vocabulario técnico antes de abordar los algoritmos de optimización.
+
+```mermaid
+flowchart LR
+    A["Lectura previa / Videos en AV"] --> B["Taller Colaborativo (Google Sheets)"]
+    B --> C["Puesta en Común & Rigor Matemático"]
+    C --> D["Resolución de Problemas Prácticos"]
+```
+
+---
+
+## 3. Puesta en Común y Debate de Conceptos Básicos (42:24 – 1:00:45)
+
+Tras el trabajo en comisiones, se realiza una revisión grupal analizando los aciertos y errores conceptuales detectados en las hojas de cálculo:
+
+```mermiad
+subgraph Red["Estructura de una Red R = (X, U)"]
+	X1((x1))
+	X2((x2))
+	X3((x3))
+	X4((x4))
+	
+	X1 -->|u1 = (x1,x2)| X2
+	X1 -->|u2 = (x1,x3)| X3
+	X2 -->|u3 = (x2,x4)| X4
+	X3 -->|u4 = (x3,x4)| X4
+end
+```
+
+### Aclaraciones conceptuales clave:
+1. **Vértices / Nodos ($X$):** No basta con decir "los vértices son nodos". Formalmente, $X$ es un conjunto finito de elementos que representan entidades reales (ciudades, máquinas, intersecciones), modelados geométricamente como puntos en el plano.
+2. **Arcos / Conexiones ($U$):** Representan una **relación binaria** entre pares de elementos de $X$. Es un subconjunto del producto cartesiano $X \times X$.
+3. **Producto Cartesiano ($X \times X$):** Es el conjunto de todos los pares ordenados posibles $(x_i, x_j)$. Como es un *par ordenado*, el orden importa: $(x_i, x_j) \neq (x_j, x_i)$.
+4. **Red Orientada vs. No Orientada:**
+   - *Orientada (Dirigida):* Los arcos tienen sentido de dirección (flechas).
+   - *No Orientada:* Los arcos son aristas bidireccionales sin orientación prefijada.
+5. **Red Conexa:** Una red es conexa si existe al menos una conexión o camino (directo o indirecto) entre cualquier par de nodos.
+6. **Ciclo / Circuito vs. Bucle:**
+   - *Ciclo / Circuito:* Camino cerrado donde el vértice de inicio coincide con el vértice de fin tras transitar por varios arcos distintos.
+   - *Bucle (Lazo):* Arco que conecta un nodo consigo mismo $(x_i, x_i)$.
+7. **Formas de Representación:**
+   - *Gráfica:* Diagrama topológico de nodos y flechas/aristas.
+   - *Matricial:* Matriz de adyacencia/incidencia con valores binarios ($1$ si existe arco entre $x_i$ y $x_j$, $0$ si no).
+
+---
+
+## 4. Formalización Teórica y Exposición Magistral (1:00:45 – 1:10:15)
+
+El profesor proyecta las transparencias oficiales de la **Unidad 6** para formalizar matemáticamente los modelos de redes.
+
+### 4.1. Definiciones Formales de una Red
+
+Existen dos formas canónicas de definir rigurosamente una red:
+
+#### A) Definición por Par de Conjuntos: $R = (X, U)$
+$$R = (X, U)$$
+- $X = \{x_1, x_2, \dots, x_n\}$: Conjunto finito y no vacío de vértices o nodos ($|X| \ge 2$).
+- $U \subseteq X \times X$: Conjunto de pares ordenados $(x_i, x_j)$ denominados **arcos**, donde $x_i \in X$ (vértice inicial) y $x_j \in X$ (vértice final).
+
+#### B) Definición mediante Aplicación Multívoca: $R = (X, \Gamma)$
+$$R = (X, \Gamma)$$
+- $\Gamma(x_i)$: Subconjunto de vértices que son **vértices finales (sucesores)** de arcos que parten desde $x_i$:
+$$\Gamma(x_i) = \{ x_j \in X \mid (x_i, x_j) \in U \}$$
+- $\Gamma^{-1}(x_i)$: Subconjunto de vértices que son **vértices iniciales (predecesores)** de arcos que llegan a $x_i$:
+$$\Gamma^{-1}(x_i) = \{ x_k \in X \mid (x_k, x_i) \in U \}$$
+
+```mermaid
+flowchart LR
+    P1((xk)) -->|Arco incidente interior| X((xi))
+    P2((xk')) -->|Arco incidente interior| X
+    X -->|Arco incidente exterior| S1((xj))
+    X -->|Arco incidente exterior| S2((xj'))
+
+    classDef focal fill:#f96,stroke:#333,stroke-width:2px;
+    class X focal;
+```
+
+---
+
+### 4.2. Arcos Incidentes
+
+Para un nodo particular $x_i$:
+- **Arcos Incidentes hacia el Exterior ($U^+(x_i)$):** Conjunto de arcos que **salen** de $x_i$ (donde $x_i$ es origen).
+$$U^+(x_i) = \{ (x_i, x_j) \in U \}$$
+- **Arcos Incidentes hacia el Interior ($U^-(x_i)$):** Conjunto de arcos que **llegan** a $x_i$ (donde $x_i$ es destino).
+$$U^-(x_i) = \{ (x_j, x_i) \in U \}$$
+
+> [!NOTE] Ejemplo
+> Si de un nodo $x_1$ parten arcos hacia $x_2, x_3, x_4$ y no le llega ninguno:
+> - $U^+(x_1) = \{(x_1, x_2), (x_1, x_3), (x_1, x_4)\}$
+> - $U^-(x_1) = \emptyset$
+
+---
+
+### 4.3. Caminos: Por Arcos vs. Por Vértices
+
+Un **camino** es una secuencia encadenada donde el extremo final de un elemento coincide con el inicial del siguiente.
+
+| Tipo de Camino | Definición | Aplicación Típica |
+| :--- | :--- | :--- |
+| **Camino por los Arcos** | Secuencia ordenada de arcos contiguos $(u_1, u_2, \dots, u_k)$. | Rutas de transporte, redes de cañerías, costos de traslado, distancias entre ciudades. |
+| **Camino por los Vértices** | Secuencia ordenada de nodos consecutivos $(x_1, x_2, \dots, x_m)$. | Procesos productivos secuenciales, tiempos de operación en máquinas, etapas de procesamiento. |
+
+---
+
+### 4.4. Distinción Fundamental: Valor vs. Longitud de un Camino
+
+El docente hace especial énfasis en no confundir estos dos conceptos:
+
+```mermaid
+classDiagram
+    class Camino {
+        +Secuencia de Arcos / Vértices
+    }
+    class Valor {
+        +Suma de pesos de los elementos
+        +V = sum(v_i)
+        +Mide distancia, costo, tiempo
+    }
+    class Longitud {
+        +Conteo físico de elementos
+        +L_arcos = k
+        +L_vértices = n - 1
+    }
+    Camino --> Valor : Cuantificación ponderada
+    Camino --> Longitud : Cuantificación cardinal
+```
+
+$$
+\begin{array}{|l|c|c|}
+\hline
+\textbf{Concepto} & \textbf{Por los Arcos} & \textbf{Por los Vértices} \\
+\hline
+\textbf{Valor del Camino } (V) & V = \sum_{u \in C} \text{valor}(u) & V = \sum_{x \in C} \text{valor}(x) \\
+\hline
+\textbf{Longitud del Camino } (L) & L = \text{Cantidad total de arcos} & L = \text{Cantidad de vértices} - 1 \\
+\hline
+\end{array}
+$$
+
+> [!IMPORTANT] ¿Cuándo coinciden Valor y Longitud?
+> El **Valor** de un camino será igual a su **Longitud** **únicamente si todos los arcos (o vértices) tienen peso unitario ($v = 1$)**. En cualquier otro escenario son conceptos totalmente independientes.
+
+---
+
+## 5. Cierre, Material en Aula Virtual y Próxima Clase (1:10:15 – 1:13:14)
+
+### 📚 Material disponible en el Aula Virtual (Unidad 6)
+1. **Video introductorio:** Conceptos básicos de Teoría de Redes.
+2. **Video temático:** Árbol de Expansión y Árbol de Expansión Mínima (MST).
+3. **Guía de Estudio N° 1:** Ejercicios de conceptos básicos, árboles y camino de valor mínimo.
+
+### 🗓️ Próxima Sesión
+- **Temas centrales:**
+  1. **Árbol de Expansión y Árbol de Expansión Mínima (MST)**.
+  2. **Problema de la Ruta más Corta (Algoritmo de Dijkstra)**.
+- **Preparación previa requerida:** Ver los videos de la plataforma y leer el capítulo correspondiente del libro para trabajar directamente con problemas de aplicación práctica en clase.
+- **Consultas de Parcial:** Miércoles en la clase de trabajos prácticos.

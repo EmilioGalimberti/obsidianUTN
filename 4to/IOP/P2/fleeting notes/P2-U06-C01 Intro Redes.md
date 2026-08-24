@@ -11,6 +11,7 @@ status: in-progress
 date: 2026-08-18
 source:
   - https://www.youtube.com/watch?v=tUx67DUAVvU&list=PLYZrqm_pzRul0t_2QKU2kdHDwGkKblutk&index=23
+  - "[[P2-U06-T01 IOP]]"
 tags:
 ---
 ---
@@ -26,7 +27,60 @@ https://www.youtube.com/watch?v=kZxCetFmfP8&time_continue=1&source_ve_path=MjM4N
 Conceptos Básicos de Redes
 https://www.youtube.com/watch?v=Ao92GmfdTts
 
+```mermaid
+mindmap
+  root((Unidad 6: Modelos de Redes))
+    Conceptos Elementales
+      Definición formal R = (X, U)
+      Aplicación Gamma
+      Arcos Incidentes
+      Caminos, Longitud y Valor
+    Árboles de Expansión
+      Árbol de Expansión Mínima (MST)
+      Algoritmos Kruskal / Prim
+    Problemas de Ruta Más Corta
+      Algoritmo de Dijkstra
+      Camino de valor mínimo
+    Redes de Flujo
+      Flujo Máximo (Ford-Fulkerson)
+      Flujo de Costo Mínimo
+```
+
+**Que es una red?**
+un conjunto de nodos los cuales están unidos mediante un conjunto de trayectorias
+
+![[Pasted image 20260823191018.png|542]]
+
+# Modelos de redes
+
+## Modelo de transporte
+0consiste en tener un conjunto de fábricas que producen algún bien y un conjunto de clientes que demandan este tipo de unidades la idea fundamental consiste en que cada planta puede enviar artículos a cada uno de los clientes y el problema consiste en determinar cuántos artículos debe enviar cada fábrica a cada cliente para que el costo de transporte sea el más económico
+![[Pasted image 20260823191215.png|361]]
+### Generalización: modelo de transbordo
+contempla la posibilidad de que puedan existir centros de distribución hacia donde las plantas envían sus productos y estos centros de distribución realizan los envíos de los artículos las a sus clientes 
+![[Pasted image 20260823191341.png|417]]
+pueden existir diferentes variantes en el modelo por ejemplo que exista la posibilidad de que las plantas puedan enviar artículos directamente a algunos de sus clientes
+
+![[Pasted image 20260823191356.png|426]]
 
 
+## Problema de la ruta mas corta
+este problema consiste en seleccionar dos nodos digamos a y un nodo b y obtener la ruta más corta para unir ambos nodos
+![[Pasted image 20260823191531.png|387]]
+
+## Problema de Árbol de expansion minima
+consiste en tender una red de tamaño mínimo que logre unir a todos los nodos si lo piensas un momento te darás cuenta de que este problema tiene múltiples aplicaciones por ejemplo en la construcción es muy utilizada cuando se tienden las conexiones de energía eléctrica dentro de los edificios y se desea minimizar la cantidad de cable a utilizar o bien cuando se construyen gaseoductos desde los campos petroleros y el combustible puede tener diferentes destinos
+![[Pasted image 20260823191744.png|366]]
+
+## problema de la gente viajero de s&p
+el problema consiste en diseñar una ruta que visite todos los nodos de la red y pase únicamente una vez por cada nodo la idea es que el nodo inicial sea a su vez el nodo final este problema ha generado una infinidad de estudios y existen nueve diferentes formulaciones para el problema sin embargo aún no ha podido ser resuelto de forma eficiente el problema es tan retador e interesante en su resolución que existen páginas en la red libros y múltiples artículos dedicados a él yo te recomendaría visitar esta página y navegar en ella
+![[Pasted image 20260823192004.png|393]]
+
+## problema de flujo maximo
+cada trayectoria tiene una capacidad máxima de flujo y es importante determinar el máximo de unidades que pueden ser transportadas de un nodo a , a un nodo b
+
+
+## problema de la ruta critica (perth cpm)
+este tipo de problemas nos puede ser útil para la realización de diferentes proyectos básicamente sirve para identificar cuáles actividades necesitan terminar en tiempo para no sufrir atrasos en la entrega de los proyectos o bien también puede indicarnos qué actividades podemos comprimir para tratar de terminar el proyecto en el menor tiempo posible al menor costo
 
 ---
