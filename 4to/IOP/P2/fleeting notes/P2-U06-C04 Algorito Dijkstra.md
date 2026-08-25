@@ -7,9 +7,9 @@ unit: "6"
 type: PRACTICO
 zk_type: fleeting
 status: in-progress
-date: 2026-08-18
+date: 2026-08-24
 source:
-  - "[[P2-U06-T03 IOP]]"
+  - https://www.youtube.com/watch?v=cTF35_C66Bs&list=PLYZrqm_pzRul0t_2QKU2kdHDwGkKblutk&index=30
 tags:
 ---
 ---

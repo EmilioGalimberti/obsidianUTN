@@ -1887,10 +1887,12 @@ $$U^-(x_i) = \{ (x_j, x_i) \in U \}$$
 
 Un **camino** es una secuencia encadenada donde el extremo final de un elemento coincide con el inicial del siguiente.
 
-| Tipo de Camino | Definición | Aplicación Típica |
-| :--- | :--- | :--- |
-| **Camino por los Arcos** | Secuencia ordenada de arcos contiguos $(u_1, u_2, \dots, u_k)$. | Rutas de transporte, redes de cañerías, costos de traslado, distancias entre ciudades. |
+| Tipo de Camino              | Definición                                                         | Aplicación Típica                                                                             |
+| :-------------------------- | :----------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| **Camino por los Arcos**    | Secuencia ordenada de arcos contiguos $(u_1, u_2, \dots, u_k)$.    | Rutas de transporte, redes de cañerías, costos de traslado, distancias entre ciudades.        |
 | **Camino por los Vértices** | Secuencia ordenada de nodos consecutivos $(x_1, x_2, \dots, x_m)$. | Procesos productivos secuenciales, tiempos de operación en máquinas, etapas de procesamiento. |
+
+*No entiendo aca, pero los arcos no pasan por nodos xd*
 
 ---
 
