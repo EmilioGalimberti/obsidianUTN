@@ -54,6 +54,8 @@ mindmap
 
 
 ---
+
+# ICMP
 ## 1. 🚀 Protocolo ICMPv4: Fundamentos y Motivación
 
 ### 1.1. ¿Por qué es necesario ICMP?
@@ -310,16 +312,25 @@ cola, se liberen hilos en la memoria y recién ahí intentar acceder.
 	* • Checksum: [Correct]. El checksum dio correctamente.
 	* • Datos: 32 bytes
 	* • Si se suman los datos del protocolo ICMP y las cabeceras se llega a 72 bytes que es la longitud total.
+
+![[Pasted image 20260828203534.png]]
 * Protocolo IPv4 con el número 1 que indica encapsulamiento de paquete ICMP.
 * Los campos "tipo" en Ethernet y "protocol" en IPv4 permiten unir capas en una arquitectura en capas.
 * El comando PING utiliza paquetes echo request y echo reply encapsulados en ICMP.
-![[Pasted image 20260828203534.png]]
+
 ---
 
 ### 4.2. Comando `traceroute` (`tracert` en Windows)
 - **Objetivo:** Mapear y descubrir salto por salto todos los routers intermediarios que atraviesa un paquete hasta el destino.
+	- Tiene como objetivo determinar la ruta (los routers) que sigue un paquete hasta alcanzar el destino.
 
+**Funcionalidades Principales:**
+• Muestra las direcciones IP intermedias entre el equipo local y el destino.
+• Utiliza mensajes echo request y echo reply del protocolo ICMP.
+• Controla hasta 30 saltos entre origen y destino.
+• En Linux se denomina "traceroute".
 #### Funcionamiento Paso a Paso (Manipulación del TTL)
+![[Pasted image 20260829105432.png]]
 
 ```mermaid
 sequenceDiagram
@@ -356,10 +367,171 @@ sequenceDiagram
     end
 ```
 
+
+![[Pasted image 20260829110406.png]]
+
+
 > [!IMPORTANT] **Detalles Clave de `traceroute` / `tracert`:**
 > 1. **Múltiples Sondas:** En Windows se envían **3 paquetes por salto**, mostrando tres tiempos en milisegundos para evaluar variaciones de latencia (*jitter*).
+> 	1. Cada vez que se ejecuta el comando Traceroute, se envían tres paquetes "echo request" por seguridad, en caso de que se pierda alguno.
 > 2. **Asteriscos (`* * *`):** Indican que el router descartó el paquete pero tiene deshabilitada/bloqueada la respuesta ICMP por políticas de firewall.
 > 3. **Condición de Parada:** El bucle se detiene al recibir un **Echo Reply (Tipo 0)** del destino final o al alcanzar el límite máximo de saltos (típicamente 30).
 > 4. **Estabilidad de Rutas:** En redes convergentes, las tablas de enrutamiento son estables y los paquetes siguen el mismo camino, salvo que exista balanceo de carga o caída de enlaces.
+
+
+>[!note] Importante: 
+>como estamos sobre una red de conmutación de paquetes, puede que los paquetes primero vayan al R1y después al R2 o que después vayan por R1 y después a R4 (o sea no siguiendo el camino que habían hecho antes). De esta forma no me daría la ruta real. Para resolver esto, los routers tienen tablas de encaminamiento y eso es lo que me guía en el camino. Pero si le configuro al router un “balanceo de carga”, lo cual permite esta situación de que los paquetes vayan por caminos diferentes entonces NO PUEDO utilizar el comando traceroute, porque nunca me daría la ruta real por la que van los paquetes.
+
+#### en linux 
+##### 1. traceroute (El equivalente directo)
+
+Es la herramienta clásica.
+
+• Uso básico:
+traceroute google.com
+
+• Diferencia clave con Windows (tracert):
+• Windows tracert usa paquetes ICMP por defecto.
+• Linux traceroute usa paquetes UDP por defecto. Si quieres que se comporte exactamente igual que Windows (usando ICMP), puedes usar el parámetro -I:
+sudo traceroute -I google.com
+
+• También permite probar puertos TCP (muy útil si los firewalls bloquean ICMP/UDP):
+sudo traceroute -T -p 443 google.com
+
+
+──────
+##### 2. tracepath (Nativa en la mayoría de distros modernas)
+
+Viene incluida por defecto en el paquete iputils (presente en Debian, Ubuntu, Red Hat, Fedora, Arch, etc.) y no requiere permisos de superusuario (sudo).
+
+• Uso básico:
+tracepath google.com
+
+• Además de la ruta, detecta el MTU (Maximum Transmission Unit) en el camino.
+──────
+##### 3. mtr (My Traceroute - Recomendada)
+
+Combina ping y traceroute en una interfaz interactiva en tiempo real.
+
+• Uso básico:
+mtr google.com
+
+• Modo reporte rápido (sin interfaz interactiva):
+mtr -rw google.com
+
+──────
+##### Resumen rápido
+
+| Comando    | Características                                       | Viene preinstalado                                                     |
+| ---------- | ----------------------------------------------------- | ---------------------------------------------------------------------- |
+| tracepath  | Ligero, no requiere root, muestra MTU.                | Sí (en casi todas las distros).                                        |
+| traceroute | Idéntico a tracert, muy configurable (UDP/ICMP/TCP).  | A veces requiere sudo apt install traceroute / dnf install traceroute. |
+| mtr        | El más completo, diagnóstico continuo en tiempo real. | Suele requerir instalación (apt install mtr / dnf install mtr).        |
+
+
+---
+
+### wirshark del traceroute
+• En casos de "no response found," el servidor no responde, indicando que el paquete no llegó al destino con TTL = 1.
+•Capturas en Wireshark muestran respuestas de routers generando mensajes "tiempo de vida excedido."
+•Se realizan tres envíos para análisis de tiempos y compensación por pérdida de paquetes.
+![[Pasted image 20260829111847.png]]
+• La ruta puede cambiar entre paquetes, especialmente si se produce un cambio en la red.
+•Balanceo de carga en routers puede afectar la precisión del comando traceroute al permitir que los paquetes sigan caminos diferentes.
+
+como se veria cuando llega al servidor?
+el renglon en negro en vez de decir ttl diria echo reply
+
+
+### traceroute vs ping
+El comando PING verifica la conectividad de capa 3 y evalúa el estado de la red, mientras que el comando Tracert rastrea la ruta de un paquete a través de la red y muestra las direcciones IP intermedias. ICMP es fundamental para diagnosticar problemas en la red y garantizar la entrega confiable de paquetes en entornos IPv4. Funciona enviando paquetes "echo Request" con incrementos graduales en el valor del campo TTL (Time To Live) en la cabecera de IPv4.
+
+
+# ARP
+## 5. 🌐 Protocolo ARP: Resolución de Direcciones
+
+### 5.1. La Brecha entre Capa 3 y Capa 2
+- **Dirección IP (Capa 3):** Jerárquica y enrutable globalmente. Identifica la interfaz lógica del nodo.
+- **Dirección MAC (Capa 2):** Plana y física (48 bits en hexadecimal). Solo tiene significado y alcance **dentro del enlace local (LAN)**.
+- **Función de ARP (Address Resolution Protocol - RFC 826):** Dado el conocimiento de una IP destino dentro de la misma subred, **averiguar dinámicamente su dirección física MAC** para construir la trama Ethernet.
+
+```mermaid
+block-beta
+columns 3
+  block:L2:1
+    columns 1
+    TramaEthernet["Trama Ethernet (Capa 2)"]:1
+    MACs["MAC Origen | <b>MAC Destino (?)</b>"]:1
+  end
+  ARPArrow["<b>ARP</b><br/><i>Resuelve IP a MAC</i>"]:1
+  block:L3:1
+    columns 1
+    PaqueteIP["Paquete IPv4 (Capa 3)"]:1
+    IPs["IP Origen | IP Destino (Conocida)"]:1
+  end
+```
+
+para comunicarnos a un servidor por ejemplo fuera de nuestra red es imposible conocer la mac destino 
+
+
+---
+
+### 5.2. Escenario 1: Comunicación en la Misma LAN (Local)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant PCA as PC A (192.168.1.16)
+    participant Switch as Switch LAN
+    participant PCB as PC B (192.168.1.4)
+    participant PCC as PC C (192.168.1.8)
+
+    Note over PCA: Consulta Caché ARP -> No encontrada
+    PCA->>Switch: Trama Ethernet (EtherType 0x0806 ARP)<br/>MAC Destino: FF:FF:FF:FF:FF:FF (Broadcast)
+    Switch->>PCB: Inunda Broadcast
+    Switch->>PCC: Inunda Broadcast
+    Note over PCC: Compara IP objetivo -> No coincide -> Descarta
+    Note over PCB: Compara IP objetivo -> Coincide -> Procesa
+    PCB->>Switch: ARP Reply (Unicast hacia MAC de PC A)<br/>"Mi MAC es BB:BB:BB:BB:BB:BB"
+    Switch->>PCA: Entrega Unicast
+    Note over PCA: Actualiza Tabla ARP y envía datos
+```
+
+---
+
+### 5.3. Escenario 2: Comunicación hacia Redes Remotas (A través de Router)
+
+> [!WARNING] **Principio Fundamental de Capa 2:**
+> Las tramas de difusión (*Broadcast*) **NUNCA atraviesan un router** (los routers delimitan dominios de difusión). Por lo tanto, un host **jamás puede hacer un ARP Request por la MAC de un servidor en Internet**.
+
+Cuando la IP destino pertenece a otra subred (verificado con la máscara de red):
+1. El emisor envía un **ARP Request solicitando la MAC de su Puerta de Enlace Predeterminada (*Default Gateway*)**.
+2. Encapsula el paquete IP (con IPs de extremo a extremo) en una trama cuya **MAC destino es la del Router local**.
+3. El Router desencapsula la trama, enruta el paquete y crea una **nueva trama** con sus propias MACs para el siguiente salto.
+
+```mermaid
+flowchart LR
+    subgraph LAN_Origen ["LAN Origen (192.168.1.0/24)"]
+        PCA["PC A<br/>IP: 192.168.1.16<br/>MAC: AA:AA:AA"]
+    end
+    
+    subgraph Router_GW ["Router Gateway"]
+        G0["Int G0/0<br/>IP: 192.168.1.1<br/>MAC: R1:R1:R1"]
+        G1["Int G0/1<br/>IP: 192.168.2.1<br/>MAC: R2:R2:R2"]
+        G0 --- G1
+    end
+    
+    subgraph LAN_Destino ["LAN Destino (192.168.2.0/24)"]
+        PCB["PC B<br/>IP: 192.168.2.9<br/>MAC: BB:BB:BB"]
+    end
+
+    PCA -->|Trama 1:<br/>IP: 192.168.1.16 -> 192.168.2.9<br/><b>MAC: AA:AA:AA -> R1:R1:R1</b>| G0
+    G1 -->|Trama 2:<br/>IP: 192.168.1.16 -> 192.168.2.9<br/><b>MAC: R2:R2:R2 -> BB:BB:BB</b>| PCB
+```
+
+> [!IMPORTANT] **Invarianza IP vs Mutabilidad MAC:**
+> - **Las direcciones IP (Origen y Destino)** permanecen **invariables** de extremo a extremo a lo largo de todo el viaje.
+> - **Las direcciones MAC (Origen y Destino)** son **mutables** y se reescriben en cada salto (*hop-by-hop*) al atravesar routers.
+> - *(Excepción en enlaces seriales PPP: no utilizan direcciones MAC al ser enlaces estrictamente punto a punto - analogía de la manguera).*
 
 ---
