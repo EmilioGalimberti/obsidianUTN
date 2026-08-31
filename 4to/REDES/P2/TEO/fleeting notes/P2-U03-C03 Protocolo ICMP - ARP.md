@@ -453,7 +453,22 @@ El comando PING verifica la conectividad de capa 3 y evalúa el estado de la red
 ### 5.1. La Brecha entre Capa 3 y Capa 2
 - **Dirección IP (Capa 3):** Jerárquica y enrutable globalmente. Identifica la interfaz lógica del nodo.
 - **Dirección MAC (Capa 2):** Plana y física (48 bits en hexadecimal). Solo tiene significado y alcance **dentro del enlace local (LAN)**.
+
+Recordatorio:
+para comunicarnos a un servidor por ejemplo fuera de nuestra red es imposible conocer la mac destino 
+
+entonces la mac que pondra como destion es el gateway
+	por eso es importante que a una maquina se le configure la mascara, la ip y la puerta de enlace, ademas de servidor dns
+
+
 - **Función de ARP (Address Resolution Protocol - RFC 826):** Dado el conocimiento de una IP destino dentro de la misma subred, **averiguar dinámicamente su dirección física MAC** para construir la trama Ethernet.
+	- Tiene como objetivo principal obtener la dirección MAC correspondiente a una dirección IP dentro de la misma red local (LAN)
+
+Sus funciones clave incluyen:
+	1. Resolución de Dirección IP a Dirección MAC: ARP permite que un dispositivo obtenga la dirección MAC asociada a una dirección IP específica en la misma red local. 
+	2. Mantenimiento de una Tabla ARP: Cada dispositivo, como PCs, routers y servidores, mantiene una tabla ARP. Esta tabla almacena las asociaciones de direcciones IP a direcciones MAC que se han resuelto previamente. Cuando un dispositivo necesita comunicarse con otro en la misma LAN, consulta esta tabla antes de realizar una solicitud ARP para evitar realizar la resolución nuevamente.
+
+
 
 ```mermaid
 block-beta
@@ -471,12 +486,38 @@ columns 3
   end
 ```
 
-para comunicarnos a un servidor por ejemplo fuera de nuestra red es imposible conocer la mac destino 
+![[Pasted image 20260829200502.png]]
 
+primero la pc-a la va buscar en la tabla, si no lo tiene en la tabla a la mac de b, tratara de averiguarla y aca es donde empieza el protocolo ARP
 
 ---
 
-### 5.2. Escenario 1: Comunicación en la Misma LAN (Local)
+### Funcionamiento del protocolo ARP
+El proceso de ARP se inicia cuando un dispositivo necesita determinar la dirección MAC de otro dispositivo en la misma red local para enviar datos. Si no encuentra la información en su tabla ARP, se activa el protocolo ARP, que consta de dos tipos de mensajes:
+
+**✓ ARP Request:**
+1. Se encapsula en una trama Ethernet y se lanza al cable como broadcast.
+2. Todas las computadoras en la LAN reciben y procesan la trama.
+3. Las máquinas desencapsulan la trama y verifican si la IP de destino coincide.
+4. Solo responde el dueño de la IP solicitada, enviando un ARP Reply.
+5. No es eficiente debido al broadcast, ya que todas las máquinas deben procesar el mensaje.
+6. Type: ARP, ya que se encapsula un protocolo ARP.
+7. La información de la IP origen, destino y la MAC a averiguar se coloca en el ARP Request.
+8. FUNCIONA EN LA CAPA DE EN ENLACE
+	1. se contruye un ARP REQUEST y se encapusla en una trama Ethernet
+![[Pasted image 20260829201252.png]]
+**✓ARP Reply:**
+1. Responde al ARP Request, no es broadcast, es unicast.
+2. Se encapsula en una trama Ethernet de manera similar al ARP Request.
+3. La máquina destino construye la respuesta con su propia dirección MAC como origen.
+4. La dirección MAC del solicitante se utiliza como destino en la trama.
+5. Se invierten las direcciones IP en la respuesta.
+6. Type: ARP en la cabecera de Ethernet.
+7. Las respuestas se almacenan en la tabla ARP para evitar broadcast en futuras solicitudes.
+![[Pasted image 20260829201344.png]]
+Con las respuestas de ARP, la tabla ARP se actualiza con las asociaciones de direcciones IP a direcciones MAC para futuras referencias, evitando la necesidad de realizar solicitudes ARP repetidas.
+
+#### 5.2. Escenario 1: Comunicación en la Misma LAN (Local)
 
 ```mermaid
 sequenceDiagram
@@ -498,17 +539,29 @@ sequenceDiagram
 ```
 
 ---
+![[Pasted image 20260829200742.png]]
+![[Pasted image 20260829200955.png]]
+![[Pasted image 20260829201011.png]]
+![[Pasted image 20260829201028.png]]
 
-### 5.3. Escenario 2: Comunicación hacia Redes Remotas (A través de Router)
+#### 5.3. Escenario 2: Comunicación hacia Redes Remotas (A través de Router)
+![[Pasted image 20260829202751.png]]
+![[Pasted image 20260829202816.png]]
 
 > [!WARNING] **Principio Fundamental de Capa 2:**
 > Las tramas de difusión (*Broadcast*) **NUNCA atraviesan un router** (los routers delimitan dominios de difusión). Por lo tanto, un host **jamás puede hacer un ARP Request por la MAC de un servidor en Internet**.
 
+![[Pasted image 20260829202832.png]]
 Cuando la IP destino pertenece a otra subred (verificado con la máscara de red):
-1. El emisor envía un **ARP Request solicitando la MAC de su Puerta de Enlace Predeterminada (*Default Gateway*)**.
+1. El emisor consulta la tabla arp, si tiene la mac del router dirirectamente la encapsula y si no la tiene envía un **ARP Request solicitando la MAC de su Puerta de Enlace Predeterminada (*Default Gateway*)**.
 2. Encapsula el paquete IP (con IPs de extremo a extremo) en una trama cuya **MAC destino es la del Router local**.
-3. El Router desencapsula la trama, enruta el paquete y crea una **nueva trama** con sus propias MACs para el siguiente salto.
+	![[Pasted image 20260829203028.png]]
+3. El Router desencapsula la trama,  consulta su tabla de encaminamiento para determinar la interfaz adecuada y luego encapsula el paquete en una nueva trama, utilizando la MAC del router como origen y la MAC de la máquina(o de otro router) de destino como destino.
+	1. ![[Pasted image 20260829203202.png]]
+	2. Antes de encapsular el paquete, el router consulta su Tabla ARP para obtener la MAC de la máquina de destino. Si la MAC está en la tabla, se utiliza; de lo contrario, se realiza un ARP request para obtener la MAC antes de encapsular.
+	3. Los router manejan tantas tablas arp como interfaces que tengan
 
+ejemplo si tendria otro router entre medio
 ```mermaid
 flowchart LR
     subgraph LAN_Origen ["LAN Origen (192.168.1.0/24)"]
@@ -532,6 +585,56 @@ flowchart LR
 > [!IMPORTANT] **Invarianza IP vs Mutabilidad MAC:**
 > - **Las direcciones IP (Origen y Destino)** permanecen **invariables** de extremo a extremo a lo largo de todo el viaje.
 > - **Las direcciones MAC (Origen y Destino)** son **mutables** y se reescriben en cada salto (*hop-by-hop*) al atravesar routers.
+> 	-  por lo tanto el protocolo ARP funciona en la capa de enlace. No llega a la capa de interred. Es decir, se encapsula en una trama ethernet. TABLAS ARP
 > - *(Excepción en enlaces seriales PPP: no utilizan direcciones MAC al ser enlaces estrictamente punto a punto - analogía de la manguera).*
 
 ---
+## 6. 🗄️ La Tabla / Caché ARP
+
+Para evitar inundar la red con constantes difusiones de broadcast, todo dispositivo (hosts, servidores, interfaces de routers) mantiene una **Tabla / Caché ARP** en memoria RAM.
+
+Las Tablas ARP son registros de información que las máquinas utilizan para asociar direcciones IP con direcciones MAC en una red.
+1. Almacenamiento de Asociaciones IP-MAC: Las máquinas mantienen Tablas ARP para evitar realizar solicitudes ARP repetidas cada vez que necesitan la dirección MAC de una dirección IP específica.
+2. Tablas ARP en Dispositivos: Cada dispositivo, como PCs, servidores o interfaces de routers, mantiene su propia tabla ARP, conocida como "caché ARP".
+3. Crecimiento de la Tabla ARP: Con el tiempo, a medida que un dispositivo se comunica con más máquinas en la red, su tabla ARP se llena con más entradas.
+### 6.1. Tipos de Entradas
+1. **Dinámicas:** Aprendidas automáticamente mediante respuestas *ARP Reply*. Poseen un tiempo de vida finito (*aging timer / timeout*, típicamente de 2 a 20 minutos) y se eliminan automáticamente para mantener la consistencia si un equipo cambia de placa o IP.
+2. **Estáticas:** Ingresadas manualmente por el administrador. Son permanentes (no caducan) y persisten hasta el reinicio.
+3. **Predefinidas del Sistema:** Asignaciones automáticas para broadcast (`x.x.x.255` $\rightarrow$ `FF:FF:FF:FF:FF:FF`) y grupos multicast (`224.0.0.0/4` $\rightarrow$ prefijo `01:00:5E:...`).
+
+### 6.2. Comandos de Administración ARP (CLI)
+6. Opciones del Comando ARP: El comando ARP en sistemas operativos permite realizar varias operaciones en la tabla ARP, incluyendo:
+	1.  -s (Static): Permite definir una entrada estática en la tabla ARP. Estas entradas no se eliminan automáticamente y se deben configurar manualmente. Ejemplo: `arp -s ip mac`.
+	2.  -d (Delete): Elimina entradas de la tabla ARP. Puede eliminar entradas específicas o todas las entradas. Ejemplo: `arp -d *`. 
+	3.  -a (Display): Muestra la tabla ARP actual con todas sus entradas. Ejemplo: `arp -a`.
+
+```cmd
+:: 1. Ver la tabla / caché ARP completa:
+arp -a
+
+:: 2. Agregar una entrada estática permanente:
+arp -s 192.168.1.254 00-14-22-01-23-45
+
+:: 3. Eliminar una entrada específica:
+arp -d 192.168.1.254
+
+:: 4. Vaciar / limpiar toda la caché ARP:
+arp -d *
+```
+![[Pasted image 20260829204213.png]]
+---
+
+
+## 8. 📝 Síntesis para el Parcial y Puntos Clave de Evaluación
+
+> [!IMPORTANT] **Checklist de Conceptos Clave Evaluados en Exámenes:**
+> 1. **Rol de ICMP:** Protocolo auxiliar de Capa 3 para notificación de errores y diagnóstico; no hace a IP confiable ni retransmite datos perdidos.
+> 2. **Encapsulamiento de ICMP:** Va directamente sobre IPv4 (`Protocol = 1`).
+> 3. **Mensajes de Error ICMP:** Incluyen la cabecera IP original + 8 bytes de datos para identificar el datagrama fallido.
+> 4. **Diferenciación de Códigos Tipo 3:** Código 0 (Red), Código 1 (Host), Código 3 (Puerto), Código 4 (MTU/DF=1).
+> 5. **Mecánica de Traceroute:** Envía sondas con TTL incremental ($1, 2, 3...$) y descubre routers mediante mensajes ICMP *Time Exceeded* (Tipo 11). Finaliza al recibir *Echo Reply* (Tipo 0).
+> 6. **Broadcast ARP:** ARP Request es de **difusión (`FF:FF:FF:FF:FF:FF`)**, mientras que ARP Reply es **Unicast**.
+> 7. **Límite de Enrutamiento de ARP:** ARP solo resuelve en el enlace local. Para destinos fuera de la subred, el host resuelve la **MAC del Default Gateway**.
+> 8. **Comportamiento en Tránsito:** Las direcciones IP no cambian entre extremos; las direcciones MAC cambian en cada salto de router.
+> 9. **Comandos Clave:** `arp -a` (ver tabla), `arp -s` (estática), `arp -d *` (borrar), `ping` (eco ICMP) y `tracert` / `traceroute` (ruta ICMP).
+
